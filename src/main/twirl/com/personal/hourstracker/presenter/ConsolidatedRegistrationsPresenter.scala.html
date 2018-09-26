@@ -1,0 +1,93 @@
+@(registrations: Seq[com.personal.hourstracker.domain.ConsolidatedRegistration], total: String, month: String)
+@import com.personal.hourstracker.service.presenter.PresenterHelper._
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+        <div id="page" style="margin-left: 100px; margin-right: 100px">
+            <div id="header">
+                <table width="100%">
+                    <tr>
+                        <td colspan="3" align="center">TIMESHEET</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td width="10%">&nbsp</td>
+                        <td width="40%">Naam consultant</td>
+                        <td>Maand</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp</td>
+                        <td>Hans Drost</td>
+                        <td>@month</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">&nbsp;</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div id="contents">
+                <table width="100%">
+                    <thead>
+                        <tr>
+                            <td width="10%" style="border-top: 2px solid navy; border-bottom: 2px solid navy">Dag</td>
+                            <td width="40%" style="border-top: 2px solid navy; border-bottom: 2px solid navy">Bedrijf</td>
+                            <td width="10%" style="border-top: 2px solid navy; border-bottom: 2px solid navy">Uren</td>
+                            <td width="40%" style="border-top: 2px solid navy; border-bottom: 2px solid navy">Omschrijving</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @registrations.map { registration =>
+                            <tr>
+                                <td width="10%">@registration.date</td>
+                                <td width="40%">@registration.job</td>
+                                <td width="10%">@registration.duration.map(d=>toHumanReadableHours(d)).getOrElse(0)</td>
+                                <td width="40%">@registration.comment.getOrElse("")</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4">&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td width="10%">&nbsp</td>
+                            <td width="40%">Totaal aantal uren deze maand</td>
+                            <td width="10%">@total</td>
+                            <td width="40%">&nbsp</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div id="footer">
+                <table border="0" width="100%">
+                    <tr>
+                        <td colspan="3" style="border-top: 2px solid navy;">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td width="10%">&nbsp</td>
+                        <td width="40%">Mailen naar: <b>backoffice @@ the-future-group.com</b></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td width="10%">&nbsp</td>
+                        <td width="40%">Handtekening consultant</td>
+                        <td width="40%">Handtekening opdrachtgever</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </body>
+</html>
