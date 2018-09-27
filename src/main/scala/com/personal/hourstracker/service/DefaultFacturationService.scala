@@ -15,8 +15,10 @@ trait DefaultFacturationService extends FacturationService {
   class DefaultFacturationService extends FacturationService {
 
     private lazy val format: NumberFormat = NumberFormat.getInstance(new Locale("nl", "NL"))
+
     override val splitForFacturation: Registration => Registrations =
       registration => splitOnTags(registration)
+
     private val tagPattern = raw"^([^-]+)-([0-9]{1,2})%$$|(.*)".r
 
     def splitForFacturation(registrations: Registrations): Registrations = {
@@ -26,9 +28,9 @@ trait DefaultFacturationService extends FacturationService {
 
     def constructJobWithTag(job: String, tag: String): String = {
       splitTag(tag) match {
-        case None => job
-        case Some((t, None)) => s"${job} - [$t]"
-        case Some((t, Some(p))) => s"${job} - [$t] ($p)"
+        case Some((Some(t), _)) =>
+          s"${job} - $t"
+        case _ => job
       }
     }
 
@@ -55,7 +57,7 @@ trait DefaultFacturationService extends FacturationService {
         case x: Set[String] =>
           x.map { tag =>
             registration.copy(
-              job = s"${registration.job} - $tag",
+              job = constructJobWithTag(registration.job, tag),
               tags = Some(Set(tag)),
               totalTimeAdjustment = calculateTotalTimeAdjustmentUsing(tag, registration.duration)
             )

@@ -30,27 +30,11 @@ object Application extends App
   println(consolidatedRegistrations.toJson.prettyPrint)
 
   consolidatedRegistrations.foreach(_ match {
-    case (job, registrations) =>
-      presenter.renderRegistrationsTo(registrations, s"CSVExport-$job.html")
-  })
+    case (job, registrations) => {
 
-  //  htmlPresenter.renderRegistrationsTo(consolidatedRegistrations, "CSVExport.html")
-  //
-  //  val myhtml = html.index("Finch rocks!").toString()
-  //
-  //  withWriter("CSVExport.html") { writer =>
-  //    writer.write(myhtml)
-  //    writer.flush()
-  //  }
-  //
-  //  def withWriter(fileName: String)(fn: Writer => Unit) {
-  //    val writer: Writer = new PrintWriter(new File(fileName))
-  //    try {
-  //      fn(writer)
-  //    } catch {
-  //      case e: Exception =>
-  //    } finally {
-  //      writer.close()
-  //    }
-  //  }
+      htmlPresenter.renderRegistrationsTo(registrations, s"CSVExport-$job.html")
+
+      pdfPresenter.renderRegistrationsTo(registrations, s"CSVExport-$job.pdf")
+    }
+  })
 }
