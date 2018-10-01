@@ -11,6 +11,7 @@
                 .page {
                     font-family: "Titillium Web", sans-serif;
                     font-size: 12px;
+                    height: 100%;
                 }
 
                 .page>.header {
@@ -18,7 +19,7 @@
                 }
 
                 .page>.contents {
-                    padding-bottom: 150px;
+                    padding-bottom: 100px;
                 }
 
                 th {
@@ -34,16 +35,29 @@
                     text-align: center;
                 }
 
-                .page>.footer {
+                .signature {
+                    font-family: "Titillium Web", sans-serif;
+                    font-weight: bold;
+                    vertical-align: center;
+                    padding-top: 25px;
+                    padding-bottom: 25px;
+                    font-size: 14px;
+                    height: 250px;
+                }
+
+                .footer {
                     font-family: "Titillium Web", sans-serif;
                     font-weight: bold;
                     text-align: center;
                     vertical-align: center;
-                    padding-top: 25px;
-                    padding-bottom: 25px;
                     background-color: black;
                     color: white;
-                    font-size: 24px;
+                    font-size: 18px;
+
+                    position:fixed;
+                    bottom: 0;
+                    width: 100%;
+                    height: 30px;
                 }
 
                 .date {
@@ -110,7 +124,7 @@
                             <tr>
                                 <td width="15%" class="date">@toHumanReadable(registration.date)</td>
                                 <td width="40%" class="job">@registration.job</td>
-                                <td width="10%" class="duration">@registration.duration.map(d => toHumanReadableHours(d)).getOrElse(0)</td>
+                                <td width="10%" class="duration">@registration.duration.map(d => toHumanReadableHours(d)).getOrElse("")</td>
                                 <td width="35%" class="comment">@registration.comment.getOrElse("")</td>
                             </tr>
                         }
@@ -127,32 +141,31 @@
                         </tfoot>
                     </table>
                 </div>
-
-                <div id="footer" class="footer">
-                    <table border="0" width="100%">
-                        <tr>
-                            <td colspan="3" style="border-top: 2px solid navy;">&nbsp;</td>
-                        </tr>
-                        <tr>
-                            <td width="15%">&nbsp</td>
-                            <td width="40%">Mailen naar: <b>backoffice @@ the-future-group.com</b></td>
-                        </tr>
-                        <tr>
-                            <td colspan="3">&nbsp;</td>
-                        </tr>
-                        <tr>
-                            <td width="15%">&nbsp</td>
-                            <td width="40%">Handtekening consultant</td>
-                            <td width="40%">Handtekening opdrachtgever</td>
-                        </tr>
-                    </table>
-                </div>
             </div>
 
-
-            <div class="footer">
-                dé maat in ondernemen - www.the-future-group-com
+            <div class="signature">
+                <table border="0" width="100%">
+                    <tr>
+                        <td colspan="3" style="border-top: 2px solid silver;">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td width="15%">&nbsp</td>
+                        <td width="40%">Mailen naar: <b>backoffice @@ the-future-group.com</b></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td width="15%">&nbsp</td>
+                        <td width="40%">Handtekening consultant</td>
+                        <td width="40%">Handtekening opdrachtgever</td>
+                    </tr>
+                </table>
             </div>
+        </div>
+
+        <div class="footer">
+            dé maat in ondernemen - www.the-future-group-com
         </div>
     </body>
 </html>

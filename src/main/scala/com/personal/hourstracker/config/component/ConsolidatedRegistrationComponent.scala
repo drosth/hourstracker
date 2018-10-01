@@ -14,6 +14,8 @@ trait ConsolidatedRegistrationService {
 
 
   trait ConsolidatedRegistrationService {
+    def addUnregisteredEntriesTo(consolidatedRegistrations: Map[String, ConsolidatedRegistrations]): Map[String, ConsolidatedRegistrations]
+
     def consolidateRegistrations(registrations: Registrations): ConsolidatedRegistrations
   }
 

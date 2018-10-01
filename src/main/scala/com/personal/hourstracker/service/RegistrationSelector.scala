@@ -1,6 +1,6 @@
 package com.personal.hourstracker.service
 
-import java.time.LocalDateTime
+import java.time.{LocalDate, LocalDateTime}
 import java.time.temporal.WeekFields
 
 import com.personal.hourstracker.domain.Registration
@@ -11,6 +11,18 @@ object RegistrationSelector {
   val registrationsForCurrentYear: Registration => Boolean = registration =>
     registration.clockedIn.isDefined &&
         registration.clockedIn.get.isAfter(startOfYear)
+
+  def registrationsBetween(start: LocalDate, finish: LocalDate): Registration => Boolean = { registration =>
+    registration.clockedIn.isDefined match {
+      case false => false
+      case true =>
+        val clockedIn = registration.clockedIn.get.toLocalDate
+        registration.clockedIn.isDefined &&
+            clockedIn.isAfter(start) &&
+            clockedIn.isBefore(finish)
+    }
+  }
+
 
   val registrationsForCurrentMonth: Registration => Boolean = registration =>
     registration.clockedIn.isDefined &&

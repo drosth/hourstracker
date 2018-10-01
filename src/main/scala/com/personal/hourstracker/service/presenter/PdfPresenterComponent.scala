@@ -31,9 +31,11 @@ trait ConsolidatedRegistrationsPdfPresenter extends PdfPresenter[ConsolidatedReg
 
   val pdfPresenter: PdfPresenter[ConsolidatedRegistrations] = new ConsolidatedRegistrationsPdfPresenter()
 
-
   class ConsolidatedRegistrationsPdfPresenter extends PdfPresenter[ConsolidatedRegistrations] {
-    lazy val pdf = Pdf(new PdfConfig {
+
+    val executablePath = "/usr/local/bin/wkhtmltopdf"
+
+    lazy val pdf = Pdf(executablePath, new PdfConfig {
       orientation := Portrait
       pageSize := "A4"
       marginTop := "0.5cm"

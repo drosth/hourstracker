@@ -1,10 +1,12 @@
 package com.personal.hourstracker.service
 
+import java.time.{LocalDate, Period}
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 import com.personal.hourstracker.config.component.ConsolidatedRegistrationService
 import com.personal.hourstracker.domain.{ConsolidatedRegistration, Registration}
-import com.personal.hourstracker.domain.ConsolidatedRegistration.ConsolidatedRegistrations
+import com.personal.hourstracker.domain.ConsolidatedRegistration.{ConsolidatedRegistrations, DateTimeOrdering}
 import com.personal.hourstracker.domain.Registration.Registrations
 
 
@@ -71,8 +73,33 @@ trait DefaultConsolidatedRegistrationService extends ConsolidatedRegistrationSer
       case None => registration.duration
       case Some(_) => registration.totalTimeAdjustment
     }
-  }
 
+    override def addUnregisteredEntriesTo(consolidatedRegistrationsPerJob: Map[String, ConsolidatedRegistrations]): Map[String, ConsolidatedRegistrations] = {
+
+      consolidatedRegistrationsPerJob
+          .map {
+            case (job, registrations) =>
+              val sorted = registrations.sorted(DateTimeOrdering)
+
+              val firstDate: LocalDate = sorted.head.date.withDayOfMonth(1)
+              val lastDate = sorted.last.date.withDayOfMonth(1).plusMonths(1).minusDays(1)
+
+              val daysCount = Period.between(firstDate, lastDate).get(ChronoUnit.DAYS).intValue()
+
+              val actualDates = registrations.map(_.date).toList
+
+              val expectedDates: List[LocalDate] = (0 until daysCount + 1).map(firstDate.plusDays(_)).toList
+
+              val datesToAdd: Seq[LocalDate] = expectedDates.filterNot(actualDates.toSet)
+
+              val addedRegistrations = datesToAdd.foldLeft(registrations) { (acc, dateToAdd) =>
+                val newConsolidatedRegistration: ConsolidatedRegistration = ConsolidatedRegistration(dateToAdd, "", None, None)
+                acc :+ newConsolidatedRegistration
+              }
+              (job, addedRegistrations.sorted(DateTimeOrdering))
+          }
+    }
+  }
 
 }
 
