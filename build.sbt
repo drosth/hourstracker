@@ -8,7 +8,8 @@ scalaVersion := "2.12.6"
 
 lazy val global = project.in(file(".")).settings(settings).aggregate(rest, core)
 
-lazy val rest = (project in file("rest")).settings(
+lazy val rest = (project in file("rest"))
+  .settings(
     name := "hourstracker-rest",
     settings,
     libraryDependencies ++= commonDependencies ++ swaggerDependencies ++ Seq(
@@ -18,10 +19,10 @@ lazy val rest = (project in file("rest")).settings(
       dependencies.`akka-stream`,
       dependencies.`javax.ws.rs-api`,
       dependencies.`akka-http-cors`,
-      dependencies.`akka-http-testkit` % Test,
+      dependencies.`akka-http-testkit`   % Test,
       dependencies.`akka-stream-testkit` % Test,
       dependencies.`akka-testkit`        % Test,
-      dependencies.scalatest % Test
+      dependencies.scalatest             % Test
     )
   )
   .dependsOn(core)
@@ -51,39 +52,39 @@ lazy val commonSettings = Seq(
 
 lazy val dependencies =
   new {
-    val akkaHttpV = "10.0.11"
+    val akkaHttpV           = "10.0.11"
     val akkaV               = "2.5.6"
-    val commonsIoV = "2.6"
-    val logbackV = "1.2.3"
-    val scalacheckV = "1.13.5"
-    val scalaCsvV = "1.3.5"
+    val commonsIoV          = "2.6"
+    val logbackV            = "1.2.3"
+    val scalacheckV         = "1.13.5"
+    val scalaCsvV           = "1.3.5"
     val scalaLoggingV       = "3.7.2"
-    val scalatestV = "3.0.4"
+    val scalatestV          = "3.0.4"
     val slf4jV              = "1.7.25"
-    val spdfV = "1.4.0"
-    val sprayJsonV = "1.3.4"
+    val spdfV               = "1.4.0"
+    val sprayJsonV          = "1.3.4"
     val swaggerAkkaHttpV    = "2.0.0"
     val swaggerScalaModuleV = "2.0.2"
     val swaggerV            = "2.0.5"
-    val javaxWsRsApiV = "2.1.1"
-    val akkaHttpCorsV = "0.3.0"
+    val javaxWsRsApiV       = "2.1.1"
+    val akkaHttpCorsV       = "0.3.0"
 
-    val `akka-http-spray-json` = "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpV
-    val `akka-http-xml` = "com.typesafe.akka"    %% "akka-http-xml"        % akkaHttpV
-    val `akka-http` = "com.typesafe.akka"    %% "akka-http"            % akkaHttpV
+    val `akka-http-spray-json` = "com.typesafe.akka"    %% "akka-http-spray-json" % akkaHttpV
+    val `akka-http-xml`        = "com.typesafe.akka"    %% "akka-http-xml"        % akkaHttpV
+    val `akka-http`            = "com.typesafe.akka"    %% "akka-http"            % akkaHttpV
     val `akka-slf4j`           = "com.typesafe.akka"    %% "akka-slf4j"           % akkaV
     val `akka-stream`          = "com.typesafe.akka"    %% "akka-stream"          % akkaV
-    val `commons-io` = "commons-io"           % "commons-io"            % commonsIoV
+    val `commons-io`           = "commons-io"           % "commons-io"            % commonsIoV
     val `scala-csv`            = "com.github.tototoshi" %% "scala-csv"            % scalaCsvV
     val `spray-json`           = "io.spray"             %% "spray-json"           % sprayJsonV
-    val `javax.ws.rs-api` = "javax.ws.rs"          % "javax.ws.rs-api"       % javaxWsRsApiV
-    val `akka-http-cors`       = "ch.megard" %% "akka-http-cors"       % akkaHttpCorsV excludeAll ExclusionRule(organization = "com.typesafe.akka")
+    val `javax.ws.rs-api`      = "javax.ws.rs"          % "javax.ws.rs-api"       % javaxWsRsApiV
+    val `akka-http-cors`       = "ch.megard"            %% "akka-http-cors"       % akkaHttpCorsV excludeAll ExclusionRule(organization = "com.typesafe.akka")
 
-    val `swagger-core` = "io.swagger.core.v3"           % "swagger-core"          % swaggerV
-    val `swagger-annotations`  = "io.swagger.core.v3"           % "swagger-annotations" % swaggerV
+    val `swagger-core`         = "io.swagger.core.v3"           % "swagger-core"          % swaggerV
+    val `swagger-annotations`  = "io.swagger.core.v3"           % "swagger-annotations"   % swaggerV
     val `swagger-models`       = "io.swagger.core.v3"           % "swagger-models"        % swaggerV
     val `swagger-jaxrs2`       = "io.swagger.core.v3"           % "swagger-jaxrs2"        % swaggerV
-    val `swagger-akka-http`    = "com.github.swagger-akka-http" %% "swagger-akka-http" % swaggerAkkaHttpV
+    val `swagger-akka-http`    = "com.github.swagger-akka-http" %% "swagger-akka-http"    % swaggerAkkaHttpV
     val `swagger-scala-module` = "com.github.swagger-akka-http" %% "swagger-scala-module" % swaggerScalaModuleV
 //    val `swagger-akka-http` = "com.github.swagger-akka-http" %% "swagger-akka-http" % swaggerAkkaHttp excludeAll
 //      ExclusionRule(organization = "com.typesafe.akka")
@@ -95,7 +96,7 @@ lazy val dependencies =
     val `akka-stream-testkit` = "com.typesafe.akka" %% "akka-stream-testkit" % akkaV
     val `akka-testkit`        = "com.typesafe.akka" %% "akka-testkit"        % akkaV
     val scalacheck            = "org.scalacheck"    %% "scalacheck"          % scalacheckV
-    val scalatest             = "org.scalatest"     %% "scalatest" % scalatestV
+    val scalatest             = "org.scalatest"     %% "scalatest"           % scalatestV
   }
 
 lazy val swaggerDependencies = Seq(
@@ -125,6 +126,12 @@ lazy val compilerOptions = Seq(
   "-encoding",
   "utf8"
 )
+
+lazy val scalafmtSettings =
+  Seq(
+    scalafmtOnCompile := false,
+    scalafmtVersion := "1.5.1"
+  )
 
 lazy val assemblySettings = Seq(
   assemblyJarName in assembly := name.value + ".jar",
