@@ -6,10 +6,10 @@ scalaVersion := "2.12.6"
 
 // PROJECTS
 
-lazy val global = project.in(file(".")).settings(settings).aggregate(`akka-http`, core)
+lazy val global = project.in(file(".")).settings(settings).aggregate(rest, core)
 
-lazy val `akka-http` = (project in file("akka-http")).settings(
-    name := "hourstracker-akka-http",
+lazy val rest = (project in file("rest")).settings(
+    name := "hourstracker-rest",
     settings,
     libraryDependencies ++= commonDependencies ++ swaggerDependencies ++ Seq(
       dependencies.`akka-http-spray-json`,
