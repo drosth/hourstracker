@@ -80,7 +80,7 @@ object PresenterHelper {
   }
 
   def toHumanReadableHours(value: Option[Double]): String = value match {
-    case None    => ""
+    case None => ""
     case Some(v) => toHumanReadableHours(v)
   }
 }

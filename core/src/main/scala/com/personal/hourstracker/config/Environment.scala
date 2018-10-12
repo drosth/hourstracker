@@ -5,10 +5,10 @@ sealed abstract class Environment(val name: String, val abbreviation: String)
 object Environment {
   def apply(name: String): Environment = name match {
     case Development.name => Development
-    case Testing.name     => Testing
-    case Acceptance.name  => Acceptance
-    case Production.name  => Production
-    case _                => throw new Unknown(s"Environment for “$name” does not exist")
+    case Testing.name => Testing
+    case Acceptance.name => Acceptance
+    case Production.name => Production
+    case _ => throw new Unknown(s"Environment for “$name” does not exist")
   }
 
   sealed class Unknown(message: String) extends Throwable(message)

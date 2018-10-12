@@ -9,12 +9,8 @@ import com.personal.hourstracker.service.RegistrationSelector
 
 object Application extends App with ApplicationModule {
 
-  val fileName = "core/src/main/resources/CSVExport.csv"
-
-  println(fileName)
-
   val registrations: Registrations = registrationService
-    .readRegistrationsFrom(fileName)
+    .readRegistrationsFrom(Application.importFrom)
     .filter(
       RegistrationSelector.registrationsBetween(
         LocalDate.of(2018, Month.SEPTEMBER, 1),

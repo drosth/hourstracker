@@ -13,7 +13,7 @@ import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import akka.pattern.ask
 import akka.util.Timeout
 import com.personal.hourstracker.RegistrationActor.GetRegistrations
-import com.personal.hourstracker.api.v1.registration.RegistrationApi.{ ModelAdapter, RegistrationModel }
+import com.personal.hourstracker.api.v1.registration.RegistrationApi.{ModelAdapter, RegistrationModel}
 import com.personal.hourstracker.config.component.SystemComponent
 import com.personal.hourstracker.domain.Registration
 import io.swagger.v3.oas.annotations.media.Schema
@@ -24,18 +24,18 @@ object RegistrationApi {
 
   @Schema(name = "Registration")
   final case class RegistrationModel(
-      job: String,
-      clockedIn: Option[LocalDateTime],
-      clockedOut: Option[LocalDateTime],
-      duration: Option[Double],
-      hourlyRate: Option[Double],
-      earnings: Option[Double],
-      comment: Option[String],
-      tags: Option[Set[String]],
-      breaks: Option[String],
-      adjustments: Option[String],
-      totalTimeAdjustment: Option[Double],
-      totalEarningsAdjustment: Option[String])
+    job: String,
+    clockedIn: Option[LocalDateTime],
+    clockedOut: Option[LocalDateTime],
+    duration: Option[Double],
+    hourlyRate: Option[Double],
+    earnings: Option[Double],
+    comment: Option[String],
+    tags: Option[Set[String]],
+    breaks: Option[String],
+    adjustments: Option[String],
+    totalTimeAdjustment: Option[Double],
+    totalEarningsAdjustment: Option[String])
 
   object ModelAdapter {
 
@@ -52,14 +52,13 @@ object RegistrationApi {
         registration.breaks,
         registration.adjustments,
         registration.totalTimeAdjustment,
-        registration.totalEarningsAdjustment
-      )
+        registration.totalEarningsAdjustment)
   }
 }
 
 trait RegistrationApi extends RegistrationApiProtocol with RegistrationApiDoc with SystemComponent {
 
-  lazy val log                       = Logging(system, classOf[RegistrationApi])
+  lazy val log = Logging(system, classOf[RegistrationApi])
   lazy val registrationRoutes: Route = getRegistrations
 
   // Required by the `ask` (?) method below

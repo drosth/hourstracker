@@ -14,7 +14,7 @@ trait DefaultRegistrationRepository extends RegistrationRepository {
 
   private def readTagsFrom(value: Option[String]): Option[Set[String]] =
     value match {
-      case None       => None
+      case None => None
       case Some(tags) => Some(tags.split(";").toSet)
     }
 
@@ -40,8 +40,7 @@ trait DefaultRegistrationRepository extends RegistrationRepository {
               record.get("Breaks"),
               record.get("Adjustments"),
               record.get("TotalTimeAdjustment"),
-              record.get("TotalEarningsAdjustment")
-          ))
+              record.get("TotalEarningsAdjustment")))
         .toList
     }
   }

@@ -10,8 +10,7 @@ object ConsolidatedRegistration {
   type ConsolidatedRegistrations = Seq[ConsolidatedRegistration]
 
   object JsonProtocol extends CommonJsonSupport {
-    implicit lazy val consolidatedRegistrationFormat
-      : JsonFormat[ConsolidatedRegistration] = jsonFormat4(
+    implicit lazy val consolidatedRegistrationFormat: JsonFormat[ConsolidatedRegistration] = jsonFormat4(
       ConsolidatedRegistration.apply)
   }
 
@@ -25,7 +24,8 @@ object ConsolidatedRegistration {
 
 }
 
-case class ConsolidatedRegistration(date: LocalDate,
-                                    job: String,
-                                    duration: Option[Double],
-                                    comment: Option[String])
+case class ConsolidatedRegistration(
+  date: LocalDate,
+  job: String,
+  duration: Option[Double],
+  comment: Option[String])

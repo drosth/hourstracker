@@ -18,8 +18,8 @@ object RegistrationSelector {
         case true =>
           val clockedIn = registration.clockedIn.get.toLocalDate
           registration.clockedIn.isDefined &&
-          clockedIn.isAfter(start) &&
-          clockedIn.isBefore(finish)
+            clockedIn.isAfter(start) &&
+            clockedIn.isBefore(finish)
       }
   }
 

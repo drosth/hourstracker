@@ -1,13 +1,16 @@
 package com.personal.hourstracker
 
-import akka.actor.{ Actor, ActorLogging }
-import com.personal.hourstracker.config.component.{ RegistrationComponent, RegistrationService }
+import akka.actor.{Actor, ActorLogging}
+import com.personal.hourstracker.config.component.{RegistrationComponent, RegistrationService}
+import com.personal.hourstracker.config.Configuration
 
 final case class User(name: String, age: Int, countryOfResidence: String)
 
 final case class Users(users: Seq[User])
 
-object RegistrationActor extends RegistrationComponent {
+object RegistrationActor extends RegistrationComponent with Configuration {
+
+  lazy val importFrom: String = Application.importFrom
 
   final case class ActionPerformed(description: String)
 
@@ -18,11 +21,8 @@ class RegistrationActor(registrationService: RegistrationService) extends Actor 
 
   import RegistrationActor._
 
-  val fileName =
-    "/Users/hansd/data/Projects/hourstracker/core/src/main/resources/CSVExport.csv"
-
   def receive: Receive = {
     case GetRegistrations =>
-      sender() ! registrationService.readRegistrationsFrom(fileName)
+      sender() ! registrationService.readRegistrationsFrom(importFrom)
   }
 }

@@ -3,13 +3,13 @@ package com.personal.hourstracker
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-import akka.actor.{ ActorRef, Props }
+import akka.actor.{ActorRef, Props}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.HttpMethods
 import akka.http.scaladsl.server.Directives._
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import ch.megard.akka.http.cors.scaladsl.settings.CorsSettings
-import com.personal.hourstracker.api.{ Api => ApiV1 }
+import com.personal.hourstracker.api.{Api => ApiV1}
 import com.personal.hourstracker.config.WebModule
 object WebServer extends App with ApiV1 with WebModule {
 
@@ -24,7 +24,7 @@ object WebServer extends App with ApiV1 with WebModule {
   }
 
   Http().bindAndHandle(apiRoutes, Server.host, Server.port).map { binding =>
-    println(s"Server online at http://${Server.host}:${Server.port}/")
+    println(s"Server online at http://${Server.host}:${Api.port}/")
   }
 
   Await.result(system.whenTerminated, Duration.Inf)

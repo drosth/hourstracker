@@ -39,7 +39,7 @@ trait DefaultFacturationService extends FacturationService {
         case None => Seq(registration)
         case Some(tags) =>
           tags match {
-            case x: Set[String] if x.isEmpty   => Seq(registration)
+            case x: Set[String] if x.isEmpty => Seq(registration)
             case x: Set[String] if x.size == 1 => Seq(registration)
             case x: Set[String] =>
               x.map { tag =>
@@ -55,7 +55,7 @@ trait DefaultFacturationService extends FacturationService {
       case None => None
       case Some(d) =>
         splitTag(tag) match {
-          case None            => None
+          case None => None
           case Some((_, None)) => duration
           case Some((_, Some(percentage))) =>
             Some(
@@ -78,7 +78,7 @@ trait DefaultFacturationService extends FacturationService {
 
     private def toDouble(value: String): Double = value match {
       case x if x.length == 0 => 0
-      case x                  => format.parse(value).doubleValue()
+      case x => format.parse(value).doubleValue()
     }
   }
 

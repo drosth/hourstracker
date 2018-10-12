@@ -14,8 +14,8 @@ trait Api extends RegistrationApi {
 
   lazy val apiV1: Route = pathPrefix(s"v${version.value}") {
     registrationRoutes ~
-    swagger.routes
+      swagger.routes
   }
   private lazy val swagger = new Swagger(s"${Api.host}:${Api.port}", s"${Api.basePath}/v${version.value}", version)
-  private val version      = Version(1)
+  private val version = Version(1)
 }

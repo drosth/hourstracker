@@ -43,16 +43,10 @@ lazy val core = (project in file("core"))
 // SETTINGS
 
 lazy val settings =
-  commonSettings ++
-    scalafmtSettings
+  commonSettings
 
 lazy val commonSettings = Seq(
   scalacOptions ++= compilerOptions
-  //  resolvers ++= Seq(
-  //    "Local Maven Repository" at "file://" + Path.userHome.absolutePath + "/.m2/repository",
-  //    Resolver.sonatypeRepo("releases"),
-  //    Resolver.sonatypeRepo("snapshots")
-  //  )
 )
 
 lazy val dependencies =
@@ -131,13 +125,6 @@ lazy val compilerOptions = Seq(
   "-encoding",
   "utf8"
 )
-
-lazy val scalafmtSettings =
-  Seq(
-    scalafmtOnCompile := true,
-    scalafmtTestOnCompile := true,
-    scalafmtVersion := "1.2.0"
-  )
 
 lazy val assemblySettings = Seq(
   assemblyJarName in assembly := name.value + ".jar",

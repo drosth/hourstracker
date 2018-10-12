@@ -5,7 +5,7 @@ import com.github.swagger.akka.model.Info
 import io.swagger.v3.oas.models.ExternalDocumentation
 
 abstract class SwaggerSupport(url: String, path: String, apiVersion: String, override val apiClasses: Set[Class[_]])
-    extends SwaggerHttpService {
+  extends SwaggerHttpService {
 
   override val host: String = url
 

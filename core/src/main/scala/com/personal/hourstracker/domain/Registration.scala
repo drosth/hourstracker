@@ -17,18 +17,19 @@ object Registration {
   }
 }
 
-case class Registration(job: String,
-                        clockedIn: Option[LocalDateTime],
-                        clockedOut: Option[LocalDateTime],
-                        duration: Option[Double],
-                        hourlyRate: Option[Double],
-                        earnings: Option[Double],
-                        comment: Option[String],
-                        tags: Option[Set[String]],
-                        breaks: Option[String],
-                        adjustments: Option[String],
-                        totalTimeAdjustment: Option[Double],
-                        totalEarningsAdjustment: Option[String]) {
+case class Registration(
+  job: String,
+  clockedIn: Option[LocalDateTime],
+  clockedOut: Option[LocalDateTime],
+  duration: Option[Double],
+  hourlyRate: Option[Double],
+  earnings: Option[Double],
+  comment: Option[String],
+  tags: Option[Set[String]],
+  breaks: Option[String],
+  adjustments: Option[String],
+  totalTimeAdjustment: Option[Double],
+  totalEarningsAdjustment: Option[String]) {
 
   def calculateDurationInMinutes(): Long = (clockedIn, clockedOut) match {
     case (Some(in: LocalDateTime), Some(out: LocalDateTime)) =>
