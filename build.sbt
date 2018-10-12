@@ -4,61 +4,47 @@ version := "0.1"
 
 scalaVersion := "2.12.6"
 
-lazy val akkaHttpVersion = "10.0.11"
-lazy val akkaVersion = "2.5.11"
-
 // PROJECTS
 
-lazy val global = project
-    .in(file("."))
-    .settings(settings)
-    .aggregate(
-      `akka-http`,
-      core
+lazy val global = project.in(file(".")).settings(settings).aggregate(`akka-http`, core)
+
+lazy val `akka-http` = (project in file("akka-http")).settings(
+    name := "hourstracker-akka-http",
+    settings,
+    libraryDependencies ++= commonDependencies ++ swaggerDependencies ++ Seq(
+      dependencies.`akka-http-spray-json`,
+      dependencies.`akka-http-xml`,
+      dependencies.`akka-http`,
+      dependencies.`akka-stream`,
+      dependencies.`javax.ws.rs-api`,
+      dependencies.`akka-http-cors`,
+      dependencies.`akka-http-testkit` % Test,
+      dependencies.`akka-stream-testkit` % Test,
+      dependencies.`akka-testkit`        % Test,
+      dependencies.scalatest % Test
     )
-
-lazy val `akka-http` = (project in file("akka-http")).
-    settings(
-      name := "hourstracker-akka-http",
-      settings,
-      libraryDependencies ++= Seq(
-        "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
-        "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion,
-        "com.typesafe.akka" %% "akka-http-xml" % akkaHttpVersion,
-        "com.typesafe.akka" %% "akka-stream" % akkaVersion,
-
-        "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion % Test,
-        "com.typesafe.akka" %% "akka-testkit" % akkaVersion % Test,
-        "com.typesafe.akka" %% "akka-stream-testkit" % akkaVersion % Test,
-        "org.scalatest" %% "scalatest" % "3.0.1" % Test
-      )
-    )
-    .dependsOn(
-  core
-)
-
+  )
+  .dependsOn(core)
 
 lazy val core = (project in file("core"))
-    .enablePlugins(SbtTwirl)
-    .settings(
-      name := "hourstracker-core",
-      settings,
-
-      sourceDirectories in(Compile, TwirlKeys.compileTemplates) += (baseDirectory.value.getParentFile / "src" / "main" / "twirl"),
-
-      libraryDependencies ++= Seq(
-        "com.github.tototoshi" %% "scala-csv" % "1.3.5",
-        "io.spray" %% "spray-json" % "1.3.4",
-        "io.github.cloudify" %% "spdf" % "1.4.0",
-        "commons-io" % "commons-io" % "2.6"
-      )
+  .enablePlugins(SbtTwirl)
+  .settings(
+    name := "hourstracker-core",
+    settings,
+    sourceDirectories in (Compile, TwirlKeys.compileTemplates) += (baseDirectory.value.getParentFile / "src" / "main" / "twirl"),
+    libraryDependencies ++= commonDependencies ++ Seq(
+      dependencies.`commons-io`,
+      dependencies.`scala-csv`,
+      dependencies.`spray-json`,
+      dependencies.spdf
     )
+  )
 
 // SETTINGS
 
 lazy val settings =
   commonSettings ++
-      scalafmtSettings
+    scalafmtSettings
 
 lazy val commonSettings = Seq(
   scalacOptions ++= compilerOptions
@@ -67,6 +53,71 @@ lazy val commonSettings = Seq(
   //    Resolver.sonatypeRepo("releases"),
   //    Resolver.sonatypeRepo("snapshots")
   //  )
+)
+
+lazy val dependencies =
+  new {
+    val akkaHttpV = "10.0.11"
+    val akkaV               = "2.5.6"
+    val commonsIoV = "2.6"
+    val logbackV = "1.2.3"
+    val scalacheckV = "1.13.5"
+    val scalaCsvV = "1.3.5"
+    val scalaLoggingV       = "3.7.2"
+    val scalatestV = "3.0.4"
+    val slf4jV              = "1.7.25"
+    val spdfV = "1.4.0"
+    val sprayJsonV = "1.3.4"
+    val swaggerAkkaHttpV    = "2.0.0"
+    val swaggerScalaModuleV = "2.0.2"
+    val swaggerV            = "2.0.5"
+    val javaxWsRsApiV = "2.1.1"
+    val akkaHttpCorsV = "0.3.0"
+
+    val `akka-http-spray-json` = "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpV
+    val `akka-http-xml` = "com.typesafe.akka"    %% "akka-http-xml"        % akkaHttpV
+    val `akka-http` = "com.typesafe.akka"    %% "akka-http"            % akkaHttpV
+    val `akka-slf4j`           = "com.typesafe.akka"    %% "akka-slf4j"           % akkaV
+    val `akka-stream`          = "com.typesafe.akka"    %% "akka-stream"          % akkaV
+    val `commons-io` = "commons-io"           % "commons-io"            % commonsIoV
+    val `scala-csv`            = "com.github.tototoshi" %% "scala-csv"            % scalaCsvV
+    val `spray-json`           = "io.spray"             %% "spray-json"           % sprayJsonV
+    val `javax.ws.rs-api` = "javax.ws.rs"          % "javax.ws.rs-api"       % javaxWsRsApiV
+    val `akka-http-cors`       = "ch.megard" %% "akka-http-cors"       % akkaHttpCorsV excludeAll ExclusionRule(organization = "com.typesafe.akka")
+
+    val `swagger-core` = "io.swagger.core.v3"           % "swagger-core"          % swaggerV
+    val `swagger-annotations`  = "io.swagger.core.v3"           % "swagger-annotations" % swaggerV
+    val `swagger-models`       = "io.swagger.core.v3"           % "swagger-models"        % swaggerV
+    val `swagger-jaxrs2`       = "io.swagger.core.v3"           % "swagger-jaxrs2"        % swaggerV
+    val `swagger-akka-http`    = "com.github.swagger-akka-http" %% "swagger-akka-http" % swaggerAkkaHttpV
+    val `swagger-scala-module` = "com.github.swagger-akka-http" %% "swagger-scala-module" % swaggerScalaModuleV
+//    val `swagger-akka-http` = "com.github.swagger-akka-http" %% "swagger-akka-http" % swaggerAkkaHttp excludeAll
+//      ExclusionRule(organization = "com.typesafe.akka")
+
+    val logback = "ch.qos.logback"     % "logback-classic" % logbackV
+    val spdf    = "io.github.cloudify" %% "spdf"           % spdfV
+
+    val `akka-http-testkit`   = "com.typesafe.akka" %% "akka-http-testkit"   % akkaHttpV
+    val `akka-stream-testkit` = "com.typesafe.akka" %% "akka-stream-testkit" % akkaV
+    val `akka-testkit`        = "com.typesafe.akka" %% "akka-testkit"        % akkaV
+    val scalacheck            = "org.scalacheck"    %% "scalacheck"          % scalacheckV
+    val scalatest             = "org.scalatest"     %% "scalatest" % scalatestV
+  }
+
+lazy val swaggerDependencies = Seq(
+  dependencies.`swagger-akka-http`,
+  dependencies.`swagger-annotations`,
+  dependencies.`swagger-core`,
+  dependencies.`swagger-jaxrs2`,
+  dependencies.`swagger-models`,
+  dependencies.`swagger-scala-module`
+)
+
+lazy val commonDependencies = Seq(
+  dependencies.`akka-slf4j`,
+  dependencies.logback,
+  dependencies.scalacheck % "test",
+  dependencies.scalatest  % "test"
 )
 
 lazy val compilerOptions = Seq(
@@ -91,7 +142,7 @@ lazy val scalafmtSettings =
 lazy val assemblySettings = Seq(
   assemblyJarName in assembly := name.value + ".jar",
   assemblyMergeStrategy in assembly := {
-    case PathList("META-INF", xs@_*) => MergeStrategy.discard
-    case _ => MergeStrategy.first
+    case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+    case _                             => MergeStrategy.first
   }
 )

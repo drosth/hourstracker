@@ -1,12 +1,9 @@
 package com.personal.hourstracker.service
 
-import com.personal.hourstracker.config.component.{
-  RegistrationRepository,
-  RegistrationService
-}
+import com.personal.hourstracker.config.component.{ RegistrationRepository, RegistrationService, RegistrationServiceCake }
 import com.personal.hourstracker.domain.Registration.Registrations
 
-trait DefaultRegistrationService extends RegistrationService {
+trait DefaultRegistrationService extends RegistrationServiceCake {
   this: RegistrationRepository =>
 
   def registrationService: DefaultRegistrationService =

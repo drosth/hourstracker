@@ -3,21 +3,15 @@ package com.personal.hourstracker.domain
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
-import com.personal.hourstracker.marshalling.{
-  JsonDateTimeSupport,
-  JsonMapSupport,
-  JsonSupport
-}
+import com.personal.common.CommonJsonSupport
 import spray.json._
 
 object Registration {
 
   type Registrations = Seq[Registration]
 
-  object JsonProtocol
-      extends JsonSupport
-      with JsonDateTimeSupport
-      with JsonMapSupport {
+  object JsonProtocol extends CommonJsonSupport {
+
     implicit lazy val registrationFormat: RootJsonFormat[Registration] =
       jsonFormat12(Registration.apply)
   }

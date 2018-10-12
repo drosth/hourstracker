@@ -9,7 +9,7 @@ import com.personal.hourstracker.service.RegistrationSelector
 
 object Application extends App with ApplicationModule {
 
-  val fileName = "src/main/resources/CSVExport.csv"
+  val fileName = "core/src/main/resources/CSVExport.csv"
 
   println(fileName)
 
@@ -23,8 +23,7 @@ object Application extends App with ApplicationModule {
 
   import com.personal.hourstracker.domain.ConsolidatedRegistration.JsonProtocol._
 
-  private val consolidatedRegistrations
-    : Map[String, ConsolidatedRegistrations] =
+  private val consolidatedRegistrations: Map[String, ConsolidatedRegistrations] =
     consolidatedRegistrationService
       .consolidateRegistrations(registrations)
       .groupBy(_.job)
@@ -34,8 +33,7 @@ object Application extends App with ApplicationModule {
       .addUnregisteredEntriesTo(consolidatedRegistrations)
 
   println(
-    jsonPresenter
-      .renderRegistrationsTo(consolidatedRegistrationsWithMissingEntries)
+    jsonPresenter.renderRegistrationsTo(consolidatedRegistrations)
       .prettyPrint)
 
   consolidatedRegistrationsWithMissingEntries.foreach {
@@ -44,8 +42,7 @@ object Application extends App with ApplicationModule {
       val fileName =
         s"[Timesheet] - $job - ${dateRangeAsStringOf(registrations)}"
 
-      htmlPresenter.renderRegistrationsTo(registrations,
-                                          s"target/$fileName.html")
+      htmlPresenter.renderRegistrationsTo(registrations, s"target/$fileName.html")
 
       pdfPresenter.renderRegistrationsTo(registrations, s"target/$fileName.pdf")
     }

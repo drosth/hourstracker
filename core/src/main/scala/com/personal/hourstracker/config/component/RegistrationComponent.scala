@@ -6,17 +6,15 @@ import com.personal.hourstracker.domain.Registration.Registrations
 import com.personal.hourstracker.repository.DefaultRegistrationRepository
 import com.personal.hourstracker.service.DefaultRegistrationService
 
-trait RegistrationComponent
-    extends DefaultRegistrationService
-    with DefaultRegistrationRepository
+trait RegistrationComponent extends DefaultRegistrationService with DefaultRegistrationRepository
 
-trait RegistrationService {
+trait RegistrationServiceCake {
   def registrationService: RegistrationService
 
-  trait RegistrationService {
-    def readRegistrationsFrom(fileName: String): Registrations
-  }
+}
 
+trait RegistrationService {
+  def readRegistrationsFrom(fileName: String): Registrations
 }
 
 trait RegistrationRepository {

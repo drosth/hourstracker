@@ -1,20 +1,7 @@
-package com.personal.hourstracker.marshalling
-
-import spray.json.{
-  deserializationError,
-  serializationError,
-  JsArray,
-  JsFalse,
-  JsNumber,
-  JsObject,
-  JsonFormat,
-  JsString,
-  JsTrue,
-  JsValue
-}
+package com.personal.common
+import spray.json.{ deserializationError, serializationError, JsArray, JsFalse, JsNumber, JsObject, JsString, JsTrue, JsValue, JsonFormat }
 
 trait JsonMapSupport {
-
   implicit object AnyJsonFormat extends JsonFormat[Any] {
     def write(x: Any): JsValue = x match {
       case number: Int                  => JsNumber(number)
@@ -25,12 +12,10 @@ trait JsonMapSupport {
         JsObject(map.map {
           case (key, value) => key -> write(value)
         })
-      case seq: Seq[Any]       => JsArray(seq.toVector.map(write))
       case vector: Vector[Any] => JsArray(vector.map(write))
       case list: List[Any]     => JsArray(list.toVector.map(write))
       case unSupported =>
-        serializationError(
-          s"Serialization of this type is not supported: ${unSupported.toString}")
+        serializationError(s"Serialization of this type is not supported: ${unSupported.toString}")
     }
 
     def read(value: JsValue): Any = value match {
@@ -41,9 +26,7 @@ trait JsonMapSupport {
       case JsTrue            => true
       case JsFalse           => false
       case unSupported =>
-        deserializationError(
-          s"Deserialization of this type is not supported: ${unSupported.toString}")
+        deserializationError(s"Deserialization of this type is not supported: ${unSupported.toString}")
     }
   }
-
 }

@@ -34,24 +34,6 @@ trait DefaultFacturationService extends FacturationService {
       }
     }
 
-    private def splitTag(
-        tag: String): Option[Tuple2[Option[String], Option[Double]]] = {
-
-      tagPattern.findFirstMatchIn(tag) map { patternMatch =>
-        Option(patternMatch.group(1)) match {
-          case None => (Option(patternMatch.group(0)).map(_.trim), None)
-          case Some(_) =>
-            (Option(patternMatch.group(1)).map(_.trim),
-             Option(patternMatch.group(2)).map(p => toDouble(p)))
-        }
-      }
-    }
-
-    private def toDouble(value: String): Double = value match {
-      case x if x.length == 0 => 0
-      case x                  => format.parse(value).doubleValue()
-    }
-
     private def splitOnTags(registration: Registration): Registrations =
       registration.tags match {
         case None => Seq(registration)
@@ -64,16 +46,12 @@ trait DefaultFacturationService extends FacturationService {
                 registration.copy(
                   job = constructJobWithTag(registration.job, tag),
                   tags = Some(Set(tag)),
-                  totalTimeAdjustment =
-                    calculateTotalTimeAdjustmentUsing(tag,
-                                                      registration.duration))
+                  totalTimeAdjustment = calculateTotalTimeAdjustmentUsing(tag, registration.duration))
               }.toSeq
           }
       }
 
-    private def calculateTotalTimeAdjustmentUsing(
-        tag: String,
-        duration: Option[Double]): Option[Double] = duration match {
+    private def calculateTotalTimeAdjustmentUsing(tag: String, duration: Option[Double]): Option[Double] = duration match {
       case None => None
       case Some(d) =>
         splitTag(tag) match {
@@ -85,6 +63,22 @@ trait DefaultFacturationService extends FacturationService {
                 .setScale(2, BigDecimal.RoundingMode.HALF_UP)
                 .toDouble)
         }
+    }
+
+    private def splitTag(tag: String): Option[Tuple2[Option[String], Option[Double]]] = {
+
+      tagPattern.findFirstMatchIn(tag) map { patternMatch =>
+        Option(patternMatch.group(1)) match {
+          case None => (Option(patternMatch.group(0)).map(_.trim), None)
+          case Some(_) =>
+            (Option(patternMatch.group(1)).map(_.trim), Option(patternMatch.group(2)).map(p => toDouble(p)))
+        }
+      }
+    }
+
+    private def toDouble(value: String): Double = value match {
+      case x if x.length == 0 => 0
+      case x                  => format.parse(value).doubleValue()
     }
   }
 

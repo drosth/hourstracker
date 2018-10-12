@@ -6,32 +6,25 @@ import java.time.temporal.ChronoUnit
 
 import com.personal.hourstracker.config.component.ConsolidatedRegistrationService
 import com.personal.hourstracker.domain.{ConsolidatedRegistration, Registration}
-import com.personal.hourstracker.domain.ConsolidatedRegistration.{
-  ConsolidatedRegistrations,
-  DateTimeOrdering
-}
+import com.personal.hourstracker.domain.ConsolidatedRegistration.{ ConsolidatedRegistrations, DateTimeOrdering }
 import com.personal.hourstracker.domain.Registration.Registrations
 
-trait DefaultConsolidatedRegistrationService
-    extends ConsolidatedRegistrationService {
+trait DefaultConsolidatedRegistrationService extends ConsolidatedRegistrationService {
 
   def consolidatedRegistrationService: ConsolidatedRegistrationService =
     new DefaultConsolidatedRegistrationService()
 
-  class DefaultConsolidatedRegistrationService
-      extends ConsolidatedRegistrationService {
+  class DefaultConsolidatedRegistrationService extends ConsolidatedRegistrationService {
 
     private lazy val dateFormatter: DateTimeFormatter =
       DateTimeFormatter.ISO_LOCAL_DATE
-    private lazy val asConsolidatedRegistration
-      : Registration => ConsolidatedRegistration = registration =>
+    private lazy val asConsolidatedRegistration: Registration => ConsolidatedRegistration = registration =>
       ConsolidatedRegistration(registration.clockedIn.get.toLocalDate,
                                registration.job,
                                determineDurationOf(registration),
                                registration.comment)
 
-    override def consolidateRegistrations(
-        registrations: Registrations): ConsolidatedRegistrations = {
+    override def consolidateRegistrations(registrations: Registrations): ConsolidatedRegistrations = {
       registrations
         .map(asConsolidatedRegistration)
         .groupBy(_.date)
@@ -41,9 +34,7 @@ trait DefaultConsolidatedRegistrationService
         .flatten
     }
 
-    private def consolidateConsolidatedRegistrations(
-        consolidatedRegistrations: ConsolidatedRegistrations)
-      : ConsolidatedRegistrations = {
+    private def consolidateConsolidatedRegistrations(consolidatedRegistrations: ConsolidatedRegistrations): ConsolidatedRegistrations = {
       def add(x: Option[Double], y: Option[Double]): Option[Double] = x match {
         case None => y
         case Some(a) =>
@@ -53,8 +44,7 @@ trait DefaultConsolidatedRegistrationService
           }
       }
 
-      def aggregateComments(x: Option[String],
-                            y: Option[String]): Option[String] = x match {
+      def aggregateComments(x: Option[String], y: Option[String]): Option[String] = x match {
         case None => y
         case Some(a) =>
           y match {
@@ -63,16 +53,15 @@ trait DefaultConsolidatedRegistrationService
           }
       }
 
-      val aggregateConsolidatedRegistration
-        : ConsolidatedRegistrations => ConsolidatedRegistration =
+      val aggregateConsolidatedRegistration: ConsolidatedRegistrations => ConsolidatedRegistration =
         registrations =>
           registrations
             .foldLeft(registrations.head.copy(duration = None, comment = None)) {
               (acc, registration) =>
-                acc.copy(duration = add(acc.duration, registration.duration),
-                         comment =
-                           aggregateComments(acc.comment, registration.comment))
-          }
+              acc.copy(duration = add(acc.duration, registration.duration),
+                  comment =
+                    aggregateComments(acc.comment, registration.comment))
+            }
 
       consolidatedRegistrations
         .groupBy(_.job)
@@ -81,16 +70,9 @@ trait DefaultConsolidatedRegistrationService
         .toSeq
     }
 
-    private def determineDurationOf(
-        registration: Registration): Option[Double] =
-      registration.totalTimeAdjustment match {
-        case None    => registration.duration
-        case Some(_) => registration.totalTimeAdjustment
-      }
-
     override def addUnregisteredEntriesTo(
-        consolidatedRegistrationsPerJob: Map[String, ConsolidatedRegistrations])
-      : Map[String, ConsolidatedRegistrations] = {
+      consolidatedRegistrationsPerJob: Map[String, ConsolidatedRegistrations]
+      ): Map[String, ConsolidatedRegistrations] = {
 
       consolidatedRegistrationsPerJob
         .map {
@@ -123,6 +105,12 @@ trait DefaultConsolidatedRegistrationService
             (job, addedRegistrations.sorted(DateTimeOrdering))
         }
     }
+
+    private def determineDurationOf(registration: Registration): Option[Double] =
+      registration.totalTimeAdjustment match {
+        case None    => registration.duration
+        case Some(_) => registration.totalTimeAdjustment
+      }
   }
 
 }

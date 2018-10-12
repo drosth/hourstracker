@@ -4,19 +4,15 @@ import com.personal.hourstracker.domain.ConsolidatedRegistration.ConsolidatedReg
 import com.personal.hourstracker.domain.Registration.Registrations
 import com.personal.hourstracker.service.DefaultConsolidatedRegistrationService
 
-trait ConsolidatedRegistrationComponent
-    extends DefaultConsolidatedRegistrationService
+trait ConsolidatedRegistrationComponent extends DefaultConsolidatedRegistrationService
 
 trait ConsolidatedRegistrationService {
   def consolidatedRegistrationService: ConsolidatedRegistrationService
 
   trait ConsolidatedRegistrationService {
-    def addUnregisteredEntriesTo(
-        consolidatedRegistrations: Map[String, ConsolidatedRegistrations])
-      : Map[String, ConsolidatedRegistrations]
+    def addUnregisteredEntriesTo(consolidatedRegistrations: Map[String, ConsolidatedRegistrations]): Map[String, ConsolidatedRegistrations]
 
-    def consolidateRegistrations(
-        registrations: Registrations): ConsolidatedRegistrations
+    def consolidateRegistrations(registrations: Registrations): ConsolidatedRegistrations
   }
 
 }

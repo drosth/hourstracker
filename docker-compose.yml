@@ -1,0 +1,18 @@
+version: '2'
+services:
+  swagger-ui:
+    image: swaggerapi/swagger-ui:v3.1.6
+    ports:
+    - 80:8080
+    environment:
+    - API_URL=http://localhost:8080/api/v1/api-docs/swagger.json
+
+#  mysql:
+#    image: mysql:5
+#    ports:
+#      - 8990:3306
+#    environment:
+#      - MYSQL_DATABASE=privacyservice
+#      - MYSQL_USER=privacyservice
+#      - MYSQL_PASSWORD=password
+#      - MYSQL_RANDOM_ROOT_PASSWORD=yes

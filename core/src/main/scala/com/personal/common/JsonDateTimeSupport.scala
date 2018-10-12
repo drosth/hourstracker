@@ -1,9 +1,8 @@
-package com.personal.hourstracker.marshalling
-
-import java.time.{LocalDate, LocalDateTime}
+package com.personal.common
+import java.time.{ LocalDate, LocalDateTime }
 import java.time.format.DateTimeFormatter
 
-import spray.json._
+import spray.json.{ deserializationError, DefaultJsonProtocol, JsString, JsValue, JsonFormat }
 
 trait JsonDateTimeSupport {
   this: DefaultJsonProtocol =>
@@ -33,5 +32,5 @@ trait JsonDateTimeSupport {
     }
 
   implicit lazy val dateTimeFormat: JsonFormat[LocalDateTime] = jsonDateTime()
-  implicit lazy val dateFormat: JsonFormat[LocalDate] = jsonDate()
+  implicit lazy val dateFormat: JsonFormat[LocalDate]         = jsonDate()
 }

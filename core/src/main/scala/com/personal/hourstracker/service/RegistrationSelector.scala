@@ -11,8 +11,7 @@ object RegistrationSelector {
     registration.clockedIn.isDefined &&
       registration.clockedIn.get.isAfter(startOfYear)
 
-  def registrationsBetween(start: LocalDate,
-                           finish: LocalDate): Registration => Boolean = {
+  def registrationsBetween(start: LocalDate, finish: LocalDate): Registration => Boolean = {
     registration =>
       registration.clockedIn.isDefined match {
         case false => false

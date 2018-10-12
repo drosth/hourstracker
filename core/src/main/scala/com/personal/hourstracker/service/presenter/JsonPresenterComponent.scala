@@ -9,8 +9,9 @@ trait JsonPresenter {
   def jsonPresenter: JsonPresenter
 
   trait JsonPresenter {
-    def renderRegistrationsTo[T](registrations: T)(
-        implicit writer: JsonWriter[T]): JsValue
+    def renderRegistrationsTo[T](registrations: T)(implicit
+      writer: JsonWriter[T]
+      ): JsValue
   }
 }
 
@@ -22,8 +23,10 @@ trait DefaultJsonPresenter extends JsonPresenter {
 
     import spray.json._
 
-    override def renderRegistrationsTo[T](registrations: T)(
-        implicit writer: JsonWriter[T]): JsValue = {
+    override def renderRegistrationsTo[T](registrations: T
+      )(implicit
+      writer: JsonWriter[T]
+      ): JsValue = {
       registrations.toJson
     }
   }

@@ -2,21 +2,14 @@ package com.personal.hourstracker.domain
 
 import java.time.LocalDate
 
-import com.personal.hourstracker.marshalling.{
-  JsonDateTimeSupport,
-  JsonMapSupport,
-  JsonSupport
-}
+import com.personal.common.CommonJsonSupport
 import spray.json.JsonFormat
 
 object ConsolidatedRegistration {
 
   type ConsolidatedRegistrations = Seq[ConsolidatedRegistration]
 
-  object JsonProtocol
-      extends JsonSupport
-      with JsonDateTimeSupport
-      with JsonMapSupport {
+  object JsonProtocol extends CommonJsonSupport {
     implicit lazy val consolidatedRegistrationFormat
       : JsonFormat[ConsolidatedRegistration] = jsonFormat4(
       ConsolidatedRegistration.apply)

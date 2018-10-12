@@ -21,15 +21,13 @@ trait PdfPresenter[T] {
 
 }
 
-trait ConsolidatedRegistrationsPdfPresenter
-    extends PdfPresenter[ConsolidatedRegistrations] {
+trait ConsolidatedRegistrationsPdfPresenter extends PdfPresenter[ConsolidatedRegistrations] {
   this: HtmlPresenterComponent =>
 
   val pdfPresenter: PdfPresenter[ConsolidatedRegistrations] =
     new ConsolidatedRegistrationsPdfPresenter()
 
-  class ConsolidatedRegistrationsPdfPresenter
-      extends PdfPresenter[ConsolidatedRegistrations] {
+  class ConsolidatedRegistrationsPdfPresenter extends PdfPresenter[ConsolidatedRegistrations] {
 
     val executablePath = "/usr/local/bin/wkhtmltopdf"
 
@@ -42,8 +40,7 @@ trait ConsolidatedRegistrationsPdfPresenter
       marginRight := "0.5cm"
     })
 
-    override def renderRegistrationsTo(registrations: ConsolidatedRegistrations,
-                                       fileName: String): Unit = {
+    override def renderRegistrationsTo(registrations: ConsolidatedRegistrations, fileName: String): Unit = {
 
       val page = htmlPresenter.renderRegistrations(registrations)
 

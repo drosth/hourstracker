@@ -31,35 +31,33 @@ trait HtmlPresenter[T] {
   }
 }
 
-trait ConsolidatedRegistrationsHtmlPresenter
-    extends HtmlPresenter[ConsolidatedRegistrations] {
+case class Model(registrations: ConsolidatedRegistrations, totalHours: Double, monthName: String)
+
+trait ConsolidatedRegistrationsHtmlPresenter extends HtmlPresenter[ConsolidatedRegistrations] {
+
   val htmlPresenter: HtmlPresenter[ConsolidatedRegistrations] =
     new ConsolidatedRegistrationsHtmlPresenter()
 
-  class ConsolidatedRegistrationsHtmlPresenter
-      extends HtmlPresenter[ConsolidatedRegistrations] {
+  class ConsolidatedRegistrationsHtmlPresenter extends HtmlPresenter[ConsolidatedRegistrations] {
 
-    import PresenterHelper._
-
-    override def renderRegistrationsTo(registrations: ConsolidatedRegistrations,
-                                       fileName: String): Unit = {
+    override def renderRegistrationsTo(registrations: ConsolidatedRegistrations, fileName: String): Unit = {
       withWriterTo(fileName) { writer =>
         writer.write(renderRegistrations(registrations))
         writer.flush()
       }
     }
 
-    override def renderRegistrations(
-        registrations: ConsolidatedRegistrations): String = {
+    override def renderRegistrations(registrations: ConsolidatedRegistrations): String = {
+
       val total: Double = registrations
         .filter(_.duration.isDefined)
         .foldLeft(0d)((a, i) => a + i.duration.get)
 
       val month = registrations.head.date.getMonth().name()
 
-      ConsolidatedRegistrationsPresenter
-        .render(registrations, toHumanReadableHours(Option(total)), month)
-        .toString()
+      val model: Model = Model(registrations, total, month)
+
+      ConsolidatedRegistrationsPresenter.render(model).toString()
     }
 
   }
