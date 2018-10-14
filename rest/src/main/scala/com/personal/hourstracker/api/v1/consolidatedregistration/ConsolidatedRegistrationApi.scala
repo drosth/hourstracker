@@ -42,6 +42,7 @@ object ConsolidatedRegistrationApi {
 }
 
 trait ConsolidatedRegistrationApi extends ConsolidatedRegistrationApiDoc with ConsolidatedRegistrationApiProtocol with SystemComponent {
+  import ConsolidatedRegistrationApi._
 
   lazy val consolidatedRegistrationRoutes: Route = getConsolidatedRegistrations
 
