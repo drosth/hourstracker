@@ -80,14 +80,11 @@ lazy val dependencies =
     val `javax.ws.rs-api`      = "javax.ws.rs"          % "javax.ws.rs-api"       % javaxWsRsApiV
     val `akka-http-cors`       = "ch.megard"            %% "akka-http-cors"       % akkaHttpCorsV excludeAll ExclusionRule(organization = "com.typesafe.akka")
 
-    val `swagger-core`         = "io.swagger.core.v3"           % "swagger-core"          % swaggerV
-    val `swagger-annotations`  = "io.swagger.core.v3"           % "swagger-annotations"   % swaggerV
-    val `swagger-models`       = "io.swagger.core.v3"           % "swagger-models"        % swaggerV
-    val `swagger-jaxrs2`       = "io.swagger.core.v3"           % "swagger-jaxrs2"        % swaggerV
     val `swagger-akka-http`    = "com.github.swagger-akka-http" %% "swagger-akka-http"    % swaggerAkkaHttpV
-    val `swagger-scala-module` = "com.github.swagger-akka-http" %% "swagger-scala-module" % swaggerScalaModuleV
-//    val `swagger-akka-http` = "com.github.swagger-akka-http" %% "swagger-akka-http" % swaggerAkkaHttp excludeAll
-//      ExclusionRule(organization = "com.typesafe.akka")
+
+    val `swagger-jaxrs2` = "io.swagger.core.v3" % "swagger-jaxrs2" % "2.0.1"
+    val `jackson-jaxrs-json-provider` = "com.fasterxml.jackson.jaxrs" % "jackson-jaxrs-json-provider" % "2.9.1"
+
 
     val logback = "ch.qos.logback"     % "logback-classic" % logbackV
     val spdf    = "io.github.cloudify" %% "spdf"           % spdfV
@@ -100,12 +97,9 @@ lazy val dependencies =
   }
 
 lazy val swaggerDependencies = Seq(
-  dependencies.`swagger-akka-http`,
-  dependencies.`swagger-annotations`,
-  dependencies.`swagger-core`,
   dependencies.`swagger-jaxrs2`,
-  dependencies.`swagger-models`,
-  dependencies.`swagger-scala-module`
+  dependencies.`jackson-jaxrs-json-provider`,
+  dependencies.`swagger-akka-http`
 )
 
 lazy val commonDependencies = Seq(
@@ -129,8 +123,7 @@ lazy val compilerOptions = Seq(
 
 lazy val scalafmtSettings =
   Seq(
-    scalafmtOnCompile := false,
-    scalafmtVersion := "1.5.1"
+    scalafmtOnCompile := false
   )
 
 lazy val assemblySettings = Seq(

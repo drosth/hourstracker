@@ -8,6 +8,22 @@ object MyScalafmtPlugin extends AutoPlugin {
       IO.write(
         // writes to file once when build is loaded
         file(".scalafmt.conf"),
-        "maxColumn = 140".stripMargin.getBytes("UTF-8")
+        """
+style = defaultWithAlign
+
+align.openParenCallSite = false
+align.openParenDefnSite = false
+align.tokens = [{code = "->"}, {code = "<-"}, {code = "=>", owner = "Case"}]
+continuationIndent.callSite = 2
+continuationIndent.defnSite = 2
+danglingParentheses = true
+indentOperator = spray
+maxColumn = 140
+newlines.alwaysBeforeTopLevelStatements = true
+project.excludeFilters = [".*\\.sbt", ".*\\.html"]
+rewrite.rules = [RedundantParens, SortImports]
+spaces.inImportCurlyBraces = false
+unindentTopLevelOperators = true
+        """.stripMargin.getBytes("UTF-8")
       )
 }

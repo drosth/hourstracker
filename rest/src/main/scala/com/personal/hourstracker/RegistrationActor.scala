@@ -1,5 +1,7 @@
 package com.personal.hourstracker
 
+import java.time.LocalDate
+
 import akka.actor.{Actor, ActorLogging}
 import com.personal.hourstracker.config.component.{RegistrationComponent, RegistrationService}
 import com.personal.hourstracker.config.Configuration
@@ -15,6 +17,8 @@ object RegistrationActor extends RegistrationComponent with Configuration {
   final case class ActionPerformed(description: String)
 
   final case object GetRegistrations
+
+  final case class GetConsolidatedRegistrationsAsPdf(start: LocalDate, end: LocalDate)
 }
 
 class RegistrationActor(registrationService: RegistrationService) extends Actor with ActorLogging {
@@ -23,6 +27,9 @@ class RegistrationActor(registrationService: RegistrationService) extends Actor 
 
   def receive: Receive = {
     case GetRegistrations =>
+      sender() ! registrationService.readRegistrationsFrom(importFrom)
+
+    case GetConsolidatedRegistrationsAsPdf =>
       sender() ! registrationService.readRegistrationsFrom(importFrom)
   }
 }

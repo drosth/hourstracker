@@ -9,7 +9,7 @@ abstract class SwaggerSupport(url: String, path: String, apiVersion: String, ove
 
   override val host: String = url
 
-  override val info = Info(version = apiVersion, description = "Some description", title = "Hourstracker API")
+  override val info = Info(version = apiVersion, description = "API Definition", title = "Hourstracker API")
 
   override val externalDocs = Some(
     new ExternalDocumentation()
