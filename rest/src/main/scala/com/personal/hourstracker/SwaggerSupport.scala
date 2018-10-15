@@ -2,17 +2,33 @@ package com.personal.hourstracker
 
 import com.github.swagger.akka.SwaggerHttpService
 import com.github.swagger.akka.model.Info
-import io.swagger.v3.oas.models.ExternalDocumentation
+import io.swagger.v3.oas.models.{ Components, ExternalDocumentation }
 
 abstract class SwaggerSupport(url: String, path: String, apiVersion: String, override val apiClasses: Set[Class[_]])
   extends SwaggerHttpService {
 
+  //  def apiClasses: Set[Class[_]]
   override val host: String = url
-
+  override val apiDocsPath = "/api-docs"
   override val info = Info(version = apiVersion, description = "API Definition", title = "Hourstracker API")
+  override val components: Option[Components] = None
+  override val schemes = List("http", "https")
+  //  def security: List[SecurityRequirement] = List()
+  //  def securitySchemes: Map[String, SecurityScheme] = Map.empty
+  override val externalDocs: Option[ExternalDocumentation] = None
+  override val vendorExtensions: Map[String, Object] = Map.empty
+  override val unwantedDefinitions = Seq("Function1RequestContextFutureRouteResult")
 
-  override val externalDocs = Some(
-    new ExternalDocumentation()
-      .description("Core Docs")
-      .url("http://acme.com/docs"))
+  /*
+  override val securitySchemeDefinitions = Map(
+    "bearer" -> new ApiKeyAuthDefinition("Authorization", In.HEADER)
+  )
+   */
+
+  private lazy val swaggerJson: String = super.generateSwaggerJson
+  private lazy val swaggerYaml: String = super.generateSwaggerYaml
+
+  override def generateSwaggerJson: String = swaggerJson
+  override def generateSwaggerYaml: String = swaggerYaml
+
 }

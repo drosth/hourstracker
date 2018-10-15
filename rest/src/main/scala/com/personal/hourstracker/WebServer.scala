@@ -3,14 +3,14 @@ package com.personal.hourstracker
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-import akka.actor.{ActorRef, Props}
+import akka.actor.{ ActorRef, Props }
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.HttpMethods
 import akka.http.scaladsl.model.headers.HttpOriginRange
 import akka.http.scaladsl.server.Directives._
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import ch.megard.akka.http.cors.scaladsl.settings.CorsSettings
-import com.personal.hourstracker.api.{Api => ApiV1}
+import com.personal.hourstracker.api.{ Api => ApiV1 }
 import com.personal.hourstracker.api.v1.consolidatedregistration.ConsolidatedRegistrationActor
 import com.personal.hourstracker.api.v1.registration.RegistrationActor
 import com.personal.hourstracker.config.WebModule
@@ -41,6 +41,6 @@ object WebServer extends App with ApiV1 with WebModule {
 }
 /*
 
-http://0.0.0.0:8080/api/v1/registrations
+http://localhost:8080/api/v1/registrations/consolidated
 
  */
