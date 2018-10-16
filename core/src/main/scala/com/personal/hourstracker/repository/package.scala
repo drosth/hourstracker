@@ -1,6 +1,6 @@
 package com.personal.hourstracker
 
-import java.io.{File, FileInputStream, InputStreamReader, Reader}
+import java.io.{ File, FileInputStream, InputStreamReader, Reader }
 import java.text.NumberFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

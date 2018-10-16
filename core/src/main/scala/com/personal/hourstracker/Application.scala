@@ -1,6 +1,6 @@
 package com.personal.hourstracker
 
-import java.time.{LocalDate, Month}
+import java.time.{ LocalDate, Month }
 
 import com.personal.hourstracker.config.ApplicationModule
 import com.personal.hourstracker.domain.ConsolidatedRegistration.ConsolidatedRegistrations

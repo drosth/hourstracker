@@ -2,16 +2,16 @@ package com.personal.hourstracker.api.v1.consolidatedregistration
 
 import akka.http.scaladsl.server.Route
 import com.personal.hourstracker.api.v1.consolidatedregistration.ConsolidatedRegistrationApi.ConsolidatedRegistrationModel
-import io.swagger.v3.oas.annotations.{Operation, Parameter}
+import io.swagger.v3.oas.annotations.{ Operation, Parameter }
 import io.swagger.v3.oas.annotations.enums.ParameterIn
-import io.swagger.v3.oas.annotations.media.{Content, Schema}
+import io.swagger.v3.oas.annotations.media.{ Content, Schema }
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-import javax.ws.rs.{GET, Path}
+import javax.ws.rs.{ GET, Path }
 
+@Path("/api/v1/registrations/consolidated")
 protected[consolidatedregistration] trait ConsolidatedRegistrationApiDoc {
 
   @GET
-  @Path("registrations/consolidated")
   @Operation(
     summary = "Retrieve consolidated registrations between given start and end dates",
     description = "Retrieves consolidated registrations",
@@ -20,15 +20,15 @@ protected[consolidatedregistration] trait ConsolidatedRegistrationApiDoc {
       new Parameter(
         in = ParameterIn.QUERY,
         name = "startAt",
-        required = true,
+        required = false,
         schema = new Schema(implementation = classOf[String]),
-        example = "01-09-2018"),
+        example = "2018-09-01"),
       new Parameter(
         in = ParameterIn.QUERY,
         name = "endAt",
         required = false,
         schema = new Schema(implementation = classOf[String]),
-        example = "30-09-2018")),
+        example = "2018-09-30")),
 
     responses = Array(
       new ApiResponse(

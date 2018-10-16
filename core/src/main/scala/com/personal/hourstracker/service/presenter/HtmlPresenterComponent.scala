@@ -1,6 +1,6 @@
 package com.personal.hourstracker.service.presenter
 
-import java.io.{File, PrintWriter, Writer}
+import java.io.{ File, PrintWriter, Writer }
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale

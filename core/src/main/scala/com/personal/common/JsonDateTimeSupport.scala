@@ -1,8 +1,8 @@
 package com.personal.common
-import java.time.{LocalDate, LocalDateTime}
+import java.time.{ LocalDate, LocalDateTime }
 import java.time.format.DateTimeFormatter
 
-import spray.json.{deserializationError, DefaultJsonProtocol, JsonFormat, JsString, JsValue}
+import spray.json.{ deserializationError, DefaultJsonProtocol, JsonFormat, JsString, JsValue }
 
 trait JsonDateTimeSupport {
   this: DefaultJsonProtocol =>

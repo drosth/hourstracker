@@ -1,6 +1,6 @@
 package com.personal.hourstracker.service.presenter
 
-import spray.json.{JsonWriter, JsValue}
+import spray.json.{ JsonWriter, JsValue }
 
 trait JsonPresenterComponent extends DefaultJsonPresenter
 

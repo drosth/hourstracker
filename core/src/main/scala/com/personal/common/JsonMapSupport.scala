@@ -1,5 +1,5 @@
 package com.personal.common
-import spray.json.{deserializationError, serializationError, JsArray, JsFalse, JsNumber, JsObject, JsonFormat, JsString, JsTrue, JsValue}
+import spray.json.{ deserializationError, serializationError, JsArray, JsFalse, JsNumber, JsObject, JsonFormat, JsString, JsTrue, JsValue }
 
 trait JsonMapSupport {
   implicit object AnyJsonFormat extends JsonFormat[Any] {

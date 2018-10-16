@@ -1,6 +1,6 @@
 package com.personal.hourstracker.api.v1.registration
 
-import java.time.{LocalDate, LocalDateTime}
+import java.time.{ LocalDate, LocalDateTime }
 import java.time.format.DateTimeFormatter
 
 import scala.concurrent.duration._
@@ -13,7 +13,7 @@ import akka.http.scaladsl.unmarshalling.Unmarshaller
 import akka.pattern.ask
 import akka.util.Timeout
 import com.personal.hourstracker.api.v1.consolidatedregistration.ConsolidatedRegistrationApi
-import com.personal.hourstracker.api.v1.registration.RegistrationActor.{GetRegistrations, GetRegistrationsBetween}
+import com.personal.hourstracker.api.v1.registration.RegistrationActor.{ GetRegistrations, GetRegistrationsBetween }
 import com.personal.hourstracker.config.component.SystemComponent
 import com.personal.hourstracker.domain.Registration
 import io.swagger.v3.oas.annotations.media.Schema
@@ -61,7 +61,7 @@ object RegistrationApi {
   }
 }
 
-trait RegistrationApi extends RegistrationApiProtocol with RegistrationApiDoc with SystemComponent with ConsolidatedRegistrationApi {
+trait RegistrationApi extends RegistrationApiProtocol with RegistrationApiDoc with SystemComponent {
   import RegistrationApi._
 
   lazy val registrationRoutes: Route = getRegistrations

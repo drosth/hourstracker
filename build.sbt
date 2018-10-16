@@ -6,12 +6,17 @@ scalaVersion := "2.12.6"
 
 // PROJECTS
 
-lazy val global = project.in(file(".")).settings(settings).aggregate(rest, core)
+lazy val global = project.in(file("."))
+    .aggregate(rest, core)
+    .settings(
+      commonSettings,
+      publishArtifact := false
+    )
 
 lazy val rest = (project in file("rest"))
   .settings(
     name := "hourstracker-rest",
-    settings,
+    commonSettings,
     libraryDependencies ++= commonDependencies ++ Seq(
       dependencies.`swagger-akka-http`,
       dependencies.`akka-http-spray-json`,
@@ -32,7 +37,7 @@ lazy val core = (project in file("core"))
   .enablePlugins(SbtTwirl)
   .settings(
     name := "hourstracker-core",
-    settings,
+    commonSettings,
     sourceDirectories in (Compile, TwirlKeys.compileTemplates) += (baseDirectory.value.getParentFile / "src" / "main" / "twirl"),
     libraryDependencies ++= commonDependencies ++ Seq(
       dependencies.`commons-io`,
@@ -44,9 +49,6 @@ lazy val core = (project in file("core"))
 
 // SETTINGS
 
-lazy val settings =
-  commonSettings
-
 lazy val commonSettings = Seq(
   scalacOptions ++= compilerOptions
 )
@@ -54,7 +56,7 @@ lazy val commonSettings = Seq(
 lazy val dependencies =
   new {
     val akkaHttpV = "10.0.11"
-    val akkaV = "2.5.6"
+    val akkaV = "2.5.17"
     val commonsIoV = "2.6"
     val logbackV = "1.2.3"
     val scalacheckV = "1.13.5"

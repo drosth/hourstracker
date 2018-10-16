@@ -1,6 +1,6 @@
 package com.personal.hourstracker.api.v1.registration
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import com.personal.common.{CommonJsonSupport, JsonDateTimeSupport}
+import com.personal.common.{ CommonJsonSupport, JsonDateTimeSupport }
 import com.personal.hourstracker.api.v1.registration.RegistrationApi.RegistrationModel
 import spray.json.RootJsonFormat
 

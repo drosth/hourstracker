@@ -1,6 +1,6 @@
 package com.personal.hourstracker.service
 
-import java.time.{LocalDate, LocalDateTime}
+import java.time.{ LocalDate, LocalDateTime }
 import java.time.temporal.WeekFields
 
 import com.personal.hourstracker.domain.Registration

@@ -2,8 +2,8 @@ package com.personal.hourstracker.api.v1.consolidatedregistration
 
 import java.time.LocalDate
 
-import akka.actor.{Actor, ActorLogging}
-import com.personal.hourstracker.config.component.{ConsolidatedRegistrationComponent, RegistrationComponent, RegistrationService}
+import akka.actor.{ Actor, ActorLogging }
+import com.personal.hourstracker.config.component.{ ConsolidatedRegistrationComponent, RegistrationComponent, RegistrationService }
 import com.personal.hourstracker.config.Configuration
 
 final case class User(name: String, age: Int, countryOfResidence: String)

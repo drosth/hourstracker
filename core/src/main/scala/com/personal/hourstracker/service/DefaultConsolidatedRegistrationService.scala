@@ -1,12 +1,12 @@
 package com.personal.hourstracker.service
 
-import java.time.{LocalDate, Period}
+import java.time.{ LocalDate, Period }
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
 import com.personal.hourstracker.config.component.ConsolidatedRegistrationService
-import com.personal.hourstracker.domain.{ConsolidatedRegistration, Registration}
-import com.personal.hourstracker.domain.ConsolidatedRegistration.{ConsolidatedRegistrations, DateTimeOrdering}
+import com.personal.hourstracker.domain.{ ConsolidatedRegistration, Registration }
+import com.personal.hourstracker.domain.ConsolidatedRegistration.{ ConsolidatedRegistrations, DateTimeOrdering }
 import com.personal.hourstracker.domain.Registration.Registrations
 
 trait DefaultConsolidatedRegistrationService extends ConsolidatedRegistrationService {

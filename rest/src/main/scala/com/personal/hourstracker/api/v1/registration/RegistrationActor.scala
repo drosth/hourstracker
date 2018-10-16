@@ -2,8 +2,8 @@ package com.personal.hourstracker.api.v1.registration
 
 import java.time.LocalDate
 
-import akka.actor.{Actor, ActorLogging}
-import com.personal.hourstracker.config.component.{RegistrationComponent, RegistrationService}
+import akka.actor.{ Actor, ActorLogging }
+import com.personal.hourstracker.config.component.{ RegistrationComponent, RegistrationService }
 import com.personal.hourstracker.config.Configuration
 import com.personal.hourstracker.service.RegistrationSelector
 
