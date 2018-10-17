@@ -2,9 +2,10 @@ package com.personal.hourstracker.api.v1.registration
 
 import java.time.LocalDate
 
-import akka.actor.{ Actor, ActorLogging }
-import com.personal.hourstracker.config.component.{ RegistrationComponent, RegistrationService }
+import akka.actor.{Actor, ActorLogging}
+import com.personal.hourstracker.config.component.{RegistrationComponent, RegistrationService}
 import com.personal.hourstracker.config.Configuration
+import com.personal.hourstracker.domain.{Registration, SearchParameters}
 import com.personal.hourstracker.service.RegistrationSelector
 
 final case class User(name: String, age: Int, countryOfResidence: String)
@@ -17,20 +18,28 @@ object RegistrationActor extends RegistrationComponent with Configuration {
 
   final case object GetRegistrations
 
-  final case class GetRegistrationsBetween(start: LocalDate, end: Option[LocalDate])
+  final case class GetRegistrationsBy(searchParameters: SearchParameters)
 }
 
 class RegistrationActor(registrationService: RegistrationService) extends Actor with ActorLogging {
 
   import RegistrationActor._
 
+  def determineSelectorFor(searchParameters: SearchParameters): Registration => Boolean = searchParameters match {
+    case SearchParameters(Some(startAt), None) => RegistrationSelector.registrationsStartingFrom(startAt)
+    case SearchParameters(Some(startAt), Some(endAt)) => RegistrationSelector.registrationsBetween(startAt, endAt)
+    case _ =>
+      registration =>
+        true
+  }
+
   def receive: Receive = {
     case GetRegistrations =>
       sender() ! registrationService.readRegistrationsFrom(importFrom)
 
-    case req: GetRegistrationsBetween =>
+    case req: GetRegistrationsBy =>
       sender() ! registrationService
         .readRegistrationsFrom(importFrom)
-        .filter(RegistrationSelector.registrationsBetween(req.start, req.end.getOrElse(LocalDate.of(9999, 12, 31))))
+        .filter(determineSelectorFor(req.searchParameters))
   }
 }

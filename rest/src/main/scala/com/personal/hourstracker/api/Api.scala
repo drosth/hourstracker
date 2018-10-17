@@ -3,9 +3,9 @@ package com.personal.hourstracker.api
 import akka.actor.ActorSystem
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import com.personal.hourstracker.api.v1.registration.RegistrationApi
 import com.personal.hourstracker.api.v1.Swagger
 import com.personal.hourstracker.api.v1.consolidatedregistration.ConsolidatedRegistrationApi
+import com.personal.hourstracker.api.v1.registration.RegistrationApi
 import com.personal.hourstracker.config.Configuration
 
 trait Api extends RegistrationApi with ConsolidatedRegistrationApi {

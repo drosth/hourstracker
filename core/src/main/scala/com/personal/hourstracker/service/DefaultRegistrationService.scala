@@ -1,10 +1,12 @@
 package com.personal.hourstracker.service
 
-import com.personal.hourstracker.config.component.{ RegistrationRepository, RegistrationService, RegistrationServiceCake }
+import scala.concurrent.Future
+
+import com.personal.hourstracker.config.component._
 import com.personal.hourstracker.domain.Registration.Registrations
 
-trait DefaultRegistrationService extends RegistrationServiceCake {
-  this: RegistrationRepository =>
+trait DefaultRegistrationService extends RegistrationServiceContract {
+  this: RegistrationRepository with LoggingComponent with SystemComponent =>
 
   def registrationService: DefaultRegistrationService =
     new DefaultRegistrationService()
@@ -13,8 +15,12 @@ trait DefaultRegistrationService extends RegistrationServiceCake {
 
     import com.personal.hourstracker.repository._
 
-    override def readRegistrationsFrom(fileName: String): Registrations =
-      registrationRepository.readRegistrationsFrom(fileName)
+    override def importRegistrationsFrom(fileName: String): Future[Registrations] = {
+      registrationRepository.readRegistrationsFrom(fileName).recover {
+        case e =>
+          logger.error(s"Could not import from '$fileName': ${e.getMessage}", e)
+          Seq()
+      }
+    }
   }
-
 }

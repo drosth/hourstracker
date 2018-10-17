@@ -2,45 +2,58 @@ package com.personal.hourstracker
 
 import java.time.{ LocalDate, Month }
 
+import scala.concurrent.{ Await, Future }
+import scala.concurrent.duration._
+
 import com.personal.hourstracker.config.ApplicationModule
-import com.personal.hourstracker.domain.ConsolidatedRegistration.ConsolidatedRegistrations
 import com.personal.hourstracker.domain.Registration.Registrations
 import com.personal.hourstracker.service.RegistrationSelector
 
 object Application extends App with ApplicationModule {
 
-  val registrations: Registrations = registrationService
-    .readRegistrationsFrom(Application.importFrom)
-    .filter(
-      RegistrationSelector.registrationsBetween(
-        LocalDate.of(2018, Month.SEPTEMBER, 1),
-        LocalDate.of(2018, Month.SEPTEMBER, 30)))
-    .flatMap(facturationService.splitForFacturation)
+  sys.addShutdownHook(terminate)
 
-  import com.personal.hourstracker.domain.ConsolidatedRegistration.JsonProtocol._
+  private lazy val terminate = {
+    logger.info("Shutting down APPLICATION")
+    system.terminate()
+    Await.result(system.whenTerminated, 30 seconds)
+  }
 
-  private val consolidatedRegistrations: Map[String, ConsolidatedRegistrations] =
-    consolidatedRegistrationService
-      .consolidateRegistrations(registrations)
-      .groupBy(_.job)
+  val imported: Future[Registrations] = registrationService
+    .importRegistrationsFrom(Application.importFrom)
 
-  private val consolidatedRegistrationsWithMissingEntries =
-    consolidatedRegistrationService
-      .addUnregisteredEntriesTo(consolidatedRegistrations)
-
+  /*
   println(
     jsonPresenter.renderRegistrationsTo(consolidatedRegistrations)
       .prettyPrint)
+   */
 
-  consolidatedRegistrationsWithMissingEntries.foreach {
-    case (job, registrations) => {
+  val f: Future[Registrations] = imported
+    .map(
+      registrations =>
+        registrations
+          .filter(
+            RegistrationSelector.registrationsBetween(LocalDate.of(2018, Month.SEPTEMBER, 1), LocalDate.of(2018, Month.SEPTEMBER, 30)))
+          .flatMap(facturationService.splitForFacturation))
 
-      val fileName =
-        s"[Timesheet] - $job - ${dateRangeAsStringOf(registrations)}"
+  val registrations: Registrations = Await.result(f, 10 seconds)
 
-      htmlPresenter.renderRegistrationsTo(registrations, s"target/$fileName.html")
+  consolidatedRegistrationService
+    .addUnregisteredEntriesTo(
+      consolidatedRegistrationService
+        .consolidateRegistrations(registrations)
+        .groupBy(_.job))
+    .foreach {
+      case (job, consolidatedRegistrationsPerJob) => {
 
-      pdfPresenter.renderRegistrationsTo(registrations, s"target/$fileName.pdf")
+        val fileName =
+          s"[Timesheet] - $job - ${dateRangeAsStringOf(consolidatedRegistrationsPerJob)}"
+
+        htmlPresenter.renderRegistrationsTo(consolidatedRegistrationsPerJob, s"target/$fileName.html")
+
+        pdfPresenter.renderRegistrationsTo(consolidatedRegistrationsPerJob, s"target/$fileName.pdf")
+      }
     }
-  }
+
+  terminate
 }

@@ -68,8 +68,6 @@ trait ConsolidatedRegistrationApi
 
   lazy val consolidatedRegistrationRoutes: Route = getConsolidatedRegistrations
 
-  // Required by the `ask` (?) method below
-  private implicit lazy val timeout = Timeout(5.seconds) // usually we'd obtain the timeout from the system's configuration
   val myEncodings = Seq(MediaRange(`application/pdf`), MediaRange(`application/json`))
 
   //  val AcceptJson = Accept(MediaRange(MediaTypes.`application/json`))

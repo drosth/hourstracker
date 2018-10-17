@@ -11,17 +11,13 @@ object RegistrationSelector {
     registration.clockedIn.isDefined &&
       registration.clockedIn.get.isAfter(startOfYear)
 
-  def registrationsBetween(start: LocalDate, finish: LocalDate): Registration => Boolean = {
+  def registrationsStartingFrom(start: LocalDate): Registration => Boolean =
+    registration => registration.clockedIn.isDefined && registration.clockedIn.get.toLocalDate.isAfter(start)
+
+  def registrationsBetween(start: LocalDate, finish: LocalDate): Registration => Boolean =
     registration =>
-      registration.clockedIn.isDefined match {
-        case false => false
-        case true =>
-          val clockedIn = registration.clockedIn.get.toLocalDate
-          registration.clockedIn.isDefined &&
-            clockedIn.isAfter(start) &&
-            clockedIn.isBefore(finish)
-      }
-  }
+      registration.clockedIn.isDefined && registration.clockedIn.get.toLocalDate.isAfter(start) && registration.clockedIn.get.toLocalDate
+        .isBefore(finish)
 
   val registrationsForCurrentMonth: Registration => Boolean = registration =>
     registration.clockedIn.isDefined &&

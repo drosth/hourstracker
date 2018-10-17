@@ -1,6 +1,9 @@
 package com.personal.hourstracker.config
 
-import com.personal.hourstracker.config.component.{ ConsolidatedRegistrationComponent, FacturationComponent, RegistrationComponent }
+import scala.concurrent.ExecutionContext
+
+import akka.actor.ActorSystem
+import com.personal.hourstracker.config.component.{ ConsolidatedRegistrationComponent, FacturationComponent, RegistrationComponent, SystemComponent }
 import com.personal.hourstracker.service.presenter.{ HtmlPresenterComponent, JsonPresenterComponent, PdfPresenterComponent }
 
 trait ApplicationModule
@@ -11,3 +14,9 @@ trait ApplicationModule
   with HtmlPresenterComponent
   with PdfPresenterComponent
   with JsonPresenterComponent
+  with SystemComponent {
+
+  override implicit val system: ActorSystem = ActorSystem("event-replay")
+  //  override implicit val materializer: ActorMaterializer = ActorMaterializer()
+  override implicit val executor: ExecutionContext = system.dispatcher
+}
