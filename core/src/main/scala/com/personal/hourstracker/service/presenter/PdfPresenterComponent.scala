@@ -2,6 +2,7 @@ package com.personal.hourstracker.service.presenter
 
 import java.io.File
 
+import com.personal.hourstracker.config.component.LoggingComponent
 import com.personal.hourstracker.domain.ConsolidatedRegistration.ConsolidatedRegistrations
 import io.github.cloudify.scala.spdf._
 
@@ -22,7 +23,7 @@ trait PdfPresenter[T] {
 }
 
 trait ConsolidatedRegistrationsPdfPresenter extends PdfPresenter[ConsolidatedRegistrations] {
-  this: HtmlPresenterComponent =>
+  this: HtmlPresenterComponent with LoggingComponent =>
 
   val pdfPresenter: PdfPresenter[ConsolidatedRegistrations] =
     new ConsolidatedRegistrationsPdfPresenter()
@@ -41,10 +42,9 @@ trait ConsolidatedRegistrationsPdfPresenter extends PdfPresenter[ConsolidatedReg
     })
 
     override def renderRegistrationsTo(registrations: ConsolidatedRegistrations, fileName: String): Unit = {
+      logger.info(s"Rendering #${registrations.size} consolidated registrations to PDF: '$fileName'")
 
-      val page = htmlPresenter.renderRegistrations(registrations)
-
-      pdf.run(page, new File(fileName))
+      pdf.run(htmlPresenter.renderRegistrations(registrations), new File(fileName))
     }
   }
 

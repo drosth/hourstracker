@@ -5,14 +5,12 @@ import java.io.Reader
 import scala.concurrent.Future
 
 import com.personal.hourstracker.domain.Registration.Registrations
-import com.personal.hourstracker.domain.SearchParameters
 import com.personal.hourstracker.repository.DefaultRegistrationRepository
 import com.personal.hourstracker.service.DefaultRegistrationService
 
-trait RegistrationComponent extends DefaultRegistrationService
-  with DefaultRegistrationRepository
-  with LoggingComponent
-  with SystemComponent
+trait RegistrationComponent extends DefaultRegistrationService with DefaultRegistrationRepository {
+  this: LoggingComponent with SystemComponent =>
+}
 
 trait RegistrationServiceContract {
   this: RegistrationRepository =>

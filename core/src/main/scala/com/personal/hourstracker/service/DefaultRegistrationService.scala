@@ -16,6 +16,7 @@ trait DefaultRegistrationService extends RegistrationServiceContract {
     import com.personal.hourstracker.repository._
 
     override def importRegistrationsFrom(fileName: String): Future[Registrations] = {
+      logger.info(s"Importing registrations from: '$fileName'")
       registrationRepository.readRegistrationsFrom(fileName).recover {
         case e =>
           logger.error(s"Could not import from '$fileName': ${e.getMessage}", e)

@@ -9,6 +9,8 @@ object ConsolidatedRegistration {
 
   type ConsolidatedRegistrations = Seq[ConsolidatedRegistration]
 
+  type ConsolidatedRegistrationsPerJob = Map[String, ConsolidatedRegistrations]
+
   object JsonProtocol extends CommonJsonSupport {
     implicit lazy val consolidatedRegistrationFormat: JsonFormat[ConsolidatedRegistration] = jsonFormat4(
       ConsolidatedRegistration.apply)

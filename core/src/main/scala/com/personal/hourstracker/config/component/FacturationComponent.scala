@@ -4,7 +4,7 @@ import com.personal.hourstracker.domain.Registration
 import com.personal.hourstracker.domain.Registration.Registrations
 import com.personal.hourstracker.service.DefaultFacturationService
 
-trait FacturationComponent extends DefaultFacturationService
+trait FacturationComponent extends DefaultFacturationService with LoggingComponent
 
 trait FacturationService {
   def facturationService: FacturationService

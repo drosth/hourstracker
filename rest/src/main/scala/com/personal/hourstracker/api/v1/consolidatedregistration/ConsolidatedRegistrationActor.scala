@@ -1,26 +1,33 @@
 package com.personal.hourstracker.api.v1.consolidatedregistration
 
-import java.time.LocalDate
+import scala.concurrent.Future
 
-import akka.actor.{ Actor, ActorLogging }
-import com.personal.hourstracker.config.component.{ ConsolidatedRegistrationComponent, RegistrationComponent, RegistrationService }
-import com.personal.hourstracker.config.Configuration
+import akka.actor.{ Actor, ActorLogging, ActorRef, Props }
+import com.personal.hourstracker.config.component._
+import com.personal.hourstracker.domain.Registration.Registrations
 
 final case class User(name: String, age: Int, countryOfResidence: String)
 
 final case class Users(users: Seq[User])
 
-object ConsolidatedRegistrationActor extends RegistrationComponent with ConsolidatedRegistrationComponent with Configuration {
+object ConsolidatedRegistrationActor {
 
-  final case class GetConsolidatedRegistrations(start: LocalDate, end: LocalDate)
+  final case class GetConsolidatedRegistrations(registrations: Future[Registrations])
 }
 
-class ConsolidatedRegistrationActor(registrationService: RegistrationService) extends Actor with ActorLogging {
+trait ConsolidatedRegistrationActor {
+  this: ConsolidatedRegistrationServiceContract with SystemComponent =>
 
-  import ConsolidatedRegistrationActor._
+  def consolidatedRegistrationActor: ActorRef =
+    system.actorOf(Props(new ConsolidatedRegistrationActor(consolidatedRegistrationService)), "consolidatedRegistrationActor")
 
-  def receive: Receive = {
-    case GetConsolidatedRegistrations =>
-      sender() ! registrationService.readRegistrationsFrom("")
+  class ConsolidatedRegistrationActor(consolidatedRegistrationService: ConsolidatedRegistrationService) extends Actor with ActorLogging {
+    import ConsolidatedRegistrationActor._
+
+    def receive: Receive = {
+      case request: GetConsolidatedRegistrations =>
+        sender() ! request.registrations
+          .map(consolidatedRegistrationService.consolidateRegistrations())
+    }
   }
 }

@@ -10,10 +10,12 @@ import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import akka.http.scaladsl.unmarshalling.Unmarshaller
 import akka.pattern.ask
+import akka.util.Timeout
 import com.personal.hourstracker.api.v1.domain.RegistrationModel
 import com.personal.hourstracker.api.v1.registration.RegistrationActor.GetRegistrationsBy
 import com.personal.hourstracker.config.component.SystemComponent
-import com.personal.hourstracker.domain.Registration
+import com.personal.hourstracker.domain.{ Registration, SearchParameters }
+import scala.concurrent.duration._
 
 object RegistrationApi {
   implicit lazy val locale: Locale = new Locale("nl", "NL")
@@ -42,7 +44,6 @@ object RegistrationApi {
 
 trait RegistrationApi extends RegistrationApiProtocol with RegistrationApiDoc with SystemComponent {
   import RegistrationApi._
-  import SearchParameters._
 
   lazy val registrationRoutes: Route = getRegistrations
 

@@ -1,45 +1,47 @@
 package com.personal.hourstracker.api.v1.registration
 
-import java.time.LocalDate
-
-import akka.actor.{Actor, ActorLogging}
-import com.personal.hourstracker.config.component.{RegistrationComponent, RegistrationService}
+import akka.actor.{ Actor, ActorLogging, ActorRef, Props }
+import com.personal.hourstracker.config.component.{ SystemComponent, _ }
 import com.personal.hourstracker.config.Configuration
-import com.personal.hourstracker.domain.{Registration, SearchParameters}
+import com.personal.hourstracker.domain.{ Registration, SearchParameters }
 import com.personal.hourstracker.service.RegistrationSelector
 
 final case class User(name: String, age: Int, countryOfResidence: String)
 
 final case class Users(users: Seq[User])
 
-object RegistrationActor extends RegistrationComponent with Configuration {
-
-  lazy val importFrom: String = Application.importFrom
+object RegistrationActor {
 
   final case object GetRegistrations
 
   final case class GetRegistrationsBy(searchParameters: SearchParameters)
 }
 
-class RegistrationActor(registrationService: RegistrationService) extends Actor with ActorLogging {
+trait RegistrationActor {
+  this: RegistrationServiceContract with Configuration with SystemComponent =>
 
-  import RegistrationActor._
+  def registrationActor: ActorRef = system.actorOf(Props(new RegistrationActor(registrationService)), "registrationActor")
 
-  def determineSelectorFor(searchParameters: SearchParameters): Registration => Boolean = searchParameters match {
-    case SearchParameters(Some(startAt), None) => RegistrationSelector.registrationsStartingFrom(startAt)
-    case SearchParameters(Some(startAt), Some(endAt)) => RegistrationSelector.registrationsBetween(startAt, endAt)
-    case _ =>
-      registration =>
-        true
-  }
+  class RegistrationActor(registrationService: RegistrationService) extends Actor with ActorLogging {
 
-  def receive: Receive = {
-    case GetRegistrations =>
-      sender() ! registrationService.readRegistrationsFrom(importFrom)
+    import RegistrationActor._
 
-    case req: GetRegistrationsBy =>
-      sender() ! registrationService
-        .readRegistrationsFrom(importFrom)
-        .filter(determineSelectorFor(req.searchParameters))
+    def determineSelectorFor(searchParameters: SearchParameters): Registration => Boolean = searchParameters match {
+      case SearchParameters(Some(startAt), None) => RegistrationSelector.registrationsStartingFrom(startAt)
+      case SearchParameters(Some(startAt), Some(endAt)) => RegistrationSelector.registrationsBetween(startAt, endAt)
+      case _ =>
+        registration =>
+          true
+    }
+
+    def receive: Receive = {
+      case GetRegistrations =>
+        sender() ! registrationService.importRegistrationsFrom(Application.importFrom)
+
+      case request: GetRegistrationsBy =>
+        sender() ! registrationService
+          .importRegistrationsFrom(Application.importFrom)
+          .map(_.filter(determineSelectorFor(request.searchParameters)))
+    }
   }
 }

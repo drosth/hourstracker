@@ -12,16 +12,9 @@ import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import ch.megard.akka.http.cors.scaladsl.settings.CorsSettings
 import com.personal.hourstracker.api.{ Api => ApiV1 }
 import com.personal.hourstracker.api.v1.consolidatedregistration.ConsolidatedRegistrationActor
-import com.personal.hourstracker.api.v1.registration.RegistrationActor
 import com.personal.hourstracker.config.WebModule
 
 object WebServer extends App with ApiV1 with WebModule {
-
-  val registrationActor: ActorRef =
-    system.actorOf(Props(new RegistrationActor(registrationService)), "registrationActor")
-
-  val consolidatedRegistrationActor: ActorRef =
-    system.actorOf(Props(new ConsolidatedRegistrationActor(registrationService)), "consolidatedRegistrationActor")
 
   private val corsSettings = CorsSettings.defaultSettings
     .withAllowedOrigins(HttpOriginRange.*)

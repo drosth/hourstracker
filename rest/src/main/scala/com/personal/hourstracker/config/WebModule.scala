@@ -1,13 +1,10 @@
 package com.personal.hourstracker.config
-import scala.concurrent.ExecutionContext
-
-import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
+import com.personal.hourstracker.api.v1.consolidatedregistration.ConsolidatedRegistrationActor
+import com.personal.hourstracker.api.v1.registration.RegistrationActor
 
-trait WebModule extends ApplicationModule {
+trait WebModule extends ApplicationModule with RegistrationActor with ConsolidatedRegistrationActor {
 
-  implicit val system: ActorSystem = ActorSystem("WebServer")
   implicit val materializer: ActorMaterializer = ActorMaterializer()
-  implicit val executionContext: ExecutionContext = system.dispatcher
 
 }

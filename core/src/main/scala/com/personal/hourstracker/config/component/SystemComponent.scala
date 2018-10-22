@@ -7,5 +7,5 @@ import akka.actor.ActorSystem
 trait SystemComponent {
   implicit def system: ActorSystem
   //  implicit def materializer: ActorMaterializer
-  implicit def executor: ExecutionContext
+  implicit def executionContext: ExecutionContext
 }

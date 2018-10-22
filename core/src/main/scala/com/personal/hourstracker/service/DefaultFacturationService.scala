@@ -3,11 +3,13 @@ package com.personal.hourstracker.service
 import java.text.NumberFormat
 import java.util.Locale
 
-import com.personal.hourstracker.config.component.FacturationService
+import com.personal.hourstracker.config.component.{ FacturationService, LoggingComponent }
 import com.personal.hourstracker.domain.Registration
 import com.personal.hourstracker.domain.Registration.Registrations
 
 trait DefaultFacturationService extends FacturationService {
+  this: LoggingComponent =>
+
   override def facturationService: FacturationService =
     new DefaultFacturationService()
 
@@ -16,8 +18,10 @@ trait DefaultFacturationService extends FacturationService {
     private lazy val format: NumberFormat =
       NumberFormat.getInstance(new Locale("nl", "NL"))
 
-    override val splitForFacturation: Registration => Registrations =
+    override val splitForFacturation: Registration => Registrations = {
+      logger.info("Splitting for facturation")
       registration => splitOnTags(registration)
+    }
 
     private val tagPattern = raw"^([^-]+)-([0-9]{1,2})%$$|(.*)".r
 

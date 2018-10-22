@@ -5,10 +5,11 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+import com.personal.hourstracker.config.component.LoggingComponent
 import com.personal.hourstracker.domain.ConsolidatedRegistration.ConsolidatedRegistrations
 import com.personal.hourstracker.presenter.html.ConsolidatedRegistrationsPresenter
 
-trait HtmlPresenterComponent extends ConsolidatedRegistrationsHtmlPresenter
+trait HtmlPresenterComponent extends ConsolidatedRegistrationsHtmlPresenter with LoggingComponent
 
 trait HtmlPresenter[T] {
   val htmlPresenter: HtmlPresenter[T]
@@ -34,6 +35,7 @@ trait HtmlPresenter[T] {
 case class Model(registrations: ConsolidatedRegistrations, totalHours: Double, monthName: String)
 
 trait ConsolidatedRegistrationsHtmlPresenter extends HtmlPresenter[ConsolidatedRegistrations] {
+  this: LoggingComponent =>
 
   val htmlPresenter: HtmlPresenter[ConsolidatedRegistrations] =
     new ConsolidatedRegistrationsHtmlPresenter()
@@ -41,6 +43,8 @@ trait ConsolidatedRegistrationsHtmlPresenter extends HtmlPresenter[ConsolidatedR
   class ConsolidatedRegistrationsHtmlPresenter extends HtmlPresenter[ConsolidatedRegistrations] {
 
     override def renderRegistrationsTo(registrations: ConsolidatedRegistrations, fileName: String): Unit = {
+      logger.info(s"Rendering #${registrations.size} consolidated registrations to HTML: '$fileName'")
+
       withWriterTo(fileName) { writer =>
         writer.write(renderRegistrations(registrations))
         writer.flush()
@@ -48,7 +52,6 @@ trait ConsolidatedRegistrationsHtmlPresenter extends HtmlPresenter[ConsolidatedR
     }
 
     override def renderRegistrations(registrations: ConsolidatedRegistrations): String = {
-
       val total: Double = registrations
         .filter(_.duration.isDefined)
         .foldLeft(0d)((a, i) => a + i.duration.get)
