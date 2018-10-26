@@ -7,9 +7,11 @@ import com.personal.hourstracker.api.v1.Swagger
 import com.personal.hourstracker.api.v1.consolidatedregistration.ConsolidatedRegistrationApi
 import com.personal.hourstracker.api.v1.registration.RegistrationApi
 import com.personal.hourstracker.config.Configuration
+import com.personal.hourstracker.config.component.{ FacturationComponent, RegistrationComponent }
+import com.personal.hourstracker.service.presenter.PresenterComponents
 
 trait Api extends RegistrationApi with ConsolidatedRegistrationApi {
-  this: Configuration =>
+  this: RegistrationComponent with FacturationComponent with PresenterComponents with Configuration =>
 
   implicit def system: ActorSystem
 

@@ -1,18 +1,12 @@
 package com.personal.hourstracker.config.component
 
-import com.personal.hourstracker.domain.Registration
-import com.personal.hourstracker.domain.Registration.Registrations
-import com.personal.hourstracker.service.DefaultFacturationService
+import java.util.Locale
 
-trait FacturationComponent extends DefaultFacturationService with LoggingComponent
+import com.personal.hourstracker.service.{ DefaultFacturationService, FacturationService }
 
-trait FacturationService {
-  def facturationService: FacturationService
+trait FacturationComponent {
+  this: LoggingComponent with SystemComponent =>
 
-  trait FacturationService {
-    val splitForFacturation: Registration => Registrations
-
-    def splitForFacturation(registrations: Registrations): Registrations
-  }
-
+  def facturationService(implicit locale: Locale): FacturationService = new DefaultFacturationService()
 }
+

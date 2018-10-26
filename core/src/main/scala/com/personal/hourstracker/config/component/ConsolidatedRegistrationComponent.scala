@@ -1,19 +1,9 @@
 package com.personal.hourstracker.config.component
 
-import com.personal.hourstracker.domain.ConsolidatedRegistration.{ ConsolidatedRegistrations, ConsolidatedRegistrationsPerJob }
-import com.personal.hourstracker.domain.Registration.Registrations
-import com.personal.hourstracker.service.DefaultConsolidatedRegistrationService
+import com.personal.hourstracker.service.{ ConsolidatedRegistrationService, DefaultConsolidatedRegistrationService }
 
-trait ConsolidatedRegistrationComponent extends DefaultConsolidatedRegistrationService with LoggingComponent
+trait ConsolidatedRegistrationComponent {
+  this: LoggingComponent with SystemComponent =>
 
-trait ConsolidatedRegistrationServiceContract {
-  def consolidatedRegistrationService: ConsolidatedRegistrationService
-}
-
-trait ConsolidatedRegistrationService {
-  def consolidateRegistrations(): Registrations => ConsolidatedRegistrations
-
-  def addUnregisteredRegistrationsPerJob(): ConsolidatedRegistrationsPerJob => ConsolidatedRegistrationsPerJob
-
-  def consolidateRegistrationsPerJob(): ConsolidatedRegistrations => ConsolidatedRegistrationsPerJob
+  def consolidatedRegistrationService: ConsolidatedRegistrationService = new DefaultConsolidatedRegistrationService()
 }

@@ -1,17 +1,19 @@
 package com.personal.hourstracker
 
-import java.time.{ LocalDate, Month }
+import java.util.Locale
 
 import scala.collection.immutable
 import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration._
 
 import com.personal.hourstracker.config.ApplicationModule
-import com.personal.hourstracker.service.RegistrationSelector
+import com.personal.hourstracker.domain.SearchParameters
 
 object Application extends App with ApplicationModule {
 
   sys.addShutdownHook(terminate)
+
+  implicit def locale: Locale = new Locale("nl", "NL")
 
   private lazy val terminate = {
     logger.info("Shutting down APPLICATION")
@@ -19,11 +21,11 @@ object Application extends App with ApplicationModule {
     Await.result(system.whenTerminated, 30 seconds)
   }
 
+  implicit val searchParameters: SearchParameters = SearchParameters(Some("september"))
+
   val futureRendering: Future[immutable.Iterable[Unit]] = registrationService
     .importRegistrationsFrom(Application.importFrom)
-    .map(
-      _.filter(RegistrationSelector.registrationsBetween(LocalDate.of(2018, Month.SEPTEMBER, 1), LocalDate.of(2018, Month.SEPTEMBER, 30)))
-        .flatMap(facturationService.splitForFacturation))
+    .map(facturationService.splitAllRegistrationsForFacturation)
     .map(consolidatedRegistrationService.consolidateRegistrations())
     .map(consolidatedRegistrationService.consolidateRegistrationsPerJob())
     .map(consolidatedRegistrationService.addUnregisteredRegistrationsPerJob())
@@ -36,7 +38,6 @@ object Application extends App with ApplicationModule {
           //            logger.info("Rendering to HTML")
           //            htmlPresenter.renderRegistrationsTo(consolidatedRegistrationsPerJob, s"target/$fileName.html")
 
-          logger.info("Rendering to PDF")
           pdfPresenter.renderRegistrationsTo(consolidatedRegistrationsPerJob, s"target/$fileName.pdf")
       }
     }

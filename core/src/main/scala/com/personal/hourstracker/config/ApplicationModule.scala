@@ -4,16 +4,14 @@ import scala.concurrent.ExecutionContext
 
 import akka.actor.ActorSystem
 import com.personal.hourstracker.config.component._
-import com.personal.hourstracker.service.presenter.{ HtmlPresenterComponent, JsonPresenterComponent, PdfPresenterComponent }
+import com.personal.hourstracker.service.presenter.PresenterComponents
 
 trait ApplicationModule
   extends Configuration
   with RegistrationComponent
   with ConsolidatedRegistrationComponent
   with FacturationComponent
-  with HtmlPresenterComponent
-  with PdfPresenterComponent
-  with JsonPresenterComponent
+  with PresenterComponents
   with SystemComponent
   with LoggingComponent {
 

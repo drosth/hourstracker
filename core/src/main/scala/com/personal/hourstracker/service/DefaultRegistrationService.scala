@@ -1,27 +1,39 @@
 package com.personal.hourstracker.service
 
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 
-import com.personal.hourstracker.config.component._
 import com.personal.hourstracker.domain.Registration.Registrations
+import com.personal.hourstracker.domain.{ Registration, SearchParameters }
+import com.personal.hourstracker.repository.RegistrationRepository
+import org.slf4j.Logger
 
-trait DefaultRegistrationService extends RegistrationServiceContract {
-  this: RegistrationRepository with LoggingComponent with SystemComponent =>
+class DefaultRegistrationService(registrationRepository: RegistrationRepository)(
+  implicit
+  logger: Logger,
+  executionContext: ExecutionContext) extends RegistrationService {
 
-  def registrationService: DefaultRegistrationService =
-    new DefaultRegistrationService()
+  import com.personal.hourstracker.repository._
 
-  class DefaultRegistrationService extends RegistrationService {
+  override def importRegistrationsFrom(fileName: String)(implicit searchParameters: SearchParameters): Future[Registrations] = {
+    logger.info(s"Importing registrations from: '$fileName'")
 
-    import com.personal.hourstracker.repository._
-
-    override def importRegistrationsFrom(fileName: String): Future[Registrations] = {
-      logger.info(s"Importing registrations from: '$fileName'")
-      registrationRepository.readRegistrationsFrom(fileName).recover {
+    registrationRepository
+      .readRegistrationsFrom(fileName)
+      .map {
+        _.filter(determineSelectorFor(searchParameters))
+      }
+      .recover {
         case e =>
           logger.error(s"Could not import from '$fileName': ${e.getMessage}", e)
           Seq()
       }
-    }
+  }
+
+  def determineSelectorFor(searchParameters: SearchParameters): Registration => Boolean = searchParameters match {
+    case SearchParameters(Some(startAt), None) => RegistrationSelector.registrationsStartingFrom(startAt)
+    case SearchParameters(Some(startAt), Some(endAt)) => RegistrationSelector.registrationsBetween(startAt, endAt)
+    case _ =>
+      registration =>
+        true
   }
 }

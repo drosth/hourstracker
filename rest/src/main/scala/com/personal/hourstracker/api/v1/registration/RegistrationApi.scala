@@ -4,18 +4,14 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-import akka.actor.ActorRef
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import akka.http.scaladsl.unmarshalling.Unmarshaller
-import akka.pattern.ask
-import akka.util.Timeout
 import com.personal.hourstracker.api.v1.domain.RegistrationModel
-import com.personal.hourstracker.api.v1.registration.RegistrationActor.GetRegistrationsBy
-import com.personal.hourstracker.config.component.SystemComponent
+import com.personal.hourstracker.config.component.{ RegistrationComponent, SystemComponent }
+import com.personal.hourstracker.config.Configuration
 import com.personal.hourstracker.domain.{ Registration, SearchParameters }
-import scala.concurrent.duration._
 
 object RegistrationApi {
   implicit lazy val locale: Locale = new Locale("nl", "NL")
@@ -25,7 +21,7 @@ object RegistrationApi {
 
   object ModelAdapter {
 
-    implicit def toModel(registration: Registration): RegistrationModel =
+    def toModel(registration: Registration): RegistrationModel =
       RegistrationModel(
         registration.job,
         registration.clockedIn,
@@ -43,21 +39,23 @@ object RegistrationApi {
 }
 
 trait RegistrationApi extends RegistrationApiProtocol with RegistrationApiDoc with SystemComponent {
+  this: RegistrationComponent with Configuration =>
   import RegistrationApi._
 
   lazy val registrationRoutes: Route = getRegistrations
-
-  def registrationActor: ActorRef
 
   override def getRegistrations: Route =
     pathEndOrSingleSlash {
       get {
         parameters("startAt".as[String].?, "endAt".as[String].?) { (startAt, endAt) =>
           {
-            val searchParameters = SearchParameters(startAt, endAt)
-            onSuccess((registrationActor ? GetRegistrationsBy(searchParameters)).mapTo[List[Registration]]) { registrations =>
-              val models: List[RegistrationModel] = registrations.map(ModelAdapter.toModel)
-              complete(models)
+            implicit val searchParameters: SearchParameters = SearchParameters(startAt, endAt)
+            onSuccess(registrationService.importRegistrationsFrom(Application.importFrom)) {
+              registrations =>
+                {
+                  println(s"processing #${registrations.size} registrations")
+                  complete(registrations.map(ModelAdapter.toModel))
+                }
             }
           }
         }

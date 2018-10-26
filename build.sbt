@@ -6,7 +6,7 @@ scalaVersion := "2.12.6"
 
 // PROJECTS
 
-lazy val global = project.in(file("."))
+lazy val root = project.in(file("."))
     .aggregate(rest, core)
     .settings(
       commonSettings,
