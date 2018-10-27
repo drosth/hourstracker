@@ -1,12 +1,13 @@
 package com.personal.hourstracker
 
+import java.io.File
 import java.util.Locale
 
-import scala.collection.immutable
-import scala.concurrent.{ Await, Future }
+import scala.concurrent.Await
 import scala.concurrent.duration._
 
 import com.personal.hourstracker.config.ApplicationModule
+import com.personal.hourstracker.domain.ConsolidatedRegistration.ConsolidatedRegistrations
 import com.personal.hourstracker.domain.SearchParameters
 
 object Application extends App with ApplicationModule {
@@ -23,23 +24,23 @@ object Application extends App with ApplicationModule {
 
   implicit val searchParameters: SearchParameters = SearchParameters(Some("september"))
 
-  val futureRendering: Future[immutable.Iterable[Unit]] = registrationService
+  def fileName(job: String, registrations: ConsolidatedRegistrations) =
+    s"target/[Timesheet] - $job - ${dateRangeAsStringOf(registrations)}.pdf"
+
+  def processConsolidatedRegistrationsPerJob(consolidatedRegistrationsPerJob: (String, ConsolidatedRegistrations)): File = {
+    pdfPresenter.renderRegistrationsTo(
+      consolidatedRegistrationsPerJob._2,
+      fileName(consolidatedRegistrationsPerJob._1, consolidatedRegistrationsPerJob._2))
+  }
+
+  val futureRendering = registrationService
     .importRegistrationsFrom(Application.importFrom)
     .map(facturationService.splitAllRegistrationsForFacturation)
     .map(consolidatedRegistrationService.consolidateRegistrations())
     .map(consolidatedRegistrationService.consolidateRegistrationsPerJob())
     .map(consolidatedRegistrationService.addUnregisteredRegistrationsPerJob())
-    .map {
-      _.map {
-        case (job, consolidatedRegistrationsPerJob) =>
-          val fileName =
-            s"[Timesheet] - $job - ${dateRangeAsStringOf(consolidatedRegistrationsPerJob)}"
-
-          //            logger.info("Rendering to HTML")
-          //            htmlPresenter.renderRegistrationsTo(consolidatedRegistrationsPerJob, s"target/$fileName.html")
-
-          pdfPresenter.renderRegistrationsTo(consolidatedRegistrationsPerJob, s"target/$fileName.pdf")
-      }
+    .map { item =>
+      item.foreach(processConsolidatedRegistrationsPerJob)
     }
 
   Await.result(futureRendering, Duration.Inf)

@@ -17,7 +17,7 @@ trait PdfPresenter[T] {
   val pdfPresenter: PdfPresenter[T]
 
   trait PdfPresenter[T] {
-    def renderRegistrationsTo(registrations: T, fileName: String)
+    def renderRegistrationsTo(registrations: T, fileName: String): File
   }
 
 }
@@ -41,10 +41,12 @@ trait ConsolidatedRegistrationsPdfPresenter extends PdfPresenter[ConsolidatedReg
       marginRight := "0.5cm"
     })
 
-    override def renderRegistrationsTo(registrations: ConsolidatedRegistrations, fileName: String): Unit = {
+    override def renderRegistrationsTo(registrations: ConsolidatedRegistrations, fileName: String): File = {
       logger.info(s"Rendering #${registrations.size} consolidated registrations to PDF: '$fileName'")
 
-      pdf.run(htmlPresenter.renderRegistrations(registrations), new File(fileName))
+      val outputFile = new File(fileName)
+      pdf.run(htmlPresenter.renderRegistrations(registrations), outputFile)
+      outputFile
     }
   }
 

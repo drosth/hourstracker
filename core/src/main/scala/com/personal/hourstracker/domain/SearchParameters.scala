@@ -11,11 +11,12 @@ object SearchParameters {
 
   def hasEqualMonth(startAt: Option[LocalDate], endAt: Option[LocalDate]): Boolean = startAt match {
     case None => endAt.isEmpty
-    case Some(startingAt) => endAt match {
-      case None => false
-      case Some(endingAt) => startingAt.withDayOfMonth(1).equals(endingAt.withDayOfMonth(1))
-      case _ => false
-    }
+    case Some(startingAt) =>
+      endAt match {
+        case None => false
+        case Some(endingAt) => startingAt.withDayOfMonth(1).equals(endingAt.withDayOfMonth(1))
+        case _ => false
+      }
   }
 
   def correctLocalDateBasedOnStartAt(endAt: Option[LocalDate], startAt: Option[LocalDate]): Option[LocalDate] = endAt match {
@@ -52,10 +53,9 @@ object SearchParameters {
       }
   }
 
-  def nameOfMonthToLocalDate(
-    nameOfMonth: String,
-    pattern: String,
-    year: Int = LocalDate.now().getYear)(implicit locale: Locale): LocalDate =
+  def nameOfMonthToLocalDate(nameOfMonth: String, pattern: String, year: Int = LocalDate.now().getYear)(
+    implicit
+    locale: Locale): LocalDate =
     LocalDate.parse(s"$year-$nameOfMonth-1", DateTimeFormatter.ofPattern(pattern, locale))
 
   def weekNumberToLocalDate(weekNumber: Int, year: Int = LocalDate.now().getYear)(implicit locale: Locale): LocalDate =

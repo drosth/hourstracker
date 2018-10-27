@@ -43,7 +43,8 @@ lazy val core = (project in file("core"))
       dependencies.`commons-io`,
       dependencies.`scala-csv`,
       dependencies.`spray-json`,
-      dependencies.spdf
+      dependencies.spdf,
+      dependencies.rxscala
     )
   )
 
@@ -81,6 +82,7 @@ lazy val dependencies =
     val `javax.ws.rs-api` = "javax.ws.rs" % "javax.ws.rs-api" % javaxWsRsApiV
     val `akka-http-cors` = "ch.megard" %% "akka-http-cors" % akkaHttpCorsV excludeAll ExclusionRule(organization = "com.typesafe.akka")
     val `swagger-akka-http` = "com.github.swagger-akka-http" %% "swagger-akka-http" % swaggerAkkaHttpV
+    val rxscala = "io.reactivex" %% "rxscala" % "0.26.5"
 
     val logback = "ch.qos.logback" % "logback-classic" % logbackV
     val spdf = "io.github.cloudify" %% "spdf" % spdfV
