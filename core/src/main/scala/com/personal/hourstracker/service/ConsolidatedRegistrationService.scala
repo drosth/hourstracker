@@ -5,6 +5,6 @@ import com.personal.hourstracker.domain.Registration.Registrations
 
 trait ConsolidatedRegistrationService {
 
-  def consolidateAndProcessRegistrations(
-    futureRegistrations: Registrations)(processConsolidatedRegistrations: ConsolidatedRegistrationsPerJob => Unit): ConsolidatedRegistrationsPerJob
+  def consolidateAndProcessRegistrations[T](futureRegistrations: Registrations)(
+    processConsolidatedRegistrations: ConsolidatedRegistrationsPerJob => T): T
 }

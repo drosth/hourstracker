@@ -111,13 +111,11 @@ class DefaultConsolidatedRegistrationService(implicit logger: Logger, executionC
       }
   }
 
-  override def consolidateAndProcessRegistrations(
-    registrations: Registrations)(processConsolidatedRegistrations: ConsolidatedRegistrationsPerJob => Unit): ConsolidatedRegistrationsPerJob = {
+  override def consolidateAndProcessRegistrations[T](
+    registrations: Registrations)(processConsolidatedRegistrations: ConsolidatedRegistrationsPerJob => T): T = {
 
     val consolidatedRegistrationsPerJob = addUnregisteredEntriesTo(consolidateRegistrations(registrations).groupBy(_.job))
 
     processConsolidatedRegistrations(consolidatedRegistrationsPerJob)
-
-    consolidatedRegistrationsPerJob
   }
 }

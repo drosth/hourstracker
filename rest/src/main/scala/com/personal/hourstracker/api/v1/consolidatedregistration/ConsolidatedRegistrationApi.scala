@@ -75,7 +75,7 @@ trait ConsolidatedRegistrationApi extends ConsolidatedRegistrationApiDoc with Co
             case Some(_) => processConsolidatedRegistrations()
 
           }
-          */
+       */
         }
       }
 
@@ -88,11 +88,10 @@ trait ConsolidatedRegistrationApi extends ConsolidatedRegistrationApiDoc with Co
         registrationService
           .importRegistrationsFrom(Application.importFrom)
           .map(facturationService.splitAllRegistrationsForFacturation)
-          .map(consolidatedRegistrationService.consolidateRegistrations())
-          .map(consolidatedRegistrationService.consolidateRegistrationsPerJob())
-
-          .map(consolidatedRegistrationService.addUnregisteredRegistrationsPerJob())
-          .map(consolidatedRegistrationsPerJob => consolidatedRegistrationsPerJob.map(processConsolidatedRegistrationsPerJob).toList)) { files =>
+          .map(consolidatedRegistrationService.consolidateAndProcessRegistrations(_) { registrations =>
+            println(s"Processing #${registrations.size} items:")
+            registrations.map(processConsolidatedRegistrationsPerJob).toList
+          })) { files =>
           {
             files.size match {
               case 1 => getFromFile(files.head)
