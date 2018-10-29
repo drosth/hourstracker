@@ -5,6 +5,7 @@ import java.util.Locale
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
+import scala.util.{ Failure, Success }
 
 import com.personal.hourstracker.config.ApplicationModule
 import com.personal.hourstracker.domain.ConsolidatedRegistration.ConsolidatedRegistrations
@@ -33,17 +34,20 @@ object Application extends App with ApplicationModule {
       fileName(consolidatedRegistrationsPerJob._1, consolidatedRegistrationsPerJob._2))
   }
 
-  val futureRendering = registrationService
+  registrationService
     .importRegistrationsFrom(Application.importFrom)
     .map(facturationService.splitAllRegistrationsForFacturation)
-    .map(consolidatedRegistrationService.consolidateRegistrations())
-    .map(consolidatedRegistrationService.consolidateRegistrationsPerJob())
-    .map(consolidatedRegistrationService.addUnregisteredRegistrationsPerJob())
-    .map { item =>
-      item.foreach(processConsolidatedRegistrationsPerJob)
+    .map(consolidatedRegistrationService.consolidateAndProcessRegistrations(_) { registrations =>
+      println(s"Processing #${registrations.size} items:")
+      registrations.foreach(processConsolidatedRegistrationsPerJob)
+    })
+    .onComplete {
+      case Failure(e) =>
+        println(s"Some error occurred: ${e.getMessage}")
+        terminate
+
+      case Success(s) =>
+        println("Done")
+        terminate
     }
-
-  Await.result(futureRendering, Duration.Inf)
-
-  terminate
 }

@@ -4,6 +4,8 @@ import java.time.{ LocalDate, Period }
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
+import scala.concurrent.ExecutionContext
+
 import com.personal.hourstracker.domain.{ ConsolidatedRegistration, Registration }
 import com.personal.hourstracker.domain.ConsolidatedRegistration.{
   ConsolidatedRegistrations,
@@ -13,22 +15,11 @@ import com.personal.hourstracker.domain.ConsolidatedRegistration.{
 import com.personal.hourstracker.domain.Registration.Registrations
 import org.slf4j.Logger
 
-class DefaultConsolidatedRegistrationService(implicit logger: Logger) extends ConsolidatedRegistrationService {
-
-  override def consolidateRegistrationsPerJob: ConsolidatedRegistrations => ConsolidatedRegistrationsPerJob = {
-    logger.info("Consolidating registrations per job")
-    registrations =>
-      registrations.groupBy(_.job)
-  }
+class DefaultConsolidatedRegistrationService(implicit logger: Logger, executionContext: ExecutionContext)
+  extends ConsolidatedRegistrationService {
 
   private lazy val dateFormatter: DateTimeFormatter =
     DateTimeFormatter.ISO_LOCAL_DATE
-
-  override def consolidateRegistrations(): Registrations => ConsolidatedRegistrations =
-    registrations => {
-      logger.info("Consolidating registrations")
-      consolidateRegistrations(registrations)
-    }
 
   private def consolidateRegistrations(registrations: Registrations): ConsolidatedRegistrations = {
     registrations
@@ -86,12 +77,6 @@ class DefaultConsolidatedRegistrationService(implicit logger: Logger) extends Co
       .toSeq
   }
 
-  override def addUnregisteredRegistrationsPerJob(): ConsolidatedRegistrationsPerJob => ConsolidatedRegistrationsPerJob =
-    registrations => {
-      logger.info("Adding unregistered registrations per job")
-      addUnregisteredEntriesTo(registrations)
-    }
-
   private def addUnregisteredEntriesTo(
     consolidatedRegistrationsPerJob: ConsolidatedRegistrationsPerJob): ConsolidatedRegistrationsPerJob = {
 
@@ -126,4 +111,13 @@ class DefaultConsolidatedRegistrationService(implicit logger: Logger) extends Co
       }
   }
 
+  override def consolidateAndProcessRegistrations(
+    registrations: Registrations)(processConsolidatedRegistrations: ConsolidatedRegistrationsPerJob => Unit): ConsolidatedRegistrationsPerJob = {
+
+    val consolidatedRegistrationsPerJob = addUnregisteredEntriesTo(consolidateRegistrations(registrations).groupBy(_.job))
+
+    processConsolidatedRegistrations(consolidatedRegistrationsPerJob)
+
+    consolidatedRegistrationsPerJob
+  }
 }
