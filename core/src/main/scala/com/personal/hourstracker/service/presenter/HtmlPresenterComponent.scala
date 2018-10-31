@@ -15,7 +15,7 @@ trait HtmlPresenter[T] {
   val htmlPresenter: HtmlPresenter[T]
 
   trait HtmlPresenter[T] {
-    def renderRegistrationsTo(registrations: T, fileName: String)
+    def renderRegistrationsTo(registrations: T, fileName: String): File
 
     def renderRegistrations(registrations: T): String
   }
@@ -42,13 +42,14 @@ trait ConsolidatedRegistrationsHtmlPresenter extends HtmlPresenter[ConsolidatedR
 
   class ConsolidatedRegistrationsHtmlPresenter extends HtmlPresenter[ConsolidatedRegistrations] {
 
-    override def renderRegistrationsTo(registrations: ConsolidatedRegistrations, fileName: String): Unit = {
+    override def renderRegistrationsTo(registrations: ConsolidatedRegistrations, fileName: String): File = {
       logger.info(s"Rendering #${registrations.size} consolidated registrations to HTML: '$fileName'")
 
       withWriterTo(fileName) { writer =>
         writer.write(renderRegistrations(registrations))
         writer.flush()
       }
+      new File(fileName)
     }
 
     override def renderRegistrations(registrations: ConsolidatedRegistrations): String = {
@@ -62,9 +63,7 @@ trait ConsolidatedRegistrationsHtmlPresenter extends HtmlPresenter[ConsolidatedR
 
       ConsolidatedRegistrationsPresenter.render(model).toString()
     }
-
   }
-
 }
 
 object PresenterHelper {

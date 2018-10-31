@@ -1,0 +1,36 @@
+@(model: com.personal.hourstracker.service.presenter.Model)
+@import com.personal.hourstracker.service.presenter.PresenterHelper._
+
+<div class="body">
+    <table width="100%">
+        <thead>
+            <tr>
+                <th width="15%">Dag</th>
+                <th width="40%">Bedrijf</th>
+                <th width="10%">Uren</th>
+                <th width="35%">Omschrijving</th>
+            </tr>
+        </thead>
+        <tbody>
+            @model.registrations.map { registration =>
+                <tr>
+                    <td width="15%" class="date">@toHumanReadable(registration.date)</td>
+                    <td width="40%" class="job">@registration.job</td>
+                    <td width="10%" class="duration">@registration.duration.map(d => toHumanReadableHours(d)).getOrElse("")</td>
+                    <td width="35%" class="comment">@registration.comment.getOrElse("")</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="4">&nbsp;</td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align: right">Totaal aantal uren deze maand</td>
+                <td width="10%" class="duration">@model.totalHours</td>
+                <td width="40%">&nbsp</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+

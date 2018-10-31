@@ -34,6 +34,12 @@ object Application extends App with ApplicationModule {
       fileName(consolidatedRegistrationsPerJob._1, consolidatedRegistrationsPerJob._2))
   }
 
+  /*def processConsolidatedRegistrationsPerJob(consolidatedRegistrationsPerJob: (String, ConsolidatedRegistrations)): File = {
+    htmlPresenter.renderRegistrationsTo(
+      consolidatedRegistrationsPerJob._2,
+      fileName(consolidatedRegistrationsPerJob._1, consolidatedRegistrationsPerJob._2))
+  }*/
+
   registrationService
     .importRegistrationsFrom(Application.importFrom)
     .map(facturationService.splitAllRegistrationsForFacturation)
