@@ -15,7 +15,7 @@ object Application extends App with ApplicationModule {
 
   sys.addShutdownHook(terminate)
 
-  lazy val presenter: Presenter[ConsolidatedRegistrationsPerJob] = pdfPresenter
+  lazy val presenter: Presenter[ConsolidatedRegistrationsPerJob] = htmlPresenter
 
   implicit def locale: Locale = new Locale("nl", "NL")
 
@@ -43,7 +43,7 @@ object Application extends App with ApplicationModule {
     .map(facturationService.splitAllRegistrationsForFacturation)
     .map(consolidatedRegistrationService.consolidateAndProcessRegistrations(_) { registrations =>
       println(s"Processing #${registrations.size} items:")
-      presenter.renderRegistrations(registrations)
+      presenter.renderRegistrationsPerJob(registrations)
     })
     .onComplete {
       case Failure(e) =>

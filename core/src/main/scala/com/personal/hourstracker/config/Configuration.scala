@@ -12,6 +12,8 @@ trait Configuration {
   object Application {
     lazy val environment: Environment = Environment(config.getString(s"$Namespace.env"))
     lazy val importFrom: String = config.getString(s"$Namespace.application.importFrom")
+    lazy val consultantName: String = config.getString(s"$Namespace.application.consultantName")
+    lazy val outputFolder: String = config.getString(s"$Namespace.application.outputFolder")
   }
 
   object Api {
@@ -21,6 +23,11 @@ trait Configuration {
   }
 
   object Server {
+    lazy val host: String = config.getString(s"$Namespace.http.bind.host")
+    lazy val port: Int = config.getInt(s"$Namespace.http.bind.port")
+  }
+
+  object ConsolidatedRegistrations {
     lazy val host: String = config.getString(s"$Namespace.http.bind.host")
     lazy val port: Int = config.getInt(s"$Namespace.http.bind.port")
   }

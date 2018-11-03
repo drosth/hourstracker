@@ -3,6 +3,7 @@ package com.personal.hourstracker.service.presenter.impl
 import java.io.File
 
 import com.personal.hourstracker.config.component.LoggingComponent
+import com.personal.hourstracker.config.Configuration
 import com.personal.hourstracker.domain.ConsolidatedRegistration.ConsolidatedRegistrationsPerJob
 import com.personal.hourstracker.service.presenter.{ HtmlPresenterComponent, PdfPresenter, Presenter }
 import io.github.cloudify.scala.spdf.{ Pdf, PdfConfig, Portrait }
@@ -12,7 +13,7 @@ trait ConsolidatedRegistrationsPdfPresenter extends PdfPresenter[ConsolidatedReg
 
   val pdfPresenter: Presenter[ConsolidatedRegistrationsPerJob] = new ConsolidatedRegistrationsPdfPresenter()
 
-  class ConsolidatedRegistrationsPdfPresenter extends Presenter[ConsolidatedRegistrationsPerJob] {
+  class ConsolidatedRegistrationsPdfPresenter extends Presenter[ConsolidatedRegistrationsPerJob] with Configuration {
 
     val executablePath = "/usr/local/bin/wkhtmltopdf"
 
@@ -25,7 +26,7 @@ trait ConsolidatedRegistrationsPdfPresenter extends PdfPresenter[ConsolidatedReg
       marginRight := "0.5cm"
     })
 
-    override def renderRegistrations: ConsolidatedRegistrationsPerJob => Seq[File] = registrationsPerJob => {
+    override def renderRegistrationsPerJob: ConsolidatedRegistrationsPerJob => Seq[File] = registrationsPerJob => {
       registrationsPerJob.map {
         case (job, registrations) =>
           logger.info(s"Rendering #${registrations.size} consolidated registrations to PDF")
