@@ -12,16 +12,16 @@ object RegistrationSelector {
       registration.clockedIn.get.isAfter(startOfYear)
 
   def registrationsStartingFrom(start: LocalDate): Registration => Boolean =
-    registration => registration.clockedIn.isDefined && registration.clockedIn.get.toLocalDate.isAfter(start)
+    registration => registration.clockedIn.isDefined && registration.clockedIn.get.toLocalDate.isAfter(start.minusDays(1))
 
   def registrationsBetween(start: LocalDate, finish: LocalDate): Registration => Boolean =
     registration =>
-      registration.clockedIn.isDefined && registration.clockedIn.get.toLocalDate.isAfter(start) && registration.clockedIn.get.toLocalDate
-        .isBefore(finish)
+      registration.clockedIn.isDefined && registration.clockedIn.get.toLocalDate.isAfter(start.minusDays(1)) && registration.clockedIn.get.toLocalDate
+        .isBefore(finish.plusDays(1))
 
   val registrationsForCurrentMonth: Registration => Boolean = registration =>
     registration.clockedIn.isDefined &&
-      registration.clockedIn.get.isAfter(startOfMonth)
+      registration.clockedIn.get.isAfter(startOfMonth.minusDays(1))
 
   val registrationsForCurrentWeek: Registration => Boolean = registration =>
     registrationsForCurrentYear(registration) &&
