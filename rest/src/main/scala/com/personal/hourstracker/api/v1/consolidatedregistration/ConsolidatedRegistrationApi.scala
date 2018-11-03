@@ -17,7 +17,7 @@ import com.personal.hourstracker.config.Configuration
 import com.personal.hourstracker.domain.{ ConsolidatedRegistration, SearchParameters }
 import com.personal.hourstracker.Application.consolidatedRegistrationService
 import com.personal.hourstracker.dateRangeAsStringOf
-import com.personal.hourstracker.domain.ConsolidatedRegistration.ConsolidatedRegistrations
+import com.personal.hourstracker.domain.ConsolidatedRegistration.{ ConsolidatedRegistrations, ConsolidatedRegistrationsPerJob }
 import com.personal.hourstracker.service.presenter.PresenterComponents
 import io.swagger.v3.oas.annotations.media.Schema
 
@@ -56,28 +56,18 @@ trait ConsolidatedRegistrationApi extends ConsolidatedRegistrationApiDoc with Co
   val acceptedEncodings = Seq(MediaRange(`application/json`))
 
   override def getConsolidatedRegistrations: Route =
-    path("tmp") {
-      getFromBrowseableDirectories("target")
-    } ~
-      path("consolidated") {
-        (get & extract(_.request.headers)) { requestHeaders =>
-          val mediaTypeNegotiator = new MediaTypeNegotiator(requestHeaders)
+    path("consolidated") {
+      (get & extract(_.request.headers)) { requestHeaders =>
+        val mediaTypeNegotiator = new MediaTypeNegotiator(requestHeaders)
 
-          def encoding: Option[MediaRange] =
-            mediaTypeNegotiator.acceptedMediaRanges
-              .intersect(acceptedEncodings)
-              .headOption
+        def encoding: Option[MediaRange] =
+          mediaTypeNegotiator.acceptedMediaRanges
+            .intersect(acceptedEncodings)
+            .headOption
 
-          processConsolidatedRegistrations()
-          /*
-          encoding match {
-            case None => complete(StatusCodes.BadRequest)
-            case Some(_) => processConsolidatedRegistrations()
-
-          }
-       */
-        }
+        processConsolidatedRegistrations()
       }
+    }
 
   def processConsolidatedRegistrations(): Route = {
     parameters("startAt".as[String].?, "endAt".as[String].?) { (startAt, endAt) =>
@@ -88,9 +78,9 @@ trait ConsolidatedRegistrationApi extends ConsolidatedRegistrationApiDoc with Co
         registrationService
           .importRegistrationsFrom(Application.importFrom)
           .map(facturationService.splitAllRegistrationsForFacturation)
-          .map(consolidatedRegistrationService.consolidateAndProcessRegistrations(_) { registrations =>
-            println(s"Processing #${registrations.size} items:")
-            registrations.map(processConsolidatedRegistrationsPerJob).toList
+          .map(consolidatedRegistrationService.consolidateAndProcessRegistrations(_) { consolidatedRegistrationsPerJob =>
+            println(s"Processing #${consolidatedRegistrationsPerJob.size} items:")
+            processConsolidatedRegistrationsPerJob(consolidatedRegistrationsPerJob)
           })) { files =>
           {
             files.size match {
@@ -106,10 +96,8 @@ trait ConsolidatedRegistrationApi extends ConsolidatedRegistrationApiDoc with Co
     }
   }
 
-  def processConsolidatedRegistrationsPerJob(consolidatedRegistrationsPerJob: (String, ConsolidatedRegistrations)): File = {
-    pdfPresenter.renderRegistrationsTo(
-      consolidatedRegistrationsPerJob._2,
-      fileName(consolidatedRegistrationsPerJob._1, consolidatedRegistrationsPerJob._2))
+  def processConsolidatedRegistrationsPerJob(consolidatedRegistrationsPerJob: ConsolidatedRegistrationsPerJob): Seq[File] = {
+    pdfPresenter.renderRegistrationsPerJob(consolidatedRegistrationsPerJob)
   }
 
   def fileName(job: String, registrations: ConsolidatedRegistrations) =
