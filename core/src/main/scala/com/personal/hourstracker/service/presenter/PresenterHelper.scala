@@ -4,6 +4,8 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+import com.personal.hourstracker.domain.ConsolidatedRegistration.ConsolidatedRegistrations
+
 object PresenterHelper {
 
   val formatter: DateTimeFormatter =
@@ -23,4 +25,9 @@ object PresenterHelper {
     case None => ""
     case Some(v) => toHumanReadableHours(v)
   }
+
+  val calculateTotalDuration: ConsolidatedRegistrations => Double = registrations =>
+    registrations
+      .filter(_.duration.isDefined)
+      .foldLeft(0d)((a, i) => a + i.duration.get)
 }

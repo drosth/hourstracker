@@ -1,4 +1,4 @@
-package com.personal.hourstracker.service
+package com.personal.hourstracker.service.impl
 
 import java.time.{ LocalDate, Period }
 import java.time.format.DateTimeFormatter
@@ -7,12 +7,9 @@ import java.time.temporal.ChronoUnit
 import scala.concurrent.ExecutionContext
 
 import com.personal.hourstracker.domain.{ ConsolidatedRegistration, Registration }
-import com.personal.hourstracker.domain.ConsolidatedRegistration.{
-  ConsolidatedRegistrations,
-  ConsolidatedRegistrationsPerJob,
-  DateTimeOrdering
-}
+import com.personal.hourstracker.domain.ConsolidatedRegistration.{ ConsolidatedRegistrations, ConsolidatedRegistrationsPerJob, DateTimeOrdering }
 import com.personal.hourstracker.domain.Registration.Registrations
+import com.personal.hourstracker.service.ConsolidatedRegistrationService
 import org.slf4j.Logger
 
 class DefaultConsolidatedRegistrationService(implicit logger: Logger, executionContext: ExecutionContext)

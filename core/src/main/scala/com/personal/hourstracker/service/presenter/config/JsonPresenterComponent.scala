@@ -1,4 +1,4 @@
-package com.personal.hourstracker.service.presenter
+package com.personal.hourstracker.service.presenter.config
 
 import spray.json.{ JsonWriter, JsValue }
 

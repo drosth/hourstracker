@@ -1,4 +1,4 @@
-@(model: com.personal.hourstracker.service.presenter.Model)
+@(registrations: com.personal.hourstracker.domain.ConsolidatedRegistration.ConsolidatedRegistrations)
 @import com.personal.hourstracker.service.presenter.PresenterHelper._
 
 <div class="body">
@@ -12,7 +12,7 @@
             </tr>
         </thead>
         <tbody>
-        @model.registrations.map { registration =>
+        @registrations.map { registration =>
             <tr>
                 <td width="15%" class="date">@toHumanReadable(registration.date)</td>
                 <td width="40%" class="job">@registration.duration.filter(_ > 0).map(_ => registration.job).getOrElse("")</td>
@@ -27,7 +27,7 @@
             </tr>
             <tr>
                 <td colspan="2" style="text-align: right">Totaal aantal uren deze maand</td>
-                <td width="10%" class="duration">@model.totalHours</td>
+                <td width="10%" class="duration">@calculateTotalDuration(registrations)</td>
                 <td width="40%">&nbsp</td>
             </tr>
         </tfoot>

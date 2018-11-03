@@ -1,4 +1,4 @@
-package com.personal.hourstracker.service.presenter
+package com.personal.hourstracker.service.presenter.config
 
 import java.io.{ File, PrintWriter, Writer }
 import java.time.format.DateTimeFormatter
@@ -7,7 +7,7 @@ import java.util.Locale
 import com.personal.hourstracker.config.component.LoggingComponent
 import com.personal.hourstracker.config.Configuration
 import com.personal.hourstracker.domain.ConsolidatedRegistration.ConsolidatedRegistrations
-import com.personal.hourstracker.service.presenter.impl.ConsolidatedRegistrationsHtmlPresenter
+import com.personal.hourstracker.service.presenter.{ ConsolidatedRegistrationsHtmlPresenter, Presenter }
 
 trait HtmlPresenterComponent extends ConsolidatedRegistrationsHtmlPresenter with Configuration with LoggingComponent
 

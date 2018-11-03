@@ -4,7 +4,7 @@ import scala.concurrent.ExecutionContext
 
 import akka.actor.ActorSystem
 import com.personal.hourstracker.config.component._
-import com.personal.hourstracker.service.presenter.PresenterComponents
+import com.personal.hourstracker.service.presenter.config.PresenterComponents
 
 trait ApplicationModule
   extends Configuration

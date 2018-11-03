@@ -7,18 +7,18 @@ import java.util.Locale
 
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.MediaTypes._
-import akka.http.scaladsl.server.{ MediaTypeNegotiator, Route }
+import akka.http.scaladsl.server.{MediaTypeNegotiator, Route}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.directives.MethodDirectives.get
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import akka.http.scaladsl.unmarshalling.Unmarshaller
-import com.personal.hourstracker.config.component.{ FacturationComponent, RegistrationComponent, SystemComponent }
+import com.personal.hourstracker.config.component.{FacturationComponent, RegistrationComponent, SystemComponent}
 import com.personal.hourstracker.config.Configuration
-import com.personal.hourstracker.domain.{ ConsolidatedRegistration, SearchParameters }
+import com.personal.hourstracker.domain.{ConsolidatedRegistration, SearchParameters}
 import com.personal.hourstracker.Application.consolidatedRegistrationService
 import com.personal.hourstracker.dateRangeAsStringOf
-import com.personal.hourstracker.domain.ConsolidatedRegistration.{ ConsolidatedRegistrations, ConsolidatedRegistrationsPerJob }
-import com.personal.hourstracker.service.presenter.PresenterComponents
+import com.personal.hourstracker.domain.ConsolidatedRegistration.{ConsolidatedRegistrations, ConsolidatedRegistrationsPerJob}
+import com.personal.hourstracker.service.presenter.config.PresenterComponents
 import io.swagger.v3.oas.annotations.media.Schema
 
 object ConsolidatedRegistrationApi {

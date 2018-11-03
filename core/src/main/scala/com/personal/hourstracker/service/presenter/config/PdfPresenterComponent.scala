@@ -1,6 +1,6 @@
-package com.personal.hourstracker.service.presenter
+package com.personal.hourstracker.service.presenter.config
 
-import com.personal.hourstracker.service.presenter.impl.ConsolidatedRegistrationsPdfPresenter
+import com.personal.hourstracker.service.presenter.{ ConsolidatedRegistrationsPdfPresenter, Presenter }
 
 trait PdfPresenterComponent extends ConsolidatedRegistrationsPdfPresenter {
   this: HtmlPresenterComponent =>

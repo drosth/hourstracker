@@ -1,10 +1,11 @@
-package com.personal.hourstracker.service
+package com.personal.hourstracker.service.impl
 
 import scala.concurrent.{ ExecutionContext, Future }
 
-import com.personal.hourstracker.domain.Registration.Registrations
 import com.personal.hourstracker.domain.{ Registration, SearchParameters }
+import com.personal.hourstracker.domain.Registration.Registrations
 import com.personal.hourstracker.repository.RegistrationRepository
+import com.personal.hourstracker.service.{ RegistrationSelector, RegistrationService }
 import org.slf4j.Logger
 
 class DefaultRegistrationService(registrationRepository: RegistrationRepository)(

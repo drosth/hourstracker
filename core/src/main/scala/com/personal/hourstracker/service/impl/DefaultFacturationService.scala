@@ -1,10 +1,11 @@
-package com.personal.hourstracker.service
+package com.personal.hourstracker.service.impl
 
 import java.text.NumberFormat
 import java.util.Locale
 
 import com.personal.hourstracker.domain.Registration
 import com.personal.hourstracker.domain.Registration.Registrations
+import com.personal.hourstracker.service.FacturationService
 import org.slf4j.Logger
 
 class DefaultFacturationService()(implicit logger: Logger, locale: Locale) extends FacturationService {
