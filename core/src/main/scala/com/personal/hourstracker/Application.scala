@@ -19,7 +19,7 @@ object Application extends App with ApplicationModule {
 
   implicit def locale: Locale = new Locale("nl", "NL")
 
-  implicit val searchParameters: SearchParameters = SearchParameters(Some("aug"))
+  implicit val searchParameters: SearchParameters = SearchParameters(Some("sep"))
 
   registrationService
     .importRegistrationsFrom(Application.importFrom)

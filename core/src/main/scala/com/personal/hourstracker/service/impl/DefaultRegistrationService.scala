@@ -26,7 +26,7 @@ class DefaultRegistrationService(registrationRepository: RegistrationRepository)
       .recover {
         case e =>
           logger.error(s"Could not import from '$fileName': ${e.getMessage}", e)
-          Seq()
+          List()
       }
   }
 

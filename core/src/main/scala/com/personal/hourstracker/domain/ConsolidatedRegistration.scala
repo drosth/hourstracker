@@ -7,7 +7,7 @@ import spray.json.JsonFormat
 
 object ConsolidatedRegistration {
 
-  type ConsolidatedRegistrations = Seq[ConsolidatedRegistration]
+  type ConsolidatedRegistrations = List[ConsolidatedRegistration]
 
   type ConsolidatedRegistrationsPerJob = Map[String, ConsolidatedRegistrations]
 

@@ -11,6 +11,8 @@ object PresenterHelper {
   val formatter: DateTimeFormatter =
     DateTimeFormatter.ofPattern("EEEE, d MMM", new Locale("nl", "NL"))
 
+  implicit val localDateOrdering: Ordering[LocalDate] = Ordering.by(_.toEpochDay)
+
   def toHumanReadable(value: LocalDate): String = {
     value.format(formatter)
   }
@@ -30,4 +32,7 @@ object PresenterHelper {
     registrations
       .filter(_.duration.isDefined)
       .foldLeft(0d)((a, i) => a + i.duration.get)
+
+  def sortConsolidatedRegistrations(consolidatedRegistrations: ConsolidatedRegistrations): ConsolidatedRegistrations =
+    consolidatedRegistrations.sortBy(_.date)
 }

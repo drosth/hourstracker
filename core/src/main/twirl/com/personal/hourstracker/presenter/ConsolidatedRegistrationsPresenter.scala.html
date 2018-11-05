@@ -1,6 +1,6 @@
 @(model: com.personal.hourstracker.service.presenter.Model)
-@title = { "Timesheet" }
-@footerText = { "dé maat in ondernemen - www.the-future-group-com" }
+@title = { Timesheet }
+@footerText = { dé maat in ondernemen - www.the-future-group-com }
 <!DOCTYPE html>
 <html>
     <head>
@@ -24,12 +24,8 @@
                     height: 100%;
                 }
 
-                .page>.header {
-                    padding-top: 50px;
-                }
-
-                .page>.contents {
-                    padding-bottom: 100px;
+                .page > .header {
+                    border: 1px solid purple;
                 }
 
                 th {
@@ -38,7 +34,7 @@
                     border-bottom: 2px solid navy;
                 }
 
-                .page>.header .title {
+                .page > .header .title {
                     font-family: "Titillium Web", sans-serif;
                     font-size: 24px;
                     font-weight: bold;
@@ -46,11 +42,12 @@
                 }
 
                 .signature {
+                    border: 1px solid green;
                     color: silver;
                     font-family: "Titillium Web", sans-serif;
                     font-size: 14px;
                     font-weight: bold;
-                    height: 175px;
+                    height: 150px;
                     padding-bottom: 25px;
                     padding-top: 25px;
                     vertical-align: center;
@@ -65,8 +62,8 @@
                     color: white;
                     font-size: 18px;
 
-                    position:fixed;
-                    bottom: 0;
+                    /*position:fixed;*/
+                    /*bottom: 0;*/
                     width: 100%;
                     height: 30px;
                 }
@@ -88,14 +85,35 @@
                 .comments {
                     padding-left: 15px;
                 }
+
+                .timesheet {
+                    border: 1px solid red;
+                    width: 100%;
+                    height: 900px;
+                }
+
+                .keep-together {
+                    page-break-inside: avoid;
+                }
+
+                .break-before {
+                    page-break-before: always;
+                }
+
+                .break-after {
+                    page-break-after: always;
+                }
         </style>
     </head>
     <body>
         @for(groupedRegistration <- model.groupedRegistrations) {
-            <div class="page">
-                @page(header(model.consultantName)(model.fullMonthNameOf(groupedRegistration._2.head.date)))(timesheet(groupedRegistration._2))(signature())
+            <div class="keep-together">
+                <div class="page">
+                    @page(header(model.consultantName)(model.fullMonthNameOf(groupedRegistration._2.head.date)))(timesheet(groupedRegistration._2))(signature())
+                </div>
+                <div class="footer">@footerText</div>
             </div>
-            <div class="footer">@footerText</div>
+            <div class="break-after"><hr/></div>
         }
     </body>
 </html>

@@ -35,18 +35,18 @@ class DefaultFacturationService()(implicit logger: Logger, locale: Locale) exten
 
   private def splitOnTags(registration: Registration): Registrations =
     registration.tags match {
-      case None => Seq(registration)
+      case None => List(registration)
       case Some(tags) =>
         tags match {
-          case x: Set[String] if x.isEmpty => Seq(registration)
-          case x: Set[String] if x.size == 1 => Seq(registration)
+          case x: Set[String] if x.isEmpty => List(registration)
+          case x: Set[String] if x.size == 1 => List(registration)
           case x: Set[String] =>
             x.map { tag =>
               registration.copy(
                 job = constructJobWithTag(registration.job, tag),
                 tags = Some(Set(tag)),
                 totalTimeAdjustment = calculateTotalTimeAdjustmentUsing(tag, registration.duration))
-            }.toSeq
+            }.toList
         }
     }
 

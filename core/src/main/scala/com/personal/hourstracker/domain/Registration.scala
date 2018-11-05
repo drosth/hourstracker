@@ -8,7 +8,7 @@ import spray.json._
 
 object Registration {
 
-  type Registrations = Seq[Registration]
+  type Registrations = List[Registration]
 
   object JsonProtocol extends CommonJsonSupport {
 

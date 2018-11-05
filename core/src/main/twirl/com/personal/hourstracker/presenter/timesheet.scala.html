@@ -1,7 +1,7 @@
 @(registrations: com.personal.hourstracker.domain.ConsolidatedRegistration.ConsolidatedRegistrations)
 @import com.personal.hourstracker.service.presenter.PresenterHelper._
 
-<div class="body">
+<div class="timesheet">
     <table width="100%">
         <thead>
             <tr>
@@ -12,7 +12,7 @@
             </tr>
         </thead>
         <tbody>
-        @registrations.map { registration =>
+        @sortConsolidatedRegistrations(registrations).map { registration =>
             <tr>
                 <td width="15%" class="date">@toHumanReadable(registration.date)</td>
                 <td width="40%" class="job">@registration.duration.filter(_ > 0).map(_ => registration.job).getOrElse("")</td>

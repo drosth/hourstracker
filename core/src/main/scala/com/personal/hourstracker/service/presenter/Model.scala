@@ -17,5 +17,5 @@ case class Model(
 
   private def month(date: LocalDate): LocalDate = date.withDayOfMonth(1)
 
-  def groupedRegistrations: Map[LocalDate, Seq[ConsolidatedRegistration]] = registrations.groupBy(registration => month(registration.date))
+  def groupedRegistrations: Map[LocalDate, List[ConsolidatedRegistration]] = registrations.groupBy(registration => month(registration.date))
 }
