@@ -25,6 +25,7 @@ lazy val rest = (project in file("rest"))
       dependencies.`akka-stream`,
       dependencies.`javax.ws.rs-api`,
       dependencies.`akka-http-cors`,
+      dependencies.zip4j,
       dependencies.`akka-http-testkit` % Test,
       dependencies.`akka-stream-testkit` % Test,
       dependencies.`akka-testkit` % Test,
@@ -83,6 +84,7 @@ lazy val dependencies =
     val `akka-http-cors` = "ch.megard" %% "akka-http-cors" % akkaHttpCorsV excludeAll ExclusionRule(organization = "com.typesafe.akka")
     val `swagger-akka-http` = "com.github.swagger-akka-http" %% "swagger-akka-http" % swaggerAkkaHttpV
     val rxscala = "io.reactivex" %% "rxscala" % "0.26.5"
+    val zip4j = "net.lingala.zip4j" % "zip4j" % "1.3.2"
 
     val logback = "ch.qos.logback" % "logback-classic" % logbackV
     val spdf = "io.github.cloudify" %% "spdf" % spdfV

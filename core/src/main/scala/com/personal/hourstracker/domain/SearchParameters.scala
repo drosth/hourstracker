@@ -4,10 +4,26 @@ import java.time.{ LocalDate, Month }
 import java.time.format.{ DateTimeFormatter, TextStyle }
 import java.util.Locale
 
-case class SearchParameters(startAt: Option[LocalDate], endAt: Option[LocalDate])
+case class SearchParameters(startAt: Option[LocalDate], endAt: Option[LocalDate]) {
+  // TODO: optimize this def:
+  override def toString: String = {
+    startAt match {
+      case None =>
+        endAt match {
+          case None => ""
+          case Some(end) => s"${end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))}"
+        }
+      case Some(start) =>
+        endAt match {
+          case None => s"${start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))}"
+          case Some(end) => s"${start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))}-${end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))}"
+        }
+    }
+  }
+}
 
 object SearchParameters {
-  final val UndefinedSearchParameters = new SearchParameters(None, None)
+  final def UndefinedSearchParameters(implicit locale: Locale) = new SearchParameters(None, None)
 
   def hasEqualMonth(startAt: Option[LocalDate], endAt: Option[LocalDate]): Boolean = startAt match {
     case None => endAt.isEmpty
