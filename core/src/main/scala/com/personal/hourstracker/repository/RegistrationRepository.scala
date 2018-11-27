@@ -1,12 +1,12 @@
 package com.personal.hourstracker.repository
 
-import java.io.Reader
-
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.Future
 
 import com.personal.hourstracker.domain.Registration.Registrations
 import com.personal.hourstracker.domain.SearchParameters
 
 trait RegistrationRepository {
-  def readRegistrationsFrom(reader: Reader)(implicit searchParameters: SearchParameters, executionContext: ExecutionContext): Future[Registrations]
+  def load()(implicit searchParameters: SearchParameters): Future[Registrations]
+
+  def store(registrations: Registrations): Future[Unit]
 }

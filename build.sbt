@@ -6,18 +6,47 @@ scalaVersion := "2.12.6"
 
 // PROJECTS
 
-lazy val root = project.in(file("."))
-    .aggregate(rest, core)
+lazy val root = project
+  .in(file("."))
+  .aggregate(rest, core, database)
+  .settings(
+    commonSettings,
+    publishArtifact := false
+  )
+
+lazy val core = (project in file("core"))
+    .enablePlugins(SbtTwirl)
+    .settings(commonSettings: _*)
     .settings(
-      commonSettings,
-      publishArtifact := false
+      name := "hourstracker-core",
+      sourceDirectories in (Compile, TwirlKeys.compileTemplates) += (baseDirectory.value.getParentFile / "src" / "main" / "twirl"),
+      libraryDependencies ++= commonDependencies ++ Seq(
+        dependencies.`commons-io`,
+        dependencies.`scala-csv`,
+        dependencies.`spray-json`,
+        dependencies.spdf,
+        dependencies.rxscala
+      )
     )
 
+lazy val database = (project in file("database"))
+    .settings(commonSettings: _*)
+    .settings(
+      name := "hourstracker-database",
+      libraryDependencies ++= commonDependencies ++ testDependencies ++ Seq(
+        dependencies.squeryl,
+        dependencies.`mysql-connector-java`,
+        dependencies.h2,
+        dependencies.postgresql
+      )
+    )
+    .dependsOn(core)
+
 lazy val rest = (project in file("rest"))
+  .settings(commonSettings: _*)
   .settings(
     name := "hourstracker-rest",
-    commonSettings,
-    libraryDependencies ++= commonDependencies ++ Seq(
+    libraryDependencies ++= commonDependencies ++ testDependencies ++ Seq(
       dependencies.`swagger-akka-http`,
       dependencies.`akka-http-spray-json`,
       dependencies.`akka-http-xml`,
@@ -25,29 +54,10 @@ lazy val rest = (project in file("rest"))
       dependencies.`akka-stream`,
       dependencies.`javax.ws.rs-api`,
       dependencies.`akka-http-cors`,
-      dependencies.zip4j,
-      dependencies.`akka-http-testkit` % Test,
-      dependencies.`akka-stream-testkit` % Test,
-      dependencies.`akka-testkit` % Test,
-      dependencies.scalatest % Test
+      dependencies.zip4j
     )
   )
-  .dependsOn(core)
-
-lazy val core = (project in file("core"))
-  .enablePlugins(SbtTwirl)
-  .settings(
-    name := "hourstracker-core",
-    commonSettings,
-    sourceDirectories in (Compile, TwirlKeys.compileTemplates) += (baseDirectory.value.getParentFile / "src" / "main" / "twirl"),
-    libraryDependencies ++= commonDependencies ++ Seq(
-      dependencies.`commons-io`,
-      dependencies.`scala-csv`,
-      dependencies.`spray-json`,
-      dependencies.spdf,
-      dependencies.rxscala
-    )
-  )
+  .dependsOn(core, database)
 
 // SETTINGS
 
@@ -86,6 +96,13 @@ lazy val dependencies =
     val rxscala = "io.reactivex" %% "rxscala" % "0.26.5"
     val zip4j = "net.lingala.zip4j" % "zip4j" % "1.3.2"
 
+    // database
+//    val slick = "com.typesafe.slick" %% "slick" % "3.2.0"
+    val squeryl = "org.squeryl" %% "squeryl" % "0.9.13"
+    val `mysql-connector-java` = "mysql" % "mysql-connector-java" % "8.0.13"
+    val h2 = "com.h2database" % "h2" % "1.4.197"
+    val postgresql = "org.postgresql" % "postgresql" % "42.2.5"
+
     val logback = "ch.qos.logback" % "logback-classic" % logbackV
     val spdf = "io.github.cloudify" %% "spdf" % spdfV
 
@@ -98,7 +115,13 @@ lazy val dependencies =
 
 lazy val commonDependencies = Seq(
   dependencies.`akka-slf4j`,
-  dependencies.logback,
+  dependencies.logback
+)
+
+lazy val testDependencies = Seq(
+  dependencies.`akka-http-testkit` % "test",
+  dependencies.`akka-stream-testkit` % "test",
+  dependencies.`akka-testkit` % "test",
   dependencies.scalacheck % "test",
   dependencies.scalatest % "test"
 )

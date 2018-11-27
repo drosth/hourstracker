@@ -6,6 +6,7 @@ import java.time.temporal.ChronoUnit
 import com.personal.common.CommonJsonSupport
 import spray.json._
 
+
 object Registration {
 
   type Registrations = List[Registration]
@@ -15,21 +16,25 @@ object Registration {
     implicit lazy val registrationFormat: RootJsonFormat[Registration] =
       jsonFormat12(Registration.apply)
   }
+
 }
 
 case class Registration(
-  job: String,
-  clockedIn: Option[LocalDateTime],
-  clockedOut: Option[LocalDateTime],
-  duration: Option[Double],
-  hourlyRate: Option[Double],
-  earnings: Option[Double],
-  comment: Option[String],
-  tags: Option[Set[String]],
-  breaks: Option[String],
-  adjustments: Option[String],
-  totalTimeAdjustment: Option[Double],
-  totalEarningsAdjustment: Option[String]) {
+                         job: String,
+                         clockedIn: Option[LocalDateTime] = None,
+                         clockedOut: Option[LocalDateTime] = None,
+                         duration: Option[Double] = None,
+                         hourlyRate: Option[Double] = None,
+                         earnings: Option[Double] = None,
+                         comment: Option[String] = None,
+                         tags: Option[Set[String]] = None,
+                         breaks: Option[String] = None,
+                         adjustments: Option[String] = None,
+                         totalTimeAdjustment: Option[Double] = None,
+                         totalEarningsAdjustment: Option[String] = None
+                       ) {
+
+  def this() = this(job = "undefined", tags = Some(Set[String]("")))
 
   def calculateDurationInMinutes(): Long = (clockedIn, clockedOut) match {
     case (Some(in: LocalDateTime), Some(out: LocalDateTime)) =>

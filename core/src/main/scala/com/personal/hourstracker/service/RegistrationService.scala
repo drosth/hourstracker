@@ -7,4 +7,5 @@ import com.personal.hourstracker.domain.SearchParameters
 
 trait RegistrationService {
   def importRegistrationsFrom(fileName: String)(implicit searchParameters: SearchParameters): Future[Registrations]
+  def loadRegistrations()(implicit searchParameters: SearchParameters): Future[Registrations]
 }
