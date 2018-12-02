@@ -1,14 +1,14 @@
 package com.personal.hourstracker.service.impl
 
-import java.io.{File, FileInputStream, InputStreamReader, Reader}
+import java.io.{ File, FileInputStream, InputStreamReader, Reader }
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.Success
 
 import com.personal.hourstracker.config.component.RegistrationRepositoryFactory
-import com.personal.hourstracker.domain.{Registration, SearchParameters}
+import com.personal.hourstracker.domain.{ Registration, SearchParameters }
 import com.personal.hourstracker.domain.Registration.Registrations
-import com.personal.hourstracker.service.{DEFAULT_ENCODING, ImportService, RegistrationSelector, RegistrationService}
+import com.personal.hourstracker.service.{ DEFAULT_ENCODING, ImportService, RegistrationSelector, RegistrationService }
 import org.slf4j.Logger
 
 object DefaultRegistrationService {
@@ -21,7 +21,7 @@ object DefaultRegistrationService {
   }
 
   def determineSelectorFor(searchParameters: SearchParameters): Registration => Boolean = searchParameters match {
-    case SearchParameters(Some(startAt), None)        => RegistrationSelector.registrationsStartingFrom(startAt)
+    case SearchParameters(Some(startAt), None) => RegistrationSelector.registrationsStartingFrom(startAt)
     case SearchParameters(Some(startAt), Some(endAt)) => RegistrationSelector.registrationsBetween(startAt, endAt)
     case _ =>
       registration =>
@@ -30,11 +30,10 @@ object DefaultRegistrationService {
 }
 
 class DefaultRegistrationService(
-  importService: ImportService
-)(
-  implicit logger: Logger,
-  executionContext: ExecutionContext
-) extends RegistrationService {
+  importService: ImportService)(
+  implicit
+  logger: Logger,
+  executionContext: ExecutionContext) extends RegistrationService {
 
   import DefaultRegistrationService._
 

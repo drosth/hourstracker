@@ -1,9 +1,9 @@
 package com.personal.hourstracker.config.component
 
 import com.personal.hourstracker.config.Configuration
-import com.typesafe.config.{Config, ConfigFactory}
-import org.squeryl.{Session, SessionFactory}
-import org.squeryl.adapters.{H2Adapter, MySQLAdapter}
+import com.typesafe.config.{ Config, ConfigFactory }
+import org.squeryl.{ Session, SessionFactory }
+import org.squeryl.adapters.{ H2Adapter, MySQLAdapter }
 
 trait SquerylComponent {
   def databaseSession: DatabaseSession
@@ -13,7 +13,7 @@ trait DatabaseSession {
   def start(): Unit
 }
 
-trait H2_SquerylComponent extends SquerylComponent {
+trait SquerylComponentForH2 extends SquerylComponent {
   this: Configuration =>
 
   val withConfig: Config = {
@@ -33,16 +33,13 @@ trait H2_SquerylComponent extends SquerylComponent {
             java.sql.DriverManager.getConnection(
               config.getString("url"),
               config.getString("user"),
-              config.getString("password")
-            ),
-            new H2Adapter
-        )
-      )
+              config.getString("password")),
+            new H2Adapter))
     }
   }
 }
 
-trait MySQL_SquerylComponent extends SquerylComponent {
+trait SquerylComponentForMySQL extends SquerylComponent {
   this: Configuration =>
 
   val withConfig: Config = {
@@ -60,11 +57,8 @@ trait MySQL_SquerylComponent extends SquerylComponent {
             java.sql.DriverManager.getConnection(
               config.getString("url"),
               config.getString("user"),
-              config.getString("password")
-            ),
-            new MySQLAdapter
-        )
-      )
+              config.getString("password")),
+            new MySQLAdapter))
     }
   }
 }

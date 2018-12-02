@@ -5,9 +5,8 @@ import scala.concurrent.Future
 import com.personal.hourstracker.domain.Registration.Registrations
 import com.personal.hourstracker.domain.SearchParameters
 import com.personal.hourstracker.repository.RegistrationRepository
-import com.personal.hourstracker.service.{ImportService, RegistrationService}
-import com.personal.hourstracker.service.impl.{CSVImportService, DefaultRegistrationService}
-
+import com.personal.hourstracker.service.{ ImportService, RegistrationService }
+import com.personal.hourstracker.service.impl.{ CSVImportService, DefaultRegistrationService }
 
 trait RegistrationComponent {
   this: LoggingComponent with SystemComponent =>
@@ -20,8 +19,8 @@ trait RegistrationComponent {
 object RegistrationRepositoryFactory {
   var _registrationRepository: RegistrationRepository = new RegistrationRepository() {
     override def load()(
-      implicit searchParameters: SearchParameters
-    ): Future[Registrations] = ???
+      implicit
+      searchParameters: SearchParameters): Future[Registrations] = ???
 
     override def store(registrations: Registrations): Future[Unit] = ???
   }

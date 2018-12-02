@@ -23,7 +23,7 @@ case class SearchParameters(startAt: Option[LocalDate], endAt: Option[LocalDate]
 }
 
 object SearchParameters {
-  final def UndefinedSearchParameters(implicit locale: Locale) = new SearchParameters(None, None)
+  final def UndefinedSearchParameters = new SearchParameters(None, None)
 
   def hasEqualMonth(startAt: Option[LocalDate], endAt: Option[LocalDate]): Boolean = startAt match {
     case None => endAt.isEmpty

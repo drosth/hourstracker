@@ -95,6 +95,7 @@ lazy val dependencies =
     val `swagger-akka-http` = "com.github.swagger-akka-http" %% "swagger-akka-http" % swaggerAkkaHttpV
     val rxscala = "io.reactivex" %% "rxscala" % "0.26.5"
     val zip4j = "net.lingala.zip4j" % "zip4j" % "1.3.2"
+    val `spring-scala` = "org.springframework.scala" % "spring-scala" % "1.0.0.M2"
 
     // database
 //    val slick = "com.typesafe.slick" %% "slick" % "3.2.0"
@@ -111,6 +112,7 @@ lazy val dependencies =
     val `akka-testkit` = "com.typesafe.akka" %% "akka-testkit" % akkaV
     val scalacheck = "org.scalacheck" %% "scalacheck" % scalacheckV
     val scalatest = "org.scalatest" %% "scalatest" % scalatestV
+    val `mockito-core` = "org.mockito" % "mockito-core" % "2.23.0"
   }
 
 lazy val commonDependencies = Seq(
@@ -123,7 +125,8 @@ lazy val testDependencies = Seq(
   dependencies.`akka-stream-testkit` % "test",
   dependencies.`akka-testkit` % "test",
   dependencies.scalacheck % "test",
-  dependencies.scalatest % "test"
+  dependencies.scalatest % "test",
+  dependencies.`mockito-core` % "test"
 )
 
 lazy val compilerOptions = Seq(

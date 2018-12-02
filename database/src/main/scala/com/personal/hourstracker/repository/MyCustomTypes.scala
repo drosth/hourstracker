@@ -1,10 +1,9 @@
 package com.personal.hourstracker.repository
 
 import org.squeryl.PrimitiveTypeMode
-import org.squeryl.dsl.{DeOptionizer, NonPrimitiveJdbcMapper, TOptionString, TString, TypedExpressionFactory}
+import org.squeryl.dsl.{ DeOptionizer, NonPrimitiveJdbcMapper, TOptionString, TString, TypedExpressionFactory }
 
-
-object MyCustomTypes extends PrimitiveTypeMode {
+trait MyCustomTypes extends PrimitiveTypeMode {
 
   implicit val seqOfStringToStringTEF = new NonPrimitiveJdbcMapper[String, Set[String], TString](stringTEF, this) {
     override def convertFromJdbc(value: String): Set[String] = value.split(",").toSet
@@ -12,8 +11,7 @@ object MyCustomTypes extends PrimitiveTypeMode {
   }
 
   implicit val optionSeqOfStringToStringTEF =
-    new TypedExpressionFactory[Option[Set[String]], TOptionString]
-    with DeOptionizer[String, Set[String], TString, Option[Set[String]], TOptionString] {
+    new TypedExpressionFactory[Option[Set[String]], TOptionString] with DeOptionizer[String, Set[String], TString, Option[Set[String]], TOptionString] {
 
       val deOptionizer = seqOfStringToStringTEF
     }

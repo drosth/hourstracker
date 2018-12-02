@@ -6,7 +6,6 @@ import java.time.temporal.ChronoUnit
 import com.personal.common.CommonJsonSupport
 import spray.json._
 
-
 object Registration {
 
   type Registrations = List[Registration]
@@ -20,19 +19,18 @@ object Registration {
 }
 
 case class Registration(
-                         job: String,
-                         clockedIn: Option[LocalDateTime] = None,
-                         clockedOut: Option[LocalDateTime] = None,
-                         duration: Option[Double] = None,
-                         hourlyRate: Option[Double] = None,
-                         earnings: Option[Double] = None,
-                         comment: Option[String] = None,
-                         tags: Option[Set[String]] = None,
-                         breaks: Option[String] = None,
-                         adjustments: Option[String] = None,
-                         totalTimeAdjustment: Option[Double] = None,
-                         totalEarningsAdjustment: Option[String] = None
-                       ) {
+  job: String,
+  clockedIn: Option[LocalDateTime] = None,
+  clockedOut: Option[LocalDateTime] = None,
+  duration: Option[Double] = None,
+  hourlyRate: Option[Double] = None,
+  earnings: Option[Double] = None,
+  comment: Option[String] = None,
+  tags: Option[Set[String]] = None,
+  breaks: Option[String] = None,
+  adjustments: Option[String] = None,
+  totalTimeAdjustment: Option[Double] = None,
+  totalEarningsAdjustment: Option[String] = None) {
 
   def this() = this(job = "undefined", tags = Some(Set[String]("")))
 

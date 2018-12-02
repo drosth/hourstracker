@@ -1,33 +1,32 @@
 package com.personal.hourstracker
 
-import com.personal.hourstracker.config.component.{MySQL_SquerylComponent, SquerylComponent}
+import com.personal.hourstracker.config.component.SquerylComponentForMySQL
 import com.personal.hourstracker.config.Configuration
 import com.personal.hourstracker.domain.DBRegistration
-import com.personal.hourstracker.repository.HourstrackerSchema
+import com.personal.hourstracker.repository.HourstrackerDB
 
+object Dummy extends App with SquerylComponentForMySQL with Configuration {
 
-object Dummy extends App with SquerylComponent with MySQL_SquerylComponent with Configuration {
-
-  import com.personal.hourstracker.repository.MyCustomTypes._
+  private lazy val schema: HourstrackerDB = HourstrackerDB()
+  import schema._
 
   databaseSession.start()
 
   transaction {
-    HourstrackerSchema.drop
-    HourstrackerSchema.create
+    schema.drop
+    schema.create
     println("Created the schema:")
   }
 
   transaction {
-    val registration = DBRegistration(job="test")
-    HourstrackerSchema.registrations.insert(registration)
+    val registration = DBRegistration(job = "test")
+    registrations.insert(registration)
     println(s"Inserted: $registration")
   }
 
   transaction {
-    val queried: Iterable[DBRegistration] = HourstrackerSchema.registrations.allRows
+    val queried: Iterable[DBRegistration] = registrations.allRows
     queried.foreach(row =>
-        println(s"${row.id} => $row")
-    )
+      println(s"${row.id} => $row"))
   }
 }

@@ -11,13 +11,12 @@ case class DBRegistration(
   hourlyRate: Option[Double] = None,
   earnings: Option[Double] = None,
   comment: Option[String] = None,
-//                         tags: Option[Set[String]] = None,
+  //                         tags: Option[Set[String]] = None,
   breaks: Option[String] = None,
   adjustments: Option[String] = None,
   totalTimeAdjustment: Option[Double] = None,
-  totalEarningsAdjustment: Option[String] = None
-) extends HourstrackerDBObject
-    with java.io.Serializable {
+  totalEarningsAdjustment: Option[String] = None) extends HourstrackerDBObject
+  with java.io.Serializable {
 
   def this() = this(
     job = "",
@@ -31,6 +30,5 @@ case class DBRegistration(
     breaks = Some(""),
     adjustments = Some(""),
     totalTimeAdjustment = Some(0.0),
-    totalEarningsAdjustment = Some("")
-  )
+    totalEarningsAdjustment = Some(""))
 }
