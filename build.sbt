@@ -29,12 +29,11 @@ lazy val core = (project in file("core"))
       )
     )
 
-lazy val database = (project in file("database"))
+lazy val database = (project in file("database.spring"))
     .settings(commonSettings: _*)
     .settings(
-      name := "hourstracker-database",
-      libraryDependencies ++= commonDependencies ++ testDependencies ++ Seq(
-        dependencies.squeryl,
+      name := "hourstracker-database-spring",
+      libraryDependencies ++= commonDependencies ++ springDependencies ++ testDependencies ++ Seq(
         dependencies.`mysql-connector-java`,
         dependencies.h2,
         dependencies.postgresql
@@ -81,6 +80,7 @@ lazy val dependencies =
     val swaggerAkkaHttpV = "2.0.0"
     val javaxWsRsApiV = "2.1.1"
     val akkaHttpCorsV = "0.3.0"
+    val springBootV = "2.1.1.RELEASE"
 
     val `akka-http-spray-json` = "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpV
     val `akka-http-xml` = "com.typesafe.akka" %% "akka-http-xml" % akkaHttpV
@@ -96,6 +96,16 @@ lazy val dependencies =
     val rxscala = "io.reactivex" %% "rxscala" % "0.26.5"
     val zip4j = "net.lingala.zip4j" % "zip4j" % "1.3.2"
     val `spring-scala` = "org.springframework.scala" % "spring-scala" % "1.0.0.M2"
+
+    // spring
+    val `spring-boot-starter` = "org.springframework.boot" % "spring-boot-starter" % springBootV
+    val `spring-boot-starter-data-jpa` = "org.springframework.boot" % "spring-boot-starter-data-jpa" % springBootV
+    val `spring-boot-starter-security` = "org.springframework.boot" % "spring-boot-starter-security" % springBootV
+    val `spring-boot-starter-aop` = "org.springframework.boot" % "spring-boot-starter-aop" % springBootV
+    val `spring-boot-starter-thymeleaf` = "org.springframework.boot" % "spring-boot-starter-thymeleaf" % springBootV
+    val `spring-boot-starter-validation` = "org.springframework.boot" % "spring-boot-starter-validation" % springBootV
+    val `spring-boot-starter-web` = "org.springframework.boot" % "spring-boot-starter-web" % springBootV
+
 
     // database
 //    val slick = "com.typesafe.slick" %% "slick" % "3.2.0"
@@ -118,6 +128,11 @@ lazy val dependencies =
 lazy val commonDependencies = Seq(
   dependencies.`akka-slf4j`,
   dependencies.logback
+)
+
+lazy val springDependencies = Seq(
+  dependencies.`spring-boot-starter-data-jpa`,
+  dependencies.`spring-boot-starter-web`
 )
 
 lazy val testDependencies = Seq(

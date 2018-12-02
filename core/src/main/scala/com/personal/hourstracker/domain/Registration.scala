@@ -13,12 +13,13 @@ object Registration {
   object JsonProtocol extends CommonJsonSupport {
 
     implicit lazy val registrationFormat: RootJsonFormat[Registration] =
-      jsonFormat12(Registration.apply)
+      jsonFormat13(Registration.apply)
   }
 
 }
 
 case class Registration(
+  id: Option[Long] = None,
   job: String,
   clockedIn: Option[LocalDateTime] = None,
   clockedOut: Option[LocalDateTime] = None,

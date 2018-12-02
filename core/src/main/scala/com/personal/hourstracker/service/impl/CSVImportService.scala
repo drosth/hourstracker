@@ -30,6 +30,7 @@ class CSVImportService() extends ImportService {
         .map(
           record =>
             Registration(
+              None,
               record.getOrElse("Job", ""),
               record.get("Clocked In"),
               record.get("Clocked Out"),

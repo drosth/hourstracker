@@ -15,4 +15,3 @@ services:
       - MYSQL_DATABASE=hourstracker
       - MYSQL_USER=hourstracker
       - MYSQL_PASSWORD=hourstracker
-      - MYSQL_RANDOM_ROOT_PASSWORD=yes
