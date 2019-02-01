@@ -37,17 +37,16 @@ class DefaultFacturationService()(implicit logger: Logger, locale: Locale) exten
     registration.tags match {
       case None => List(registration)
       case Some(tags) =>
-        tags match {
-          case x: Set[String] if x.isEmpty => List(registration)
-          case x: Set[String] if x.size == 1 => List(registration)
-          case x: Set[String] =>
-            x.map { tag =>
-              registration.copy(
-                job = constructJobWithTag(registration.job, tag),
-                tags = Some(Set(tag)),
-                totalTimeAdjustment = calculateTotalTimeAdjustmentUsing(tag, registration.duration))
-            }.toList
-        }
+        tags.map { tag =>
+          {
+            logger.info(s"Reconstructing registration using '$tag'")
+
+            registration.copy(
+              job = constructJobWithTag(registration.job, tag),
+              tags = Some(Set(tag)),
+              totalTimeAdjustment = calculateTotalTimeAdjustmentUsing(tag, registration.duration))
+          }
+        }.toList
     }
 
   private def calculateTotalTimeAdjustmentUsing(tag: String, duration: Option[Double]): Option[Double] = duration match {

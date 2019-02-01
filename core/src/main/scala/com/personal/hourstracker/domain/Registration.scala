@@ -18,7 +18,7 @@ object Registration {
 
 }
 
-case class Registration(
+final case class Registration(
   id: Option[Long] = None,
   job: String,
   clockedIn: Option[LocalDateTime] = None,

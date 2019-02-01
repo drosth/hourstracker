@@ -51,9 +51,9 @@ class DefaultRegistrationService(
           List()
       }
 
-    registrations.onComplete {
-      case Success(registrationsToStore) => storeRegistrations(registrationsToStore)
-    }
+    //    registrations.onComplete {
+    //      case Success(registrationsToStore) => storeRegistrations(registrationsToStore)
+    //    }
 
     registrations
   }

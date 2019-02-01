@@ -1,6 +1,7 @@
 name := "sbt-hourstracker"
-organization := "com.example"
+organization := "com.personal"
 version := "0.1"
+maintainer := "h.drost@gmail.com"
 
 scalaVersion := "2.12.6"
 
@@ -11,6 +12,7 @@ lazy val root = project
   .aggregate(rest, core, database)
   .settings(
     commonSettings,
+    scapegoatVersion in ThisBuild := "1.3.8",
     publishArtifact := false
   )
 
@@ -19,6 +21,7 @@ lazy val core = (project in file("core"))
     .settings(commonSettings: _*)
     .settings(
       name := "hourstracker-core",
+      organization := "com.personal",
       sourceDirectories in (Compile, TwirlKeys.compileTemplates) += (baseDirectory.value.getParentFile / "src" / "main" / "twirl"),
       libraryDependencies ++= commonDependencies ++ Seq(
         dependencies.`commons-io`,
@@ -33,6 +36,7 @@ lazy val database = (project in file("database.spring"))
     .settings(commonSettings: _*)
     .settings(
       name := "hourstracker-database-spring",
+      organization := "com.personal",
       libraryDependencies ++= commonDependencies ++ springDependencies ++ testDependencies ++ Seq(
         dependencies.`mysql-connector-java`,
         dependencies.h2,
@@ -42,9 +46,11 @@ lazy val database = (project in file("database.spring"))
     .dependsOn(core)
 
 lazy val rest = (project in file("rest"))
+  .enablePlugins(JavaAppPackaging)
   .settings(commonSettings: _*)
   .settings(
     name := "hourstracker-rest",
+    organization := "com.personal",
     libraryDependencies ++= commonDependencies ++ testDependencies ++ Seq(
       dependencies.`swagger-akka-http`,
       dependencies.`akka-http-spray-json`,

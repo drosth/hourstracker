@@ -11,9 +11,9 @@ trait JsonEnumSupport {
 
       def read(json: JsValue): T#Value = json match {
         case JsString(value) => enumType.withName(value)
-        case JsNumber(id) =>
+        case JsNumber(id: BigDecimal) =>
           enumType.values
-            .find(_.id == id)
+            .find(_.id == id.intValue)
             .getOrElse(throw DeserializationException(s"Expected a value from enum $enumType"))
         case _ =>
           throw DeserializationException(s"Expected a value from enum $enumType")

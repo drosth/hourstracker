@@ -1,4 +1,4 @@
-@(consultantName: String)(monthName: String)
+@(consultantName: String)(monthName: String, year: Int)
 <table width="100%">
     <tr>
         <td rowspan="10" width="15%"><div class="logo"></div></td>
@@ -20,7 +20,7 @@
         <td style="font-size: large;
             font-weight: bold">@consultantName</td>
         <td style="font-size: large;
-            font-weight: bold">@monthName</td>
+            font-weight: bold">@monthName @year</td>
     </tr>
     <tr>
         <td colspan="2">&nbsp;</td>

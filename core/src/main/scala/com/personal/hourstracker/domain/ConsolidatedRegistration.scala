@@ -26,7 +26,7 @@ object ConsolidatedRegistration {
 
 }
 
-case class ConsolidatedRegistration(
+final case class ConsolidatedRegistration(
   date: LocalDate,
   job: String,
   duration: Option[Double],

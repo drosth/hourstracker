@@ -8,10 +8,10 @@ object Environment {
     case Testing.name => Testing
     case Acceptance.name => Acceptance
     case Production.name => Production
-    case _ => throw new Unknown(s"Environment for “$name” does not exist")
+    case _ => throw UnknownEnvironmentException(s"Environment for “$name” does not exist")
   }
 
-  sealed class Unknown(message: String) extends Throwable(message)
+  final case class UnknownEnvironmentException(message: String) extends RuntimeException(message)
 
   final case object Development extends Environment("development", "dev")
 

@@ -4,7 +4,7 @@ import java.time.{ LocalDate, Month }
 import java.time.format.{ DateTimeFormatter, TextStyle }
 import java.util.Locale
 
-case class SearchParameters(startAt: Option[LocalDate], endAt: Option[LocalDate]) {
+final case class SearchParameters(startAt: Option[LocalDate], endAt: Option[LocalDate]) {
   // TODO: optimize this def:
   override def toString: String = {
     startAt match {
@@ -23,7 +23,7 @@ case class SearchParameters(startAt: Option[LocalDate], endAt: Option[LocalDate]
 }
 
 object SearchParameters {
-  final def UndefinedSearchParameters = new SearchParameters(None, None)
+  val UndefinedSearchParameters = new SearchParameters(None, None)
 
   def hasEqualMonth(startAt: Option[LocalDate], endAt: Option[LocalDate]): Boolean = startAt match {
     case None => endAt.isEmpty
@@ -74,7 +74,7 @@ object SearchParameters {
     locale: Locale): LocalDate =
     LocalDate.parse(s"$year-$nameOfMonth-1", DateTimeFormatter.ofPattern(pattern, locale))
 
-  def weekNumberToLocalDate(weekNumber: Int, year: Int = LocalDate.now().getYear)(implicit locale: Locale): LocalDate =
+  def weekNumberToLocalDate(weekNumber: Int, year: Int = LocalDate.now().getYear): LocalDate =
     LocalDate.parse(s"$year-W$weekNumber-1", DateTimeFormatter.ISO_WEEK_DATE)
 
   implicit def stringToLocalDate(value: Option[String])(implicit locale: Locale): Option[LocalDate] = value match {

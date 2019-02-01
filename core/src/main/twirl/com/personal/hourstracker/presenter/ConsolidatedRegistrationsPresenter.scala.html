@@ -99,13 +99,12 @@
     </head>
     <body>
         @for(groupedRegistration <- model.groupedRegistrations) {
-            <div class="keep-together">
+            <div class="keep-together break-after">
                 <div class="page">
-                    @page(header(model.consultantName)(model.fullMonthNameOf(groupedRegistration._2.head.date)))(timesheet(groupedRegistration._2))(signature())
+                    @page(header(model.consultantName)(model.fullMonthNameOf(groupedRegistration._2.head.date), groupedRegistration._2.head.date.getYear()))(timesheet(groupedRegistration._2))(signature())
                 </div>
                 <div class="footer">@footerText</div>
             </div>
-            <div class="break-after"><hr/></div>
         }
     </body>
 </html>

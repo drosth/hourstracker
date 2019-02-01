@@ -18,7 +18,7 @@ trait JsonMapSupport {
         serializationError(s"Serialization of this type is not supported: ${unSupported.toString}")
     }
 
-    def read(value: JsValue): Any = value match {
+    def read(value: JsValue) = value match {
       case JsObject(fields) => fields.map(entry => entry._1 -> read(entry._2))
       case JsArray(elements) => elements.map(read)
       case JsNumber(number) => number.intValue()
