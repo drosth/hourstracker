@@ -5,27 +5,26 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.{ Locale, UUID }
 
-import scala.concurrent.Future
-import scala.util.{ Failure, Success }
-
-import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.MediaTypes._
-import akka.http.scaladsl.model.headers.ContentDispositionTypes
-import akka.http.scaladsl.server.{ MediaTypeNegotiator, Route }
+import akka.http.scaladsl.model._
+import akka.http.scaladsl.model.headers.{ ContentDispositionTypes, _ }
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.directives.MethodDirectives.get
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
+import akka.http.scaladsl.server.{ MediaTypeNegotiator, Route }
 import akka.http.scaladsl.unmarshalling.Unmarshaller
-import com.personal.hourstracker.config.component.{ FacturationComponent, RegistrationComponent, SystemComponent }
-import com.personal.hourstracker.config.Configuration
-import com.personal.hourstracker.domain.{ ConsolidatedRegistration, SearchParameters }
 import com.personal.hourstracker.Application.consolidatedRegistrationService
+import com.personal.hourstracker.config.Configuration
+import com.personal.hourstracker.config.component.{ FacturationComponent, RegistrationComponent, SystemComponent }
 import com.personal.hourstracker.dateRangeAsStringOf
 import com.personal.hourstracker.domain.ConsolidatedRegistration.{ ConsolidatedRegistrations, ConsolidatedRegistrationsPerJob }
-import com.personal.hourstracker.service.presenter.config.PresenterComponents
+import com.personal.hourstracker.domain.{ ConsolidatedRegistration, SearchParameters }
 import com.personal.hourstracker.service.CompressorService
+import com.personal.hourstracker.service.presenter.config.PresenterComponents
 import io.swagger.v3.oas.annotations.media.Schema
-import akka.http.scaladsl.model.headers._
+
+import scala.concurrent.Future
+import scala.util.{ Failure, Success }
 
 object ConsolidatedRegistrationApi {
   type ConsolidatedRegistrationModels = Seq[ConsolidatedRegistrationModel]
@@ -98,7 +97,7 @@ trait ConsolidatedRegistrationApi extends ConsolidatedRegistrationApiDoc with Co
               case 1 => getFromFile(files.head, ContentType(MediaTypes.`application/pdf`))
 
               case numberOfFiles if numberOfFiles > 1 =>
-                val zippedFiles = new File(s"${Application.outputFolder}/consolidated-${UUID.randomUUID()}.zip")
+                val zippedFiles = new File(s"${Application.exportTo}/consolidated-${UUID.randomUUID()}.zip")
 
                 val zipRoute: Future[Route] = compressorService.zip(files, zippedFiles).map {
                   case Success(s) => getFromFile(zippedFiles)

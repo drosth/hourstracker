@@ -12,5 +12,5 @@ trait Presenter[T] {
   val renderRegistrationsPerJob: T => Seq[File]
 
   def fileName(job: String, consolidatedRegistrations: ConsolidatedRegistrations, extension: String): String =
-    s"${Application.outputFolder}/[Timesheet] - $job - ${dateRangeAsStringOf(consolidatedRegistrations)}$extension"
+    s"${Application.exportTo}/[Timesheet] - $job - ${dateRangeAsStringOf(consolidatedRegistrations)}$extension"
 }

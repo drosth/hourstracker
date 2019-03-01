@@ -34,8 +34,3 @@ object WebServer extends App with ApiV1 with WebModule {
 
   Await.result(system.whenTerminated, Duration.Inf)
 }
-/*
-
-http://localhost:8080/api/v1/registrations/consolidated
-
- */

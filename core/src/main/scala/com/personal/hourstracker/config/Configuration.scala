@@ -13,7 +13,7 @@ trait Configuration {
     lazy val environment: Environment = Environment(config.getString(s"$Namespace.env"))
     lazy val importFrom: String = config.getString(s"$Namespace.application.importFrom")
     lazy val consultantName: String = config.getString(s"$Namespace.application.consultantName")
-    lazy val outputFolder: String = config.getString(s"$Namespace.application.outputFolder")
+    lazy val exportTo: String = config.getString(s"$Namespace.application.exportTo")
   }
 
   object Api {
