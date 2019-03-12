@@ -1,17 +1,17 @@
 package com.personal.hourstracker.config.component
 
 import scala.concurrent.Future
-
 import com.personal.hourstracker.domain.Registration.Registrations
 import com.personal.hourstracker.domain.SearchParameters
+import com.personal.hourstracker.importer.service.CSVImportService
 import com.personal.hourstracker.repository.RegistrationRepository
-import com.personal.hourstracker.service.{ ImportService, RegistrationService }
-import com.personal.hourstracker.service.impl.{ CSVImportService, DefaultRegistrationService }
+import com.personal.hourstracker.service.{ImporterService, RegistrationService}
+import com.personal.hourstracker.service.impl.DefaultRegistrationService
 
 trait RegistrationComponent {
   this: LoggingComponent with SystemComponent =>
 
-  val importService: ImportService = new CSVImportService()
+  val importService: ImporterService = new CSVImportService()
 
   def registrationService: RegistrationService = new DefaultRegistrationService(importService)
 }

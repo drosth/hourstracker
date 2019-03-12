@@ -2,15 +2,16 @@ package com.personal.hourstracker.service.impl
 
 import com.personal.hourstracker.config.component.RegistrationRepositoryFactory
 import com.personal.hourstracker.domain.Registration.Registrations
-import com.personal.hourstracker.domain.{ Registration, SearchParameters }
-import com.personal.hourstracker.service.{ ImportService, RegistrationSelector, RegistrationService }
+import com.personal.hourstracker.domain.{Registration, SearchParameters}
+import com.personal.hourstracker.service.{ImporterService, RegistrationSelector, RegistrationService}
 import org.slf4j.Logger
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 object DefaultRegistrationService {
+
   def determineSelectorFor(searchParameters: SearchParameters): Registration => Boolean = searchParameters match {
-    case SearchParameters(Some(startAt), None) => RegistrationSelector.registrationsStartingFrom(startAt)
+    case SearchParameters(Some(startAt), None)        => RegistrationSelector.registrationsStartingFrom(startAt)
     case SearchParameters(Some(startAt), Some(endAt)) => RegistrationSelector.registrationsBetween(startAt, endAt)
     case _ =>
       registration =>
@@ -18,32 +19,21 @@ object DefaultRegistrationService {
   }
 }
 
-class DefaultRegistrationService(importService: ImportService)(
+class DefaultRegistrationService(importService: ImporterService)(
   implicit
   logger: Logger,
-  executionContext: ExecutionContext) extends RegistrationService {
+  executionContext: ExecutionContext
+) extends RegistrationService {
 
-  import DefaultRegistrationService._
-
-  override def importRegistrationsFrom(fileName: String)(implicit searchParameters: SearchParameters): Future[Registrations] = {
+  override def importRegistrationsFrom(fileName: String): Future[Either[String, Registrations]] = {
     logger.info(s"Importing registrations from: '$fileName'")
 
-    val registrations: Future[Registrations] = importService
+    importService
       .importRegistrationsFrom(fileName)
-      .map {
-        _.filter(determineSelectorFor(searchParameters))
-      }
       .recover {
         case e =>
-          logger.error(s"Could not import from '$fileName': ${e.getMessage}", e)
-          List()
+          Left(s"Could not import from '$fileName': ${e.getMessage}")
       }
-
-    //    registrations.onComplete {
-    //      case Success(registrationsToStore) => storeRegistrations(registrationsToStore)
-    //    }
-
-    registrations
   }
 
   def storeRegistrations(registrations: Registrations): Future[Unit] = {

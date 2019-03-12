@@ -3,28 +3,28 @@ package com.personal.hourstracker.api.v1.consolidatedregistration
 import java.io.File
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.{ Locale, UUID }
+import java.util.{Locale, UUID}
 
 import akka.http.scaladsl.model.MediaTypes._
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.headers.{ ContentDispositionTypes, _ }
+import akka.http.scaladsl.model.headers.{ContentDispositionTypes, _}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.directives.MethodDirectives.get
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
-import akka.http.scaladsl.server.{ MediaTypeNegotiator, Route }
+import akka.http.scaladsl.server.{MediaTypeNegotiator, Route}
 import akka.http.scaladsl.unmarshalling.Unmarshaller
 import com.personal.hourstracker.Application.consolidatedRegistrationService
 import com.personal.hourstracker.config.Configuration
-import com.personal.hourstracker.config.component.{ FacturationComponent, RegistrationComponent, SystemComponent }
+import com.personal.hourstracker.config.component.{FacturationComponent, RegistrationComponent, SystemComponent}
 import com.personal.hourstracker.dateRangeAsStringOf
-import com.personal.hourstracker.domain.ConsolidatedRegistration.{ ConsolidatedRegistrations, ConsolidatedRegistrationsPerJob }
-import com.personal.hourstracker.domain.{ ConsolidatedRegistration, SearchParameters }
+import com.personal.hourstracker.domain.ConsolidatedRegistration.{ConsolidatedRegistrations, ConsolidatedRegistrationsPerJob}
+import com.personal.hourstracker.domain.{ConsolidatedRegistration, SearchParameters}
 import com.personal.hourstracker.service.CompressorService
 import com.personal.hourstracker.service.presenter.config.PresenterComponents
 import io.swagger.v3.oas.annotations.media.Schema
 
 import scala.concurrent.Future
-import scala.util.{ Failure, Success }
+import scala.util.{Failure, Success}
 
 object ConsolidatedRegistrationApi {
   type ConsolidatedRegistrationModels = Seq[ConsolidatedRegistrationModel]
@@ -48,7 +48,8 @@ object ConsolidatedRegistrationApi {
         consolidatedRegistration.date,
         consolidatedRegistration.job,
         consolidatedRegistration.duration,
-        consolidatedRegistration.comment)
+        consolidatedRegistration.comment
+      )
   }
 
 }
@@ -84,39 +85,53 @@ trait ConsolidatedRegistrationApi extends ConsolidatedRegistrationApiDoc with Co
     parameters("startAt".as[String].?, "endAt".as[String].?) { (startAt, endAt) =>
       implicit val searchParameters: SearchParameters = SearchParameters(startAt, endAt)
 
-      onSuccess(
-        registrationService
-          .importRegistrationsFrom(Application.importFrom)
-          .map(facturationService.splitAllRegistrationsForFacturation)
-          .map(consolidatedRegistrationService.consolidateAndProcessRegistrations(_) { consolidatedRegistrationsPerJob =>
-            println(s"Processing #${consolidatedRegistrationsPerJob.size} items:")
-            processConsolidatedRegistrationsPerJob(consolidatedRegistrationsPerJob)
-          })) { files =>
-          {
-            files.size match {
-              case 1 => getFromFile(files.head, ContentType(MediaTypes.`application/pdf`))
+      onComplete(registrationService.importRegistrationsFrom(Application.importFrom)) {
+        case Success(importedRegistrations) =>
+          for (files <- importedRegistrations
+                 .map(facturationService.splitAllRegistrationsForFacturation)
+                 .map(consolidatedRegistrationService.consolidateAndProcessRegistrations(_) { consolidatedRegistrationsPerJob =>
+                   println(s"Processing #${consolidatedRegistrationsPerJob.size} items:")
+                   processConsolidatedRegistrationsPerJob(consolidatedRegistrationsPerJob)
+                 }))
+            yield
+              files.size match {
+                case 1 =>
+                  val file = files.head
+                  logger.info(s"Returning consolidated registrations file: '${file.getName}'")
+                  getFromFile(file, ContentType(MediaTypes.`application/pdf`))
 
-              case numberOfFiles if numberOfFiles > 1 =>
-                val zippedFiles = new File(s"${Application.exportTo}/consolidated-${UUID.randomUUID()}.zip")
+                case numberOfFiles if numberOfFiles > 1 =>
+                  val zippedFiles = new File(s"${Application.exportTo}/consolidated-${UUID.randomUUID()}.zip")
 
-                val zipRoute: Future[Route] = compressorService.zip(files, zippedFiles).map {
-                  case Success(s) => getFromFile(zippedFiles)
-                  case Failure(e) => complete(StatusCodes.NotFound)
-                }
+                  logger.info(s"Returning #$numberOfFiles consolidated registrations files in .zip file: '${zippedFiles.getName}'")
 
-                onComplete(zipRoute) {
-                  case Success(route) =>
-                    respondWithHeader(`Content-Disposition`(
-                      ContentDispositionTypes.attachment, Map("filename" -> s"timesheets-${searchParameters.toString}.zip"))) {
-                      route
-                    }
-                  case Failure(e) => complete(StatusCodes.NotFound)
-                }
+                  val zipRoute: Future[Route] = compressorService.zip(files, zippedFiles).map {
+                    case Success(s) => getFromFile(zippedFiles)
+                    case Failure(e) => complete(StatusCodes.NotFound)
+                  }
 
-              case _ => complete(StatusCodes.NotFound)
-            }
-          }
-        }
+                  onComplete(zipRoute) {
+                    case Success(route) =>
+                      respondWithHeader(
+                        `Content-Disposition`(
+                          ContentDispositionTypes.attachment,
+                          Map("filename" -> s"timesheets-${searchParameters.toString}.zip")
+                        )
+                      ) { route }
+
+                    case Failure(e) =>
+                      logger.error(e.getMessage)
+                      complete(StatusCodes.NotFound, e.getMessage)
+                  }
+
+                case _ => complete(StatusCodes.NotFound, "No consolidated registration files created!")
+              }
+          complete(StatusCodes.OK)
+
+        case Failure(e) =>
+          logger.error(e.getMessage)
+          complete(StatusCodes.NotFound, e.getMessage)
+      }
     }
   }
 

@@ -1,17 +1,17 @@
 package com.personal.hourstracker.stepdefinitions
 
 import java.text.SimpleDateFormat
-import java.time.{ LocalDate, LocalDateTime, ZoneId }
-import java.time.format.{ DateTimeFormatter, DateTimeFormatterBuilder }
+import java.time.{LocalDate, LocalDateTime, ZoneId}
+import java.time.format.{DateTimeFormatter, DateTimeFormatterBuilder}
 import java.time.temporal.ChronoField
 import java.util.Date
 
 import akka.actor.ActorSystem
-import com.personal.hourstracker.domain.{ Registration, SearchParameters }
+import com.personal.hourstracker.domain.{Registration, SearchParameters}
 import com.personal.hourstracker.service.impl.DefaultRegistrationService
-import com.personal.hourstracker.service.{ ImportService, RegistrationService }
+import com.personal.hourstracker.service.{ImporterService, RegistrationService}
 import cucumber.api.DataTable
-import cucumber.api.scala.{ EN, ScalaDsl }
+import cucumber.api.scala.{EN, ScalaDsl}
 import org.mockito.Mockito._
 import org.scalatest.Matchers
 import org.scalatest.concurrent.ScalaFutures
@@ -20,7 +20,7 @@ import org.slf4j.Logger
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._
-import scala.concurrent.{ Await, ExecutionContext, Future }
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 object Helpers {
   implicit def optionToOption[A](source: Option[String]): Option[A] = source.map(_.asInstanceOf[A])
@@ -49,7 +49,7 @@ class RegistrationsSteps extends ScalaDsl with EN with Matchers with MockitoSuga
 
   implicit val searchParameters: SearchParameters = SearchParameters.UndefinedSearchParameters
 
-  val importService: ImportService = mock[ImportService]
+  val importService: ImporterService = mock[ImporterService]
   val registrationService: RegistrationService = new DefaultRegistrationService(importService)
 
   Given("""^a CSV file named '(.*)' with the following registrations:$""") { (fileName: String, dataTable: DataTable) =>
@@ -66,13 +66,20 @@ class RegistrationsSteps extends ScalaDsl with EN with Matchers with MockitoSuga
         comment = row.get("Comment"),
         tags = row.get("Tags").map(_.split(";").toSet),
         totalTimeAdjustment = row.get("TotalTimeAdjustment"),
-        totalEarningsAdjustment = row.get("TotalEarningsAdjustment"))
+        totalEarningsAdjustment = row.get("TotalEarningsAdjustment")
+      )
     })
-    when(importService.importRegistrationsFrom(fileName)).thenReturn(Future.successful(fixture.toList))
+    when(importService.importRegistrationsFrom(fileName)).thenReturn(Future.successful(Right(fixture.toList)))
   }
 
   When("""^I import the registrations from file '(.*)'$""") { fileName: String =>
-    RegistrationAttributes.registrations = Await.result(registrationService.importRegistrationsFrom(fileName), 3 seconds)
+    RegistrationAttributes.registrations = List.empty
+    Await.result(registrationService.importRegistrationsFrom(fileName), 3 seconds) match {
+      case Right(r) =>
+        RegistrationAttributes.registrations = r
+
+      case Left(e) => ???
+    }
   }
 
   Then("""^my registrations must contain:$""") { expectedRegistrations: DataTable =>
@@ -81,19 +88,24 @@ class RegistrationsSteps extends ScalaDsl with EN with Matchers with MockitoSuga
       Registration(
         id = None,
         job = row.getOrElse("Job", ""),
-        clockedIn = row.get("Clocked In").map(source => {
-          dateTimeFormatter.parse(source)
-        }),
-        clockedOut = row.get("Clocked Out").map(source => {
-          dateTimeFormatter.parse(source)
-        }),
+        clockedIn = row
+          .get("Clocked In")
+          .map(source => {
+            dateTimeFormatter.parse(source)
+          }),
+        clockedOut = row
+          .get("Clocked Out")
+          .map(source => {
+            dateTimeFormatter.parse(source)
+          }),
         duration = row.get("Duration"),
         hourlyRate = row.get("Hourly Rate"),
         earnings = row.get("Earnings"),
         comment = row.get("Comment"),
         tags = row.get("Tags").map(_.split(",").map(_.trim).toSet),
         totalTimeAdjustment = row.get("TotalTimeAdjustment"),
-        totalEarningsAdjustment = row.get("TotalEarningsAdjustment"))
+        totalEarningsAdjustment = row.get("TotalEarningsAdjustment")
+      )
     }) shouldEqual RegistrationAttributes.registrations
   }
 }
