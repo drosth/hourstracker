@@ -17,7 +17,5 @@ final case class RegistrationModel(
   earnings: Option[Double],
   comment: Option[String],
   tags: Option[Set[String]],
-  breaks: Option[String],
-  adjustments: Option[String],
   totalTimeAdjustment: Option[Double],
   totalEarningsAdjustment: Option[String])

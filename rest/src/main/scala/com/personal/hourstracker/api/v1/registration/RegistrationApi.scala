@@ -31,8 +31,6 @@ object RegistrationApi {
         registration.earnings,
         registration.comment,
         registration.tags,
-        registration.breaks,
-        registration.adjustments,
         registration.totalTimeAdjustment,
         registration.totalEarningsAdjustment)
   }

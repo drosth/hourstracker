@@ -1,15 +1,23 @@
 package com.personal.hourstracker.service.impl
 
-import java.io.Reader
-
-import scala.concurrent.{ ExecutionContext, Future }
+import java.io.{ File, FileInputStream, InputStreamReader, Reader }
 
 import com.github.tototoshi.csv.CSVReader
-import com.personal.hourstracker.domain.{ Registration, SearchParameters }
+import com.personal.hourstracker.domain.Registration
 import com.personal.hourstracker.domain.Registration.Registrations
 import com.personal.hourstracker.service.{ ImportService, _ }
 
+import scala.concurrent.{ ExecutionContext, Future }
+
 object CSVImportService {
+  def toReader(fileName: String): Reader = {
+    toReader(new File(fileName))
+  }
+
+  def toReader(file: File): Reader = {
+    new InputStreamReader(new FileInputStream(file), DEFAULT_ENCODING)
+  }
+
   private def readTagsFrom(value: Option[String]): Option[Set[String]] =
     value match {
       case None => None
@@ -17,13 +25,13 @@ object CSVImportService {
     }
 }
 
-class CSVImportService() extends ImportService {
+class CSVImportService()(implicit executionContext: ExecutionContext) extends ImportService {
+
   import CSVImportService._
 
-  override def importRegistrationsFrom(
-    reader: Reader)(implicit searchParameters: SearchParameters, executionContext: ExecutionContext): Future[Registrations] =
+  override def importRegistrationsFrom(fileName: String): Future[Registrations] =
     Future({
-      val csvReader: CSVReader = CSVReader.open(reader)
+      val csvReader: CSVReader = CSVReader.open(toReader(fileName))
 
       csvReader.readNext() // skip the "sep" line
       csvReader.toStreamWithHeaders
@@ -39,8 +47,6 @@ class CSVImportService() extends ImportService {
               record.get("Earnings"),
               record.get("Comment"),
               readTagsFrom(record.get("Tags")),
-              record.get("Breaks"),
-              record.get("Adjustments"),
               record.get("TotalTimeAdjustment"),
               record.get("TotalEarningsAdjustment")))
         .toList

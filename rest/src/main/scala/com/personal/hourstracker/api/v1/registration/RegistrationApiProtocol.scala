@@ -7,5 +7,5 @@ import spray.json.RootJsonFormat
 
 trait RegistrationApiProtocol extends CommonJsonSupport with SprayJsonSupport with JsonDateTimeSupport {
   implicit val registrationFormat: RootJsonFormat[RegistrationModel] =
-    jsonFormat12(RegistrationModel.apply)
+    jsonFormat10(RegistrationModel.apply)
 }

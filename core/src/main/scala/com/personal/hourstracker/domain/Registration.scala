@@ -13,7 +13,7 @@ object Registration {
   object JsonProtocol extends CommonJsonSupport {
 
     implicit lazy val registrationFormat: RootJsonFormat[Registration] =
-      jsonFormat13(Registration.apply)
+      jsonFormat11(Registration.apply)
   }
 
 }
@@ -28,8 +28,6 @@ final case class Registration(
   earnings: Option[Double] = None,
   comment: Option[String] = None,
   tags: Option[Set[String]] = None,
-  breaks: Option[String] = None,
-  adjustments: Option[String] = None,
   totalTimeAdjustment: Option[Double] = None,
   totalEarningsAdjustment: Option[String] = None) {
 
