@@ -14,7 +14,7 @@ com.waioeka.sbt.CucumberPlugin.projectSettings
 
 lazy val root = project
   .in(file("."))
-  .aggregate(rest, core, database)
+  .aggregate(rest, core, storage)
   .settings(commonSettings: _*)
   .settings(cucumberSettings: _*)
   .settings(
@@ -29,7 +29,7 @@ lazy val core = (project in file("core"))
       name := "core",
       organization := "com.personal.hourstracker",
       sourceDirectories in (Compile, TwirlKeys.compileTemplates) += (baseDirectory.value.getParentFile / "src" / "main" / "twirl"),
-      libraryDependencies ++= commonDependencies ++ testDependencies ++ Seq(
+      libraryDependencies ++= commonDependencies ++ testDependencies ++ cucumberDependencies ++ Seq(
         dependencies.`commons-io`,
         dependencies.`scala-csv`,
         dependencies.`spray-json`,
@@ -43,20 +43,22 @@ lazy val core = (project in file("core"))
       unmanagedClasspath in Test += baseDirectory.value / "../features",
     )
 
-lazy val database = (project in file("database.spring"))
+lazy val storage = (project in file("storage"))
     .settings(commonSettings: _*)
     .settings(
-      name := "spring",
-      organization := "com.personal.hourstracker.database",
-      libraryDependencies ++= commonDependencies ++ springDependencies ++ testDependencies ++ Seq(
+      name := "storage",
+      organization := "com.personal.hourstracker",
+      libraryDependencies ++= commonDependencies ++ testDependencies ++ cucumberDependencies ++ Seq(
         dependencies.`mysql-connector-java`,
-        dependencies.h2,
-        dependencies.postgresql
+        dependencies.h2 % Test,
+        dependencies.`scalikejdbc`,
+        dependencies.`scalikejdbc-test` % Test
       )
     )
     .dependsOn(core)
 
 lazy val rest = (project in file("rest"))
+  .dependsOn(core, storage)
   .enablePlugins(JavaAppPackaging)
   .settings(commonSettings: _*)
   .settings(
@@ -73,29 +75,28 @@ lazy val rest = (project in file("rest"))
       dependencies.zip4j
     )
   )
-  .dependsOn(core, database)
 
 lazy val dependencies =
   new {
+    val akkaHttpCorsVersion = "0.3.0"
     val akkaHttpVersion = "10.0.11"
     val akkaVersion = "2.5.17"
     val commonsIoVersion = "2.6"
+    val cucumberRunnerVersion = "0.1.5"
+    val cucumberVersion = "2.0.1"
+    val javaxWsRsApiVersion = "2.1.1"
+    val junitVersion = "4.12"
     val logbackVersion = "1.2.3"
+    val mockitoVersion = "2.23.0"
     val scalaCheckVersion = "1.13.5"
     val scalaCsvVersion = "1.3.5"
     val scalaLoggingVersion = "3.7.2"
+    val scalatestVersion = "3.0.5"
+    val scalikejdbVersion = "3.2.3"
     val slf4jVersion = "1.7.25"
     val spdfVersion = "1.4.0"
     val sprayJsonVersion = "1.3.4"
     val swaggerAkkaHttpVersion = "2.0.0"
-    val javaxWsRsApiVersion = "2.1.1"
-    val akkaHttpCorsVersion = "0.3.0"
-    val springBootVersion = "2.1.1.RELEASE"
-    val cucumberRunnerVersion = "0.1.5"
-    val cucumberVersion = "2.0.1"
-    val junitVersion = "4.12"
-    val mockitoVersion = "2.23.0"
-    val scalatestVersion = "3.0.5"
 
     val `akka-http-spray-json` = "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion
     val `akka-http-xml` = "com.typesafe.akka" %% "akka-http-xml" % akkaHttpVersion
@@ -112,15 +113,6 @@ lazy val dependencies =
     val zip4j = "net.lingala.zip4j" % "zip4j" % "1.3.2"
     val `spring-scala` = "org.springframework.scala" % "spring-scala" % "1.0.0.M2"
 
-    // spring
-    val `spring-boot-starter` = "org.springframework.boot" % "spring-boot-starter" % springBootVersion
-    val `spring-boot-starter-data-jpa` = "org.springframework.boot" % "spring-boot-starter-data-jpa" % springBootVersion
-    val `spring-boot-starter-security` = "org.springframework.boot" % "spring-boot-starter-security" % springBootVersion
-    val `spring-boot-starter-aop` = "org.springframework.boot" % "spring-boot-starter-aop" % springBootVersion
-    val `spring-boot-starter-thymeleaf` = "org.springframework.boot" % "spring-boot-starter-thymeleaf" % springBootVersion
-    val `spring-boot-starter-validation` = "org.springframework.boot" % "spring-boot-starter-validation" % springBootVersion
-    val `spring-boot-starter-web` = "org.springframework.boot" % "spring-boot-starter-web" % springBootVersion
-
     // Cucumber libraries
     val `cucumber-core` = "io.cucumber" % "cucumber-core" % cucumberVersion
     val `cucumber-junit` = "io.cucumber" % "cucumber-junit" % cucumberVersion
@@ -129,11 +121,10 @@ lazy val dependencies =
     val `cucumber-scala` = "io.cucumber" %% "cucumber-scala" % cucumberVersion
 
     // database
-//    val slick = "com.typesafe.slick" %% "slick" % "3.2.0"
-    val squeryl = "org.squeryl" %% "squeryl" % "0.9.13"
     val `mysql-connector-java` = "mysql" % "mysql-connector-java" % "8.0.13"
     val h2 = "com.h2database" % "h2" % "1.4.197"
-    val postgresql = "org.postgresql" % "postgresql" % "42.2.5"
+    val scalikejdbc = "org.scalikejdbc" %% "scalikejdbc" % scalikejdbVersion
+    val `scalikejdbc-test` = "org.scalikejdbc" %% "scalikejdbc-test" % scalikejdbVersion
 
     val logback = "ch.qos.logback" % "logback-classic" % logbackVersion
     val spdf = "io.github.cloudify" %% "spdf" % spdfVersion
@@ -151,11 +142,6 @@ lazy val dependencies =
 lazy val commonDependencies = Seq(
   dependencies.`akka-slf4j`,
   dependencies.logback
-)
-
-lazy val springDependencies = Seq(
-  dependencies.`spring-boot-starter-data-jpa`,
-  dependencies.`spring-boot-starter-web`
 )
 
 lazy val testDependencies = Seq(
@@ -225,8 +211,6 @@ lazy val commonSettings = Seq(
 
 
 lazy val cucumberSettings = Seq(
-  libraryDependencies ++= cucumberDependencies,
-
   CucumberPlugin.glue := "com.personal.hourstracker.stepdefinitions",
   CucumberPlugin.features := List("./features"),
   // testOptions in Test += Tests.Argument(framework, "--tags", Option(System.getProperty("CUCUMBER_FILTER_TAG")).getOrElse("@sanitycheck")),

@@ -2,6 +2,17 @@ package com.personal.hourstracker.config
 
 import com.typesafe.config.ConfigFactory
 
+private[config] case class Database(
+  connectionPool: DatabaseConnectionPool,
+  connectionString: String,
+  connectionTimeout: Long,
+  driver: String,
+  password: String,
+  user: String,
+  validationQuery: String)
+
+private[config] case class DatabaseConnectionPool(initialConnections: Int = 0, maxConnections: Int)
+
 trait Configuration {
   final val Namespace = "com.personal.hourstracker"
   final val config = ConfigFactory.load()
@@ -36,20 +47,17 @@ trait Configuration {
     lazy val keepAliveConnection: Boolean = config.getBoolean(s"$Namespace.database.mysql.keepAliveConnection")
   }
 
-  object Postgres {
-    lazy val url: String = config.getString(s"$Namespace.database.postgres.url")
-    lazy val driver: String = config.getString(s"$Namespace.database.postgres.driver")
-    lazy val connectionPool: Boolean = config.getBoolean(s"$Namespace.database.postgres.connectionPool")
-    lazy val keepAliveConnection: Boolean = config.getBoolean(s"$Namespace.database.postgres.keepAliveConnection")
-  }
-
-  object H2 {
-    lazy val url: String = config.getString(s"$Namespace.database.h2.url")
-    lazy val user: String = config.getString(s"$Namespace.database.h2.user")
-    lazy val password: String = config.getString(s"$Namespace.database.h2.password")
-    lazy val driver: String = config.getString(s"$Namespace.database.h2.driver")
-    lazy val connectionPool: Boolean = config.getBoolean(s"$Namespace.database.h2.connectionPool")
-    lazy val keepAliveConnection: Boolean = config.getBoolean(s"$Namespace.database.h2.keepAliveConnection")
+  object RegistrationStore {
+    lazy val database = Database(
+      connectionPool = DatabaseConnectionPool(
+        initialConnections = config.getInt(s"$Namespace.registration-store.db.connectionPool.initialConnections"),
+        maxConnections = config.getInt(s"$Namespace.registration-store.db.connectionPool.maxConnections")),
+      connectionString = config.getString(s"$Namespace.registration-store.db.connectionString"),
+      connectionTimeout = config.getLong(s"$Namespace.registration-store.db.connectionTimeout"),
+      driver = "com.mysql.jdbc.Driver",
+      password = config.getString(s"$Namespace.registration-store.user.password"),
+      user = config.getString(s"$Namespace.registration-store.user.name"),
+      validationQuery = "select 1 from dual")
   }
 
   //  object ConsolidatedRegistrations {

@@ -7,7 +7,7 @@ import com.personal.common.CommonJsonSupport
 import spray.json._
 
 object Registration {
-
+  type RegistrationID = Long
   type Registrations = List[Registration]
 
   object JsonProtocol extends CommonJsonSupport {
@@ -19,7 +19,7 @@ object Registration {
 }
 
 final case class Registration(
-  id: Option[Long] = None,
+  id: Option[Registration.RegistrationID] = None,
   job: String,
   clockedIn: Option[LocalDateTime] = None,
   clockedOut: Option[LocalDateTime] = None,
@@ -29,7 +29,7 @@ final case class Registration(
   comment: Option[String] = None,
   tags: Option[Set[String]] = None,
   totalTimeAdjustment: Option[Double] = None,
-  totalEarningsAdjustment: Option[String] = None) {
+  totalEarningsAdjustment: Option[Double] = None) {
 
   def this() = this(job = "undefined", tags = Some(Set[String]("")))
 

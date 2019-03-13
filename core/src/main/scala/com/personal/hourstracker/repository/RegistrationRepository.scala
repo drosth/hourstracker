@@ -1,12 +1,16 @@
 package com.personal.hourstracker.repository
 
 import scala.concurrent.Future
-
 import com.personal.hourstracker.domain.Registration.Registrations
-import com.personal.hourstracker.domain.SearchParameters
+import com.personal.hourstracker.domain.{ Registration, SearchParameters }
 
 trait RegistrationRepository {
+  @Deprecated
   def load()(implicit searchParameters: SearchParameters): Future[Registrations]
 
-  def store(registrations: Registrations): Future[Unit]
+  def findById(id: Registration.RegistrationID): Future[Option[Registration]]
+
+  def findAll(): Future[Either[String, Registrations]]
+
+  def save(registration: Registration): Future[Either[String, Registration.RegistrationID]]
 }
