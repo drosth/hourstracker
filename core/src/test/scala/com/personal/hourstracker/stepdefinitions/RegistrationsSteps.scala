@@ -1,17 +1,17 @@
 package com.personal.hourstracker.stepdefinitions
 
 import java.text.SimpleDateFormat
-import java.time.{LocalDate, LocalDateTime, ZoneId}
-import java.time.format.{DateTimeFormatter, DateTimeFormatterBuilder}
+import java.time.{ LocalDate, LocalDateTime, ZoneId }
+import java.time.format.{ DateTimeFormatter, DateTimeFormatterBuilder }
 import java.time.temporal.ChronoField
 import java.util.Date
 
 import akka.actor.ActorSystem
-import com.personal.hourstracker.domain.{Registration, SearchParameters}
+import com.personal.hourstracker.domain.{ Registration, SearchParameters }
 import com.personal.hourstracker.service.impl.DefaultRegistrationService
-import com.personal.hourstracker.service.{ImporterService, RegistrationService}
+import com.personal.hourstracker.service.{ ImporterService, RegistrationService }
 import cucumber.api.DataTable
-import cucumber.api.scala.{EN, ScalaDsl}
+import cucumber.api.scala.{ EN, ScalaDsl }
 import org.mockito.Mockito._
 import org.scalatest.Matchers
 import org.scalatest.concurrent.ScalaFutures
@@ -20,7 +20,7 @@ import org.slf4j.Logger
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ Await, ExecutionContext, Future }
 
 object Helpers {
   implicit def optionToOption[A](source: Option[String]): Option[A] = source.map(_.asInstanceOf[A])
@@ -66,8 +66,7 @@ class RegistrationsSteps extends ScalaDsl with EN with Matchers with MockitoSuga
         comment = row.get("Comment"),
         tags = row.get("Tags").map(_.split(";").toSet),
         totalTimeAdjustment = row.get("TotalTimeAdjustment"),
-        totalEarningsAdjustment = row.get("TotalEarningsAdjustment")
-      )
+        totalEarningsAdjustment = row.get("TotalEarningsAdjustment"))
     })
     when(importService.importRegistrationsFrom(fileName)).thenReturn(Future.successful(Right(fixture.toList)))
   }
@@ -104,8 +103,7 @@ class RegistrationsSteps extends ScalaDsl with EN with Matchers with MockitoSuga
         comment = row.get("Comment"),
         tags = row.get("Tags").map(_.split(",").map(_.trim).toSet),
         totalTimeAdjustment = row.get("TotalTimeAdjustment"),
-        totalEarningsAdjustment = row.get("TotalEarningsAdjustment")
-      )
+        totalEarningsAdjustment = row.get("TotalEarningsAdjustment"))
     }) shouldEqual RegistrationAttributes.registrations
   }
 }

@@ -1,4 +1,4 @@
-package com.personal.hourstracker.repository
+package com.personal.hourstracker.storage.repository
 
 import java.time.LocalDateTime
 
@@ -13,8 +13,9 @@ import scalikejdbc.{ ConnectionPool, DB, DBSession, _ }
 import scala.concurrent.duration._
 import scala.concurrent.{ Await, ExecutionContext }
 import scala.util.Random
+import com.personal.hourstracker.storage.repository.RegistrationConverters._
 
-class MySQLRegistrationRepositorySpec
+class ScalikeJdbcMySQLRegistrationRepositorySpec
   extends fixture.FlatSpec
   with AutoRollback
   with BeforeAndAfter
@@ -26,13 +27,13 @@ class MySQLRegistrationRepositorySpec
   implicit lazy val executionContext: ExecutionContext = system.dispatcher
 
   private final val RegistrationId: Registration.RegistrationID = Random.nextLong()
-  private val classUnderTest: MySQLRegistrationRepository = new MySQLRegistrationRepository
+  private val classUnderTest: ScalikeJdbcMySQLRegistrationRepository = new ScalikeJdbcMySQLRegistrationRepository
 
   //  override def fixture(implicit session: DBSession): Unit = {
   //    classUnderTest.initialize()
   //  }
 
-  behavior of "MySQLRegistrationRepository"
+  behavior of "MySQLRegistrationRepository with ScalikeJdbc"
 
   behavior of "save"
 
@@ -49,7 +50,7 @@ class MySQLRegistrationRepositorySpec
     Await.result(classUnderTest.save(updatedRegistration), 2 seconds) shouldEqual Right(registration.id.get)
 
     sql"SELECT * FROM Registration WHERE id = ${registration.id}"
-      .map(RegistrationMapper.toRegistration)
+      .map(_.convert())
       .single
       .apply()
       .shouldBe(Some(updatedRegistration))

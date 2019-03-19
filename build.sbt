@@ -49,6 +49,7 @@ lazy val storage = (project in file("storage"))
       name := "storage",
       organization := "com.personal.hourstracker",
       libraryDependencies ++= commonDependencies ++ testDependencies ++ cucumberDependencies ++ Seq(
+        dependencies.squeryl,
         dependencies.`mysql-connector-java`,
         dependencies.h2 % Test,
         dependencies.`scalikejdbc`,
@@ -121,6 +122,7 @@ lazy val dependencies =
     val `cucumber-scala` = "io.cucumber" %% "cucumber-scala" % cucumberVersion
 
     // database
+    val squeryl = "org.squeryl" %% "squeryl" % "0.9.13"
     val `mysql-connector-java` = "mysql" % "mysql-connector-java" % "8.0.13"
     val h2 = "com.h2database" % "h2" % "1.4.197"
     val scalikejdbc = "org.scalikejdbc" %% "scalikejdbc" % scalikejdbVersion

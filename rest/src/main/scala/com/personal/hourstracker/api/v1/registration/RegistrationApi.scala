@@ -11,11 +11,11 @@ import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import akka.http.scaladsl.unmarshalling.Unmarshaller
 import com.personal.hourstracker.api.v1.domain.RegistrationModel
 import com.personal.hourstracker.config.Configuration
-import com.personal.hourstracker.config.component.{LoggingComponent, RegistrationComponent, SystemComponent}
-import com.personal.hourstracker.domain.{Registration, SearchParameters}
+import com.personal.hourstracker.config.component.{ LoggingComponent, RegistrationComponent, SystemComponent }
+import com.personal.hourstracker.domain.{ Registration, SearchParameters }
 import com.personal.hourstracker.service.RegistrationSelector
 
-import scala.util.{Failure, Success}
+import scala.util.{ Failure, Success }
 
 object RegistrationApi {
   implicit lazy val locale: Locale = new Locale("nl", "NL")
@@ -26,7 +26,7 @@ object RegistrationApi {
     }
 
   def determineSelectorFor(searchParameters: SearchParameters): Registration => Boolean = searchParameters match {
-    case SearchParameters(Some(startAt), None)        => RegistrationSelector.registrationsStartingFrom(startAt)
+    case SearchParameters(Some(startAt), None) => RegistrationSelector.registrationsStartingFrom(startAt)
     case SearchParameters(Some(startAt), Some(endAt)) => RegistrationSelector.registrationsBetween(startAt, endAt)
     case _ =>
       registration =>
@@ -46,8 +46,7 @@ object RegistrationApi {
         registration.comment,
         registration.tags,
         registration.totalTimeAdjustment,
-        registration.totalEarningsAdjustment
-      )
+        registration.totalEarningsAdjustment)
   }
 
 }

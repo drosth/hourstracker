@@ -1,14 +1,14 @@
 package com.personal.hourstracker.importer.service
 
-import java.io.{File, FileInputStream, InputStreamReader, Reader}
+import java.io.{ File, FileInputStream, InputStreamReader, Reader }
 
 import com.github.tototoshi.csv.CSVReader
 import com.personal.hourstracker.domain.Registration
 import com.personal.hourstracker.domain.Registration.Registrations
-import com.personal.hourstracker.service.{ImporterService, _}
+import com.personal.hourstracker.service.{ ImporterService, _ }
 
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
+import scala.concurrent.{ ExecutionContext, Future }
+import scala.util.{ Failure, Success }
 
 object CSVImportService {
 
@@ -22,7 +22,7 @@ object CSVImportService {
 
   private def readTagsFrom(value: Option[String]): Option[Set[String]] =
     value match {
-      case None       => None
+      case None => None
       case Some(tags) => Some(tags.split(";").toSet)
     }
 }
@@ -51,15 +51,12 @@ class CSVImportService()(implicit executionContext: ExecutionContext) extends Im
                 record.get("Comment"),
                 readTagsFrom(record.get("Tags")),
                 record.get("TotalTimeAdjustment"),
-                record.get("TotalEarningsAdjustment")
-            )
-          )
+                record.get("TotalEarningsAdjustment")))
           .toList
 
         Right(registrations)
 
       } catch {
         case e: Throwable => Left(e.getMessage)
-      }
-    )
+      })
 }

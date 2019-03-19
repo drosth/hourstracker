@@ -31,8 +31,6 @@ final case class Registration(
   totalTimeAdjustment: Option[Double] = None,
   totalEarningsAdjustment: Option[Double] = None) {
 
-  def this() = this(job = "undefined", tags = Some(Set[String]("")))
-
   def calculateDurationInMinutes(): Long = (clockedIn, clockedOut) match {
     case (Some(in: LocalDateTime), Some(out: LocalDateTime)) =>
       ChronoUnit.MINUTES.between(in, out)

@@ -1,17 +1,17 @@
-package com.personal.hourstracker.repository
+package com.personal.hourstracker.storage.repository
 
-import akka.actor.Status.Success
 import com.personal.hourstracker.domain.Registration.{ RegistrationID, Registrations }
 import com.personal.hourstracker.domain.{ Registration, SearchParameters }
 import scalikejdbc.{ DBSession, _ }
 
 import scala.concurrent.{ ExecutionContext, Future }
-import scala.util.Failure
 
-class MySQLRegistrationRepository(
+class ScalikeJdbcMySQLRegistrationRepository(
   implicit
   session: DBSession,
   executionContext: ExecutionContext) extends RegistrationRepository {
+
+  import com.personal.hourstracker.storage.repository.RegistrationConverters._
 
   initialize()
 
@@ -46,7 +46,7 @@ class MySQLRegistrationRepository(
        FROM Registration
        WHERE id = $id
       """
-        .map(RegistrationMapper.toRegistration)
+        .map(_.convert())
         .single
         .apply()
     })
@@ -122,10 +122,10 @@ class MySQLRegistrationRepository(
     })
 }
 
-object MySQLRegistrationRepository {
+object ScalikeJdbcMySQLRegistrationRepository {
 
   def apply(
     implicit
     session: DBSession,
-    executionContext: ExecutionContext): RegistrationRepository = new MySQLRegistrationRepository
+    executionContext: ExecutionContext): RegistrationRepository = new ScalikeJdbcMySQLRegistrationRepository
 }

@@ -4,8 +4,28 @@ import java.io.PrintWriter
 import java.sql.Connection
 import java.util.logging.Logger
 
+import com.personal.hourstracker.config.Configuration
+import com.personal.hourstracker.domain.Registration
 import javax.sql.DataSource
-import scalikejdbc.{ AutoSession, ConnectionPool, DBSession }
+import scalikejdbc.{ AutoSession, ConnectionPool, ConnectionPoolSettings, DBSession, WrappedResultSet }
+
+trait ScalikeJdbcDBComponent extends DBComponent {
+  this: Configuration =>
+
+  private val _ = Class.forName(RegistrationStore.database.driver)
+
+  private val settings = ConnectionPoolSettings(
+    initialSize = RegistrationStore.database.connectionPool.initialConnections,
+    maxSize = RegistrationStore.database.connectionPool.maxConnections,
+    connectionTimeoutMillis = RegistrationStore.database.connectionTimeout,
+    validationQuery = RegistrationStore.database.validationQuery)
+
+  ConnectionPool.singleton(
+    RegistrationStore.database.connectionString,
+    RegistrationStore.database.user,
+    RegistrationStore.database.password,
+    settings)
+}
 
 private[component] trait DBComponent {
   lazy val dataSource: DataSource = new DataSource() {
@@ -31,7 +51,9 @@ private[component] trait DBComponent {
 
     override def isWrapperFor(aClass: Class[_]): Boolean = parentDataSource.isWrapperFor(aClass)
   }
+
   private lazy val parentDataSource = ConnectionPool.dataSource()
 
   implicit val session: DBSession = AutoSession
 }
+

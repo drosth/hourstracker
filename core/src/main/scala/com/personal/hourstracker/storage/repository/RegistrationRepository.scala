@@ -1,4 +1,4 @@
-package com.personal.hourstracker.repository
+package com.personal.hourstracker.storage.repository
 
 import scala.concurrent.Future
 import com.personal.hourstracker.domain.Registration.Registrations
@@ -13,4 +13,8 @@ trait RegistrationRepository {
   def findAll(): Future[Either[String, Registrations]]
 
   def save(registration: Registration): Future[Either[String, Registration.RegistrationID]]
+}
+
+trait RegistrationRepositoryComponent {
+  def registrationRepository: RegistrationRepository
 }
