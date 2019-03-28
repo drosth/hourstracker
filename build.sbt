@@ -51,9 +51,9 @@ lazy val storage = (project in file("storage"))
       libraryDependencies ++= commonDependencies ++ testDependencies ++ cucumberDependencies ++ Seq(
         dependencies.squeryl,
         dependencies.`mysql-connector-java`,
-        dependencies.h2 % Test,
-        dependencies.`scalikejdbc`,
-        dependencies.`scalikejdbc-test` % Test
+        dependencies.h2
+//        dependencies.`scalikejdbc`,
+//        dependencies.`scalikejdbc-test` % Test
       )
     )
     .dependsOn(core)
@@ -122,9 +122,12 @@ lazy val dependencies =
     val `cucumber-scala` = "io.cucumber" %% "cucumber-scala" % cucumberVersion
 
     // database
-    val squeryl = "org.squeryl" %% "squeryl" % "0.9.13"
-    val `mysql-connector-java` = "mysql" % "mysql-connector-java" % "8.0.13"
-    val h2 = "com.h2database" % "h2" % "1.4.197"
+    val squeryl = "org.squeryl" %% "squeryl" % "0.9.5-7"
+    val h2 = "com.h2database" % "h2" % "1.2.127"
+    val `mysql-connector-java` = "mysql" % "mysql-connector-java" % "5.1.10"
+    
+//    val `mysql-connector-java` = "mysql" % "mysql-connector-java" % "8.0.13"
+//    val h2 = "com.h2database" % "h2" % "1.4.197"
     val scalikejdbc = "org.scalikejdbc" %% "scalikejdbc" % scalikejdbVersion
     val `scalikejdbc-test` = "org.scalikejdbc" %% "scalikejdbc-test" % scalikejdbVersion
 
