@@ -26,7 +26,7 @@ lazy val core = (project in file("core"))
     .enablePlugins(CucumberPlugin, SbtTwirl)
     .settings(commonSettings: _*)
     .settings(
-      name := "core",
+      name := "hourstracker-core",
       organization := "com.personal.hourstracker",
       sourceDirectories in (Compile, TwirlKeys.compileTemplates) += (baseDirectory.value.getParentFile / "src" / "main" / "twirl"),
       libraryDependencies ++= commonDependencies ++ testDependencies ++ cucumberDependencies ++ Seq(
@@ -46,14 +46,12 @@ lazy val core = (project in file("core"))
 lazy val storage = (project in file("storage"))
     .settings(commonSettings: _*)
     .settings(
-      name := "storage",
+      name := "hourstracker-storage",
       organization := "com.personal.hourstracker",
       libraryDependencies ++= commonDependencies ++ testDependencies ++ cucumberDependencies ++ Seq(
         dependencies.squeryl,
         dependencies.`mysql-connector-java`,
         dependencies.h2
-//        dependencies.`scalikejdbc`,
-//        dependencies.`scalikejdbc-test` % Test
       )
     )
     .dependsOn(core)
@@ -63,7 +61,7 @@ lazy val rest = (project in file("rest"))
   .enablePlugins(JavaAppPackaging)
   .settings(commonSettings: _*)
   .settings(
-    name := "rest",
+    name := "hourstracker-rest",
     organization := "com.personal.hourstracker",
     libraryDependencies ++= commonDependencies ++ testDependencies ++ Seq(
       dependencies.`swagger-akka-http`,
@@ -93,7 +91,6 @@ lazy val dependencies =
     val scalaCsvVersion = "1.3.5"
     val scalaLoggingVersion = "3.7.2"
     val scalatestVersion = "3.0.5"
-    val scalikejdbVersion = "3.2.3"
     val slf4jVersion = "1.7.25"
     val spdfVersion = "1.4.0"
     val sprayJsonVersion = "1.3.4"
@@ -123,13 +120,8 @@ lazy val dependencies =
 
     // database
     val squeryl = "org.squeryl" %% "squeryl" % "0.9.5-7"
-    val h2 = "com.h2database" % "h2" % "1.2.127"
-    val `mysql-connector-java` = "mysql" % "mysql-connector-java" % "5.1.10"
-    
-//    val `mysql-connector-java` = "mysql" % "mysql-connector-java" % "8.0.13"
-//    val h2 = "com.h2database" % "h2" % "1.4.197"
-    val scalikejdbc = "org.scalikejdbc" %% "scalikejdbc" % scalikejdbVersion
-    val `scalikejdbc-test` = "org.scalikejdbc" %% "scalikejdbc-test" % scalikejdbVersion
+    val h2 = "com.h2database" % "h2" % "1.4.197"
+    val `mysql-connector-java` = "mysql" % "mysql-connector-java" % "8.0.13"
 
     val logback = "ch.qos.logback" % "logback-classic" % logbackVersion
     val spdf = "io.github.cloudify" %% "spdf" % spdfVersion

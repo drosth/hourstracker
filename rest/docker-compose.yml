@@ -9,6 +9,9 @@ services:
         TARGET_DIR: /opt/webapp
     image: hourstracker
     container_name: hourstracker
+    depends_on:
+      registration-storage:
+        condition: service_healthy
     volumes_from:
       - data
     environment:
@@ -22,17 +25,18 @@ services:
     environment:
     - API_URL=http://0.0.0.0:8080/api/v1/api-docs/swagger.json
 
-#  mysql:
-#    image: mysql:5
-#    environment:
-#      - MYSQL_DATABASE=hourstracker
-#      - MYSQL_USER=hourstracker
-#      - MYSQL_PASSWORD=hourstracker
-#      - MYSQL_RANDOM_ROOT_PASSWORD=yes
-#    healthcheck:
-#      test: "/etc/init.d/mysql status"
-#      interval: 1s
-#      retries: 120
+  registration-storage:
+    image: mysql:5.7
+    container_name: hourstracker-registration-storage
+    environment:
+      - MYSQL_DATABASE=hourstracker
+      - MYSQL_USER=hourstracker
+      - MYSQL_PASSWORD=hourstracker
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+    healthcheck:
+      test: "/etc/init.d/mysql status"
+      interval: 1s
+      retries: 120
 
   data:
     image: busybox

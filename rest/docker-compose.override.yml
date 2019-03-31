@@ -9,6 +9,6 @@ services:
     ports:
     - 8079:8080
 
-#  mysql:
-#    ports:
-#      - 3306:3306
+  registration-storage:
+    ports:
+      - 3306:3306

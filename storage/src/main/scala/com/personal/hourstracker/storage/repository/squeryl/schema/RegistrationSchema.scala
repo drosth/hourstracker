@@ -11,7 +11,6 @@ object RegistrationSchema extends Schema {
   def reset() = transaction {
     RegistrationSchema.drop
     RegistrationSchema.create
-    println("Created the schema")
   }
 
   implicit def localDateTimeToTimestamp(source: LocalDateTime): Timestamp =

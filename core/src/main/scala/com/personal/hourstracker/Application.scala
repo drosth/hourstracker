@@ -2,16 +2,21 @@ package com.personal.hourstracker
 
 import java.util.Locale
 
-import scala.concurrent.{ Await, Future }
-import scala.concurrent.duration._
-import scala.util.{ Failure, Success }
 import com.personal.hourstracker.config.ApplicationModule
 import com.personal.hourstracker.domain.ConsolidatedRegistration.ConsolidatedRegistrationsPerJob
 import com.personal.hourstracker.domain.Registration.Registrations
 import com.personal.hourstracker.domain.SearchParameters
 import com.personal.hourstracker.service.presenter.Presenter
+import com.personal.hourstracker.config.component.NoopRegistrationRepositoryComponent
 
-object Application extends App with ApplicationModule {
+import scala.concurrent.{ Await, Future }
+import scala.concurrent.duration._
+import scala.util.{ Failure, Success }
+
+object Application
+  extends App
+  with ApplicationModule
+  with NoopRegistrationRepositoryComponent {
 
   sys.addShutdownHook(terminate)
 

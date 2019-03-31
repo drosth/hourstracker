@@ -5,11 +5,11 @@ import com.personal.hourstracker.domain.Registration
 import com.personal.hourstracker.storage.repository.Converter
 import com.personal.hourstracker.storage.repository.squeryl.entities.RegistrationEntity
 
-object RegistrationConverters {
+object RegistrationConverter {
 
   implicit class toRegistrationConverter(source: RegistrationEntity) extends Converter[Registration] {
 
-    override def convert(): Registration = {
+    override lazy val convert: Registration = {
       Registration(
         id = Some(source.id),
         job = source.job,
@@ -19,7 +19,7 @@ object RegistrationConverters {
         hourlyRate = source.hourlyRate,
         earnings = source.earnings,
         comment = source.comment,
-        //      tags = rs.stringOpt("tags").map(_.split(";").toSet),
+        tags = source.tags.map(t => t.split(";").toSet),
         totalTimeAdjustment = source.totalTimeAdjustment,
         totalEarningsAdjustment = source.totalEarningsAdjustment)
     }
@@ -27,7 +27,7 @@ object RegistrationConverters {
 
   implicit class toRegistrationEntityConverter(source: Registration) extends Converter[RegistrationEntity] {
 
-    override def convert(): RegistrationEntity = {
+    override lazy val convert: RegistrationEntity = {
       RegistrationEntity(
         job = source.job,
         clockedIn = source.clockedIn.map(Timestamp.valueOf),
@@ -36,7 +36,7 @@ object RegistrationConverters {
         hourlyRate = source.hourlyRate,
         earnings = source.earnings,
         comment = source.comment,
-        //      tags = rs.stringOpt("tags").map(_.split(";").toSet),
+        tags = source.tags.map(t => t.mkString(";")),
         totalTimeAdjustment = source.totalTimeAdjustment,
         totalEarningsAdjustment = source.totalEarningsAdjustment)
     }
