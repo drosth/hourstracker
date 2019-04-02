@@ -1,21 +1,18 @@
 package com.personal.hourstracker.stepdefinitions
 
 import java.text.SimpleDateFormat
-import java.time.{ LocalDate, LocalDateTime, ZoneId }
-import java.time.format.{ DateTimeFormatter, DateTimeFormatterBuilder }
-import java.time.temporal.ChronoField
-import java.util.Date
 
 import akka.actor.ActorSystem
-import com.personal.hourstracker.domain.{ Registration, SearchParameters }
+import com.personal.hourstracker.domain.Registration
+import com.personal.hourstracker.repository.RegistrationRepository
 import com.personal.hourstracker.service.impl.DefaultRegistrationService
 import com.personal.hourstracker.service.{ ImporterService, RegistrationService }
 import cucumber.api.DataTable
 import cucumber.api.scala.{ EN, ScalaDsl }
 import org.mockito.Mockito._
-import org.scalatest.Matchers
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
+import org.scalatest.{ BeforeAndAfter, Matchers }
 import org.slf4j.Logger
 
 import scala.concurrent.duration._
@@ -24,14 +21,13 @@ import scala.concurrent.{ Await, ExecutionContext, Future }
 class RegistrationsSteps extends ScalaDsl with EN with Matchers with MockitoSugar with ScalaFutures {
   import Helpers._
 
-  implicit val logger: Logger = mock[Logger]
-  implicit val system: ActorSystem = ActorSystem()
-  implicit lazy val executionContext: ExecutionContext = system.dispatcher
+  private implicit val logger: Logger = mock[Logger]
+  private implicit val system: ActorSystem = ActorSystem()
+  private implicit lazy val executionContext: ExecutionContext = system.dispatcher
 
-  implicit val searchParameters: SearchParameters = SearchParameters.UndefinedSearchParameters
-
-  val importService: ImporterService = mock[ImporterService]
-  val registrationService: RegistrationService = new DefaultRegistrationService(importService)
+  private val registrationRepository: RegistrationRepository = mock[RegistrationRepository]
+  private val importService: ImporterService = mock[ImporterService]
+  private val registrationService: RegistrationService = new DefaultRegistrationService(registrationRepository, importService)
 
   Given("""^a CSV file named '(.*)' with the following registrations:$""") { (fileName: String, dataTable: DataTable) =>
     val dateTimeFormatter = new SimpleDateFormat("dd/MM/yyyy hh:mm")

@@ -13,9 +13,3 @@ Feature: Import registrations
     Then my registrations consists of:
       | Job           | Clocked In       | Clocked Out      | Duration | Hourly Rate | Earnings | Comment      | Tags                          | TotalTimeAdjustment | TotalEarningsAdjustment |
       | Some Job name | 2018-09-05 07:53 | 2018-09-05 16:41 | 8,5      | 76,5        | 650,25   | Some comment | POS, DPES005-50%, DPES004-50% | -0,33               | 0                       |
-
-  Scenario: Store imported registration
-    When I import the registrations from file 'import.csv'
-    Then my storage contains:
-      | Job           | Clocked In       | Clocked Out      | Duration | Hourly Rate | Earnings | Comment      | Tags                          | TotalTimeAdjustment | TotalEarningsAdjustment |
-      | Some Job name | 2018-09-05 07:53 | 2018-09-05 16:41 | 8,5      | 76,5        | 650,25   | Some comment | POS, DPES005-50%, DPES004-50% | -0,33               | 0                       |

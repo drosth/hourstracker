@@ -1,7 +1,7 @@
 package com.personal.hourstracker.storage.repository.squeryl
 
 import com.personal.hourstracker.domain.Registration
-import com.personal.hourstracker.storage.repository.RegistrationRepository
+import com.personal.hourstracker.repository.RegistrationRepository
 import com.personal.hourstracker.storage.repository.squeryl.entities.RegistrationEntity
 import com.personal.hourstracker.storage.repository.squeryl.schema.RegistrationSchema
 import org.squeryl.PrimitiveTypeMode.{ transaction, _ }

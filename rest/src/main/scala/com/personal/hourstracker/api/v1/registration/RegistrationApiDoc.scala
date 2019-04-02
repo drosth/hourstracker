@@ -8,11 +8,12 @@ import io.swagger.v3.oas.annotations.media.{ Content, Schema }
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import javax.ws.rs.{ GET, Path, Produces }
 
-@Path("/api/v1/registrations")
+@Path("/api/v1/registration")
 @Produces(Array("application/json"))
 protected[registration] trait RegistrationApiDoc {
 
   @GET
+  @Path("/")
   @Operation(
     summary = "Retrieve all registrations",
     description = "Retrieves all known registrations",
@@ -38,4 +39,5 @@ protected[registration] trait RegistrationApiDoc {
           new Content(mediaType = "application/json", schema = new Schema(implementation = classOf[RegistrationModels])))),
       new ApiResponse(responseCode = "404", description = "Registrations not found")))
   def getRegistrations: Route
+
 }

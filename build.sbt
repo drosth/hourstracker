@@ -44,6 +44,7 @@ lazy val core = (project in file("core"))
     )
 
 lazy val storage = (project in file("storage"))
+    .dependsOn(core % "compile->compile;test->test")
     .settings(commonSettings: _*)
     .settings(
       name := "hourstracker-storage",
@@ -54,7 +55,6 @@ lazy val storage = (project in file("storage"))
         dependencies.h2
       )
     )
-    .dependsOn(core)
 
 lazy val rest = (project in file("rest"))
   .dependsOn(core, storage)

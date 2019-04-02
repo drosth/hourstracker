@@ -5,11 +5,9 @@ import com.personal.hourstracker.service.impl.DefaultRegistrationService
 import com.personal.hourstracker.service.{ ImporterService, RegistrationService }
 
 trait RegistrationComponent {
-  this: LoggingComponent with SystemComponent =>
+  this: RegistrationRepositoryComponent with ImporterServiceComponent with LoggingComponent with SystemComponent =>
 
-  val importService: ImporterService = new CSVImportService()
-
-  def registrationService: RegistrationService = new DefaultRegistrationService(importService)
+  def registrationService: RegistrationService = new DefaultRegistrationService(registrationRepository, importerService)
 }
 
 //object RegistrationRepositoryFactory {

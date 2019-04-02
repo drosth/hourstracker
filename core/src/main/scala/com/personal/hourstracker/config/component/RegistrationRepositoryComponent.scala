@@ -1,12 +1,12 @@
 package com.personal.hourstracker.config.component
 import com.personal.hourstracker.domain.Registration
-import com.personal.hourstracker.storage.repository.RegistrationRepository
+import com.personal.hourstracker.repository.RegistrationRepository
 
 trait RegistrationRepositoryComponent {
   def registrationRepository: RegistrationRepository
 }
 
-trait NoopRegistrationRepositoryComponent {
+trait NoopRegistrationRepositoryComponent extends RegistrationRepositoryComponent {
   lazy val registrationRepository: RegistrationRepository = new NoopRegistrationRepository()
 
   class NoopRegistrationRepository extends RegistrationRepository {

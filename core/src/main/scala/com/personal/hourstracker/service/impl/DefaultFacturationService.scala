@@ -38,14 +38,10 @@ class DefaultFacturationService()(implicit logger: Logger, locale: Locale) exten
       case None => List(registration)
       case Some(tags) =>
         tags.map { tag =>
-          {
-            logger.info(s"Reconstructing registration using '$tag'")
-
-            registration.copy(
-              job = constructJobWithTag(registration.job, tag),
-              tags = Some(Set(tag)),
-              totalTimeAdjustment = calculateTotalTimeAdjustmentUsing(tag, registration.duration))
-          }
+          registration.copy(
+            job = constructJobWithTag(registration.job, tag),
+            tags = Some(Set(tag)),
+            totalTimeAdjustment = calculateTotalTimeAdjustmentUsing(tag, registration.duration))
         }.toList
     }
 

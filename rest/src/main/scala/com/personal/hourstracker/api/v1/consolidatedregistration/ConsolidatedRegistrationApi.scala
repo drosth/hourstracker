@@ -17,9 +17,11 @@ import com.personal.hourstracker.Application.consolidatedRegistrationService
 import com.personal.hourstracker.config.Configuration
 import com.personal.hourstracker.config.component.{ FacturationComponent, RegistrationComponent, SystemComponent }
 import com.personal.hourstracker.dateRangeAsStringOf
+import com.personal.hourstracker.domain.ConsolidatedRegistration
 import com.personal.hourstracker.domain.ConsolidatedRegistration.{ ConsolidatedRegistrations, ConsolidatedRegistrationsPerJob }
-import com.personal.hourstracker.domain.{ ConsolidatedRegistration, SearchParameters }
+import com.personal.hourstracker.domain.Registration.Registrations
 import com.personal.hourstracker.service.CompressorService
+import com.personal.hourstracker.service.RegistrationSelector.{ RegistrationRangeSelector, _ }
 import com.personal.hourstracker.service.presenter.config.PresenterComponents
 import io.swagger.v3.oas.annotations.media.Schema
 
@@ -81,49 +83,61 @@ trait ConsolidatedRegistrationApi extends ConsolidatedRegistrationApiDoc with Co
   def processConsolidatedRegistrations(): Route = {
     import ConsolidatedRegistrationApi._
 
-    parameters("startAt".as[String].?, "endAt".as[String].?) { (startAt, endAt) =>
-      implicit val searchParameters: SearchParameters = SearchParameters(startAt, endAt)
-
+    parameters("startAt".as[String].?, "endAt".as[String].?) { (startAt: Option[String], endAt: Option[String]) =>
       onComplete(registrationService.importRegistrationsFrom(Application.importFrom)) {
-        case Success(importedRegistrations) =>
-          for (
-            files <- importedRegistrations
-              .map(facturationService.splitAllRegistrationsForFacturation)
-              .map(consolidatedRegistrationService.consolidateAndProcessRegistrations(_) { consolidatedRegistrationsPerJob =>
-                println(s"Processing #${consolidatedRegistrationsPerJob.size} items:")
-                processConsolidatedRegistrationsPerJob(consolidatedRegistrationsPerJob)
-              })
-          ) yield files.size match {
-            case 1 =>
-              val file = files.head
-              logger.info(s"Returning consolidated registrations file: '${file.getName}'")
-              getFromFile(file, ContentType(MediaTypes.`application/pdf`))
+        case Success(importedRegistrations: Either[String, Registrations]) =>
+          importedRegistrations match {
+            case Left(message) =>
+              logger.warn(s"Did not receive registrations: $message")
+              complete(StatusCodes.NotFound)
 
-            case numberOfFiles if numberOfFiles > 1 =>
-              val zippedFiles = new File(s"${Application.exportTo}/consolidated-${UUID.randomUUID()}.zip")
+            case Right(registrations: Registrations) =>
+              logger.debug(s"of #${registrations.size} registrations")
+              val filtered: Registrations = registrations.filter(new RegistrationRangeSelector(startAt, endAt).filter)
+              logger.debug(s"going to process #${filtered.size} filtered registrations")
 
-              logger.info(s"Returning #$numberOfFiles consolidated registrations files in .zip file: '${zippedFiles.getName}'")
+              val splitted: Registrations = facturationService.splitAllRegistrationsForFacturation(filtered)
+              logger.debug(s"after splitting, #${splitted.size} remains")
 
-              val zipRoute: Future[Route] = compressorService.zip(files, zippedFiles).map {
-                case Success(s) => getFromFile(zippedFiles)
-                case Failure(e) => complete(StatusCodes.NotFound)
+              val consolidatedFiles: Seq[File] = consolidatedRegistrationService.consolidateAndProcessRegistrations(splitted) {
+                consolidatedRegistrationsPerJob =>
+                  logger.debug(s"Processing #${consolidatedRegistrationsPerJob.size} items:")
+                  processConsolidatedRegistrationsPerJob(consolidatedRegistrationsPerJob)
               }
+              logger.debug(s"after consolidating, #${consolidatedFiles.size} file(s) have been created")
 
-              onComplete(zipRoute) {
-                case Success(route) =>
-                  respondWithHeader(
-                    `Content-Disposition`(
-                      ContentDispositionTypes.attachment,
-                      Map("filename" -> s"timesheets-${searchParameters.toString}.zip"))) { route }
+              consolidatedFiles.size match {
+                case 1 =>
+                  val file = consolidatedFiles.head
+                  logger.info(s"Returning consolidated registrations file: '${file.getName}'")
+                  getFromFile(file, ContentType(MediaTypes.`application/pdf`))
 
-                case Failure(e) =>
-                  logger.error(e.getMessage)
-                  complete(StatusCodes.NotFound, e.getMessage)
+                case numberOfFiles if numberOfFiles > 1 =>
+                  val zippedFiles = new File(s"${Application.exportTo}/consolidated-${UUID.randomUUID()}.zip")
+
+                  logger.info(s"Returning #$numberOfFiles consolidated registrations files in .zip file: '${zippedFiles.getName}'")
+
+                  val zipRoute: Future[Route] = compressorService.zip(consolidatedFiles, zippedFiles).map {
+                    case Success(s) => getFromFile(zippedFiles)
+                    case Failure(e) => complete(StatusCodes.NotFound)
+                  }
+
+                  onComplete(zipRoute) {
+                    case Success(route) =>
+                      respondWithHeader(
+                        `Content-Disposition`(
+                          ContentDispositionTypes.attachment,
+                          Map("filename" -> constructZipFileNameWith(startAt, endAt)))) { route }
+
+                    case Failure(e) =>
+                      logger.error(e.getMessage)
+                      complete(StatusCodes.NotFound, e.getMessage)
+                  }
+
+                case _ => complete(StatusCodes.NotFound, "No consolidated registration files created!")
               }
-
-            case _ => complete(StatusCodes.NotFound, "No consolidated registration files created!")
+              complete(StatusCodes.OK)
           }
-          complete(StatusCodes.OK)
 
         case Failure(e) =>
           logger.error(e.getMessage)
@@ -132,10 +146,15 @@ trait ConsolidatedRegistrationApi extends ConsolidatedRegistrationApiDoc with Co
     }
   }
 
-  def processConsolidatedRegistrationsPerJob(consolidatedRegistrationsPerJob: ConsolidatedRegistrationsPerJob): Seq[File] = {
+  private def constructZipFileNameWith(startAt: Option[String], endAt: Option[String]) = {
+    val range = Seq(startAt.getOrElse(""), endAt.getOrElse(""))
+    s"timesheets-${range.mkString("-")}.zip"
+  }
+
+  private def processConsolidatedRegistrationsPerJob(consolidatedRegistrationsPerJob: ConsolidatedRegistrationsPerJob): Seq[File] = {
     pdfPresenter.renderRegistrationsPerJob(consolidatedRegistrationsPerJob)
   }
 
-  def fileName(job: String, registrations: ConsolidatedRegistrations) =
+  private def fileName(job: String, registrations: ConsolidatedRegistrations) =
     s"target/[Timesheet] - $job - ${dateRangeAsStringOf(registrations)}.pdf"
 }

@@ -1,4 +1,4 @@
-package com.personal.hourstracker.storage.repository
+package com.personal.hourstracker.repository
 
 trait BaseRepository[T, ID] {
   def findAll(): List[T]

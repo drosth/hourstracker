@@ -9,6 +9,8 @@ import com.personal.hourstracker.service.presenter.config.PresenterComponents
 trait ApplicationModule
   extends Configuration
   with RegistrationComponent
+  with NoopRegistrationRepositoryComponent
+  with CSVImporterServiceComponent
   with ConsolidatedRegistrationComponent
   with FacturationComponent
   with PresenterComponents

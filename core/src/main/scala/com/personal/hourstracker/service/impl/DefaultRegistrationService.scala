@@ -1,24 +1,13 @@
 package com.personal.hourstracker.service.impl
 
 import com.personal.hourstracker.domain.Registration.Registrations
-import com.personal.hourstracker.domain.{ Registration, SearchParameters }
-import com.personal.hourstracker.service.{ ImporterService, RegistrationSelector, RegistrationService }
+import com.personal.hourstracker.repository.RegistrationRepository
+import com.personal.hourstracker.service.{ ImporterService, RegistrationService }
 import org.slf4j.Logger
 
 import scala.concurrent.{ ExecutionContext, Future }
 
-object DefaultRegistrationService {
-
-  def determineSelectorFor(searchParameters: SearchParameters): Registration => Boolean = searchParameters match {
-    case SearchParameters(Some(startAt), None) => RegistrationSelector.registrationsStartingFrom(startAt)
-    case SearchParameters(Some(startAt), Some(endAt)) => RegistrationSelector.registrationsBetween(startAt, endAt)
-    case _ =>
-      registration =>
-        true
-  }
-}
-
-class DefaultRegistrationService(importService: ImporterService)(
+class DefaultRegistrationService(registrationRepository: RegistrationRepository, importService: ImporterService)(
   implicit
   logger: Logger,
   executionContext: ExecutionContext) extends RegistrationService {
@@ -34,10 +23,15 @@ class DefaultRegistrationService(importService: ImporterService)(
       }
   }
 
-  //  def storeRegistrations(registrations: Registrations): Future[Unit] = {
-  //    val registrationRepository = RegistrationRepositoryFactory.registrationRepository
-  //    registrationRepository.store(registrations)
-  //  }
-
-  override def loadRegistrations()(implicit searchParameters: SearchParameters): Future[Registrations] = ???
+  override def storeRegistrations(registrations: Registrations): Future[Either[String, Seq[Long]]] = {
+    val result: Either[String, List[Long]] = registrations
+      .map(registrationRepository.save) // Seq[Either[String, Long]]
+      .partition(_.isLeft) match { // (List[Either[String, Long]], List[Either[String, Long]])
+        case (Nil, ids) =>
+          Right(for (Right(id) <- ids) yield id) // Either[Nothing, List[Long]]
+        case (messages, _) =>
+          Left((for (Left(message) <- messages) yield message).head) // Either[String, Nothing]
+      }
+    Future.successful(result)
+  }
 }

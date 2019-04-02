@@ -3,15 +3,16 @@ package com.personal.hourstracker.storage.repository.squeryl
 import java.sql.Timestamp
 import java.time.LocalDateTime
 
+import com.personal.hourstracker.config.Configuration
 import com.personal.hourstracker.domain.Registration
-import com.personal.hourstracker.storage.config.{ StorageConfiguration }
+import com.personal.hourstracker.repository.RegistrationRepository
+import com.personal.hourstracker.storage.config.StorageConfiguration
 import com.personal.hourstracker.storage.config.component.SquerylRegistrationRepositoryComponent
-import com.personal.hourstracker.storage.repository.RegistrationRepository
 import com.personal.hourstracker.storage.repository.squeryl.converter.RegistrationConverter._
 import com.personal.hourstracker.storage.repository.squeryl.entities.RegistrationEntity
 import com.personal.hourstracker.storage.repository.squeryl.schema.RegistrationSchema
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{ BeforeAndAfterAll, Matchers, Outcome, fixture }
+import org.scalatest.{BeforeAndAfterAll, Matchers, Outcome, fixture}
 
 class SquerylRegistrationRepositorySpec
   extends fixture.FlatSpec

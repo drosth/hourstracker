@@ -3,14 +3,13 @@ package com.personal.hourstracker
 import java.util.Locale
 
 import com.personal.hourstracker.config.ApplicationModule
+import com.personal.hourstracker.config.component.NoopRegistrationRepositoryComponent
 import com.personal.hourstracker.domain.ConsolidatedRegistration.ConsolidatedRegistrationsPerJob
 import com.personal.hourstracker.domain.Registration.Registrations
-import com.personal.hourstracker.domain.SearchParameters
 import com.personal.hourstracker.service.presenter.Presenter
-import com.personal.hourstracker.config.component.NoopRegistrationRepositoryComponent
 
-import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration._
+import scala.concurrent.{ Await, Future }
 import scala.util.{ Failure, Success }
 
 object Application
@@ -23,8 +22,6 @@ object Application
   lazy val presenter: Presenter[ConsolidatedRegistrationsPerJob] = htmlPresenter
 
   implicit def locale: Locale = new Locale("nl", "NL")
-
-  implicit val searchParameters: SearchParameters = SearchParameters(Some("sep"))
 
   val importedRegistrations: Future[Either[String, Registrations]] = registrationService.importRegistrationsFrom(Application.importFrom)
   importedRegistrations

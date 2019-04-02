@@ -4,16 +4,16 @@ import java.sql.Timestamp
 import org.squeryl.annotations.Column
 
 case class RegistrationEntity(
-  var job: String,
-  var clockedIn: Option[Timestamp] = None,
-  var clockedOut: Option[Timestamp] = None,
+  job: String,
+  clockedIn: Option[Timestamp] = None,
+  clockedOut: Option[Timestamp] = None,
   @Column(scale = 2) duration: Option[Double] = None,
-  var hourlyRate: Option[Double] = None,
-  var earnings: Option[Double] = None,
-  var comment: Option[String] = None,
-  var tags: Option[String] = None,
-  var totalTimeAdjustment: Option[Double] = None,
-  var totalEarningsAdjustment: Option[Double] = None) extends BaseEntity {
+  hourlyRate: Option[Double] = None,
+  earnings: Option[Double] = None,
+  comment: Option[String] = None,
+  tags: Option[String] = None,
+  totalTimeAdjustment: Option[Double] = None,
+  totalEarningsAdjustment: Option[Double] = None) extends BaseEntity {
 
   /*
     Important:

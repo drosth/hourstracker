@@ -12,8 +12,8 @@ import akka.http.scaladsl.unmarshalling.Unmarshaller
 import com.personal.hourstracker.api.v1.domain.RegistrationModel
 import com.personal.hourstracker.config.Configuration
 import com.personal.hourstracker.config.component.{ LoggingComponent, RegistrationComponent, SystemComponent }
-import com.personal.hourstracker.domain.{ Registration, SearchParameters }
-import com.personal.hourstracker.service.RegistrationSelector
+import com.personal.hourstracker.domain.Registration
+import com.personal.hourstracker.service.RegistrationSelector.{ RegistrationRangeSelector, _ }
 
 import scala.util.{ Failure, Success }
 
@@ -24,14 +24,6 @@ object RegistrationApi {
     Unmarshaller.strict[String, LocalDate] {
       LocalDate.parse(_, DateTimeFormatter.ISO_LOCAL_DATE)
     }
-
-  def determineSelectorFor(searchParameters: SearchParameters): Registration => Boolean = searchParameters match {
-    case SearchParameters(Some(startAt), None) => RegistrationSelector.registrationsStartingFrom(startAt)
-    case SearchParameters(Some(startAt), Some(endAt)) => RegistrationSelector.registrationsBetween(startAt, endAt)
-    case _ =>
-      registration =>
-        true
-  }
 
   object ModelAdapter {
 
@@ -61,16 +53,14 @@ trait RegistrationApi extends RegistrationApiProtocol with RegistrationApiDoc wi
   override def getRegistrations: Route =
     pathEndOrSingleSlash {
       get {
-        parameters("startAt".as[String].?, "endAt".as[String].?) { (startAt, endAt) =>
+        parameters("startAt".as[String].?, "endAt".as[String].?) { (startAt: Option[String], endAt: Option[String]) =>
           {
-            implicit val searchParameters: SearchParameters = SearchParameters(startAt, endAt)
-
             onComplete(registrationService.importRegistrationsFrom(Application.importFrom)) {
               case Success(importedRegistrations) =>
                 importedRegistrations match {
                   case Right(registrations) =>
                     val models = registrations
-                      .filter(determineSelectorFor(searchParameters))
+                      .filter(new RegistrationRangeSelector(startAt, endAt).filter)
                       .map(ModelAdapter.toModel)
                     complete(models)
 

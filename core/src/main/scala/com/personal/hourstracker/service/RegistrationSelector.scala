@@ -1,46 +1,31 @@
 package com.personal.hourstracker.service
 
+import java.time.format.DateTimeFormatter
 import java.time.{ LocalDate, LocalDateTime }
-import java.time.temporal.WeekFields
 
 import com.personal.hourstracker.domain.Registration
 
+trait Selector {
+  def filter: Registration => Boolean
+}
+
 object RegistrationSelector {
+  private val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
-  val registrationsForCurrentYear: Registration => Boolean = registration =>
-    registration.clockedIn.isDefined &&
-      registration.clockedIn.get.isAfter(startOfYear)
+  implicit def optionalStringToLocalDate(value: Option[String]): Option[LocalDate] = value.map(x => x)
 
-  def registrationsStartingFrom(start: LocalDate): Registration => Boolean =
-    registration => registration.clockedIn.isDefined && registration.clockedIn.get.toLocalDate.isAfter(start.minusDays(1))
+  implicit def stringToLocalDate(value: String): LocalDate = LocalDate.parse(value, dateTimeFormatter)
 
-  def registrationsBetween(start: LocalDate, finish: LocalDate): Registration => Boolean =
-    registration =>
-      registration.clockedIn.isDefined && registration.clockedIn.get.toLocalDate.isAfter(start.minusDays(1)) && registration.clockedIn.get.toLocalDate
-        .isBefore(finish.plusDays(1))
+  final class RegistrationRangeSelector(startAt: Option[LocalDate], endAt: Option[LocalDate]) extends Selector {
+    private def isInRange(source: LocalDateTime): Boolean = {
+      startAt.exists(lower => source.toLocalDate.isAfter(lower.minusDays(1))) ||
+        endAt.exists(upper => source.toLocalDate.isBefore(upper))
+    }
 
-  val registrationsForCurrentMonth: Registration => Boolean = registration =>
-    registration.clockedIn.isDefined &&
-      registration.clockedIn.get.isAfter(startOfMonth.minusDays(1))
+    override lazy val filter: Registration => Boolean = registration => registration.clockedIn.exists(isInRange)
+  }
 
-  val registrationsForCurrentWeek: Registration => Boolean = registration =>
-    registrationsForCurrentYear(registration) &&
-      currentWeeknumber == extractWeeknumberFrom(registration.clockedIn)
-
-  private def startOfYear = LocalDateTime.now().withMonth(1).withDayOfMonth(1)
-
-  private def startOfMonth = LocalDateTime.now().withDayOfMonth(1)
-
-  private def currentWeeknumber: Int =
-    extractWeeknumberFrom(Some(LocalDateTime.now()))
-
-  private def extractWeeknumberFrom(dateTime: Option[LocalDateTime]): Int =
-    dateTime map {
-      _.get(WeekFields.ISO.weekOfYear())
-    } getOrElse 0
-
-  private def extractYearFrom(dateTime: Option[LocalDateTime]): Int =
-    dateTime map {
-      _.getYear
-    } getOrElse 0
+  final class RegistrationInYearSelector(year: Int = LocalDateTime.now().getYear) extends Selector {
+    override lazy val filter: Registration => Boolean = registration => registration.clockedIn.exists(value => value.getYear == year)
+  }
 }
