@@ -3,7 +3,6 @@ package com.personal.hourstracker.storage.repository.squeryl
 import java.sql.Timestamp
 import java.time.LocalDateTime
 
-import com.personal.hourstracker.config.Configuration
 import com.personal.hourstracker.domain.Registration
 import com.personal.hourstracker.repository.RegistrationRepository
 import com.personal.hourstracker.storage.config.StorageConfiguration
@@ -12,7 +11,7 @@ import com.personal.hourstracker.storage.repository.squeryl.converter.Registrati
 import com.personal.hourstracker.storage.repository.squeryl.entities.RegistrationEntity
 import com.personal.hourstracker.storage.repository.squeryl.schema.RegistrationSchema
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{BeforeAndAfterAll, Matchers, Outcome, fixture}
+import org.scalatest.{ fixture, BeforeAndAfterAll, Matchers, Outcome }
 
 class SquerylRegistrationRepositorySpec
   extends fixture.FlatSpec
@@ -27,7 +26,11 @@ class SquerylRegistrationRepositorySpec
   override type FixtureParam = RegistrationRepository
 
   override def withFixture(test: OneArgTest): Outcome = {
-    RegistrationSchema.reset()
+    startDatabaseSession()
+    transaction {
+      RegistrationSchema.drop
+      RegistrationSchema.create
+    }
     test(registrationRepository)
   }
 
@@ -121,9 +124,12 @@ class SquerylRegistrationRepositorySpec
     classUnderTest.findAll() shouldEqual List(entity.convert)
   }
 
+  behavior of "find record"
+
   object Fixtures {
 
     val DefaultRegistration: Registration = Registration(
+      id = None,
       job = "job",
       clockedIn = Some(LocalDateTime.of(2019, 1, 2, 3, 4, 5)),
       clockedOut = Some(LocalDateTime.of(2019, 1, 2, 4, 5, 6)),

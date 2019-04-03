@@ -48,7 +48,7 @@ trait RegistrationApi extends RegistrationApiProtocol with RegistrationApiDoc wi
 
   import RegistrationApi._
 
-  lazy val registrationRoutes: Route = getRegistrations
+  lazy val registrationRoutes: Route = getRegistrations ~ importRegistrations
 
   override def getRegistrations: Route =
     pathEndOrSingleSlash {
@@ -77,4 +77,10 @@ trait RegistrationApi extends RegistrationApiProtocol with RegistrationApiDoc wi
         }
       }
     }
+
+  override def importRegistrations: Route = path("import") {
+    get {
+      complete(StatusCodes.OK)
+    }
+  }
 }

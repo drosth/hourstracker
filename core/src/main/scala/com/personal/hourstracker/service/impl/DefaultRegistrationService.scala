@@ -17,21 +17,32 @@ class DefaultRegistrationService(registrationRepository: RegistrationRepository,
 
     importService
       .importRegistrationsFrom(fileName)
-      .recover {
-        case e =>
-          Left(s"Could not import from '$fileName': ${e.getMessage}")
+      .map {
+        case Left(message) =>
+          logger.warn(s"Could not import from '$fileName': '$message'")
+          Left("Could not import registrations")
+        case Right(registrations) =>
+          storeRegistrations(registrations)
+          Right(registrations)
       }
   }
 
-  override def storeRegistrations(registrations: Registrations): Future[Either[String, Seq[Long]]] = {
-    val result: Either[String, List[Long]] = registrations
-      .map(registrationRepository.save) // Seq[Either[String, Long]]
-      .partition(_.isLeft) match { // (List[Either[String, Long]], List[Either[String, Long]])
-        case (Nil, ids) =>
-          Right(for (Right(id) <- ids) yield id) // Either[Nothing, List[Long]]
-        case (messages, _) =>
-          Left((for (Left(message) <- messages) yield message).head) // Either[String, Nothing]
-      }
-    Future.successful(result)
+  override def storeRegistrations(registrations: Registrations): Future[Unit] = {
+    logger.info(s"Storing #${registrations.size} registrations")
+
+    Future({
+      registrations
+        .map(registration =>
+          registrationRepository.save(registration) match {
+            case Left(message) =>
+              Left(s"Could not store registration: '$message'")
+            case _ => Right(())
+          })
+        .partition(_.isLeft) match {
+          case (messages, _) =>
+            for (Left(message) <- messages) yield message
+        }
+      ()
+    })
   }
 }

@@ -1,4 +1,6 @@
 package com.personal.hourstracker.config.component
+import java.time.LocalDateTime
+
 import com.personal.hourstracker.domain.Registration
 import com.personal.hourstracker.repository.RegistrationRepository
 
@@ -13,5 +15,6 @@ trait NoopRegistrationRepositoryComponent extends RegistrationRepositoryComponen
     override def findAll(): List[Registration] = List.empty
     override def save(entity: Registration): Either[String, Long] = Right(0L)
     override def findById(id: Long): Option[Registration] = None
+    override def findBy(job: String, clockedIn: Option[LocalDateTime], clockedOut: Option[LocalDateTime]): Seq[Registration] = Seq.empty
   }
 }
