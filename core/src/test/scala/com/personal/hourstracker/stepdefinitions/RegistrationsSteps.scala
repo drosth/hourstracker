@@ -51,8 +51,8 @@ class RegistrationsSteps extends ScalaDsl with EN with Matchers with MockitoSuga
   When("""^I import the registrations from file '(.*)'$""") { fileName: String =>
     RegistrationAttributes.registrations = List.empty
     Await.result(registrationService.importRegistrationsFrom(fileName), 3 seconds) match {
-      case Right(r) =>
-        RegistrationAttributes.registrations = r
+      case Right(numberOfRegistrationsImported) =>
+        RegistrationAttributes.numberOfRegistrationsImported = numberOfRegistrationsImported
 
       case Left(e) => ???
     }

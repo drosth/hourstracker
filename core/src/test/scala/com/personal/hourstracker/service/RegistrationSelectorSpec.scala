@@ -16,44 +16,81 @@ class RegistrationSelectorSpec extends FlatSpec with BeforeAndAfter with Matcher
   behavior of "RegistrationInYearSelector"
 
   it should "return correct list of Registrations, given year is 2019" in {
-    List(
-      Fixtures.withRegistration(Some(4), Some("2018-12-31 23:59:59")),
-      Fixtures.withRegistration(Some(4), Some("2019-01-01 00:00:00")),
-      Fixtures.withRegistration(Some(4), Some("2019-01-01 00:00:01")),
+    val registrations = List(
+      Fixtures.withRegistration(Some(1), Some("2018-12-31 23:59:59")),
+      Fixtures.withRegistration(Some(2), Some("2019-01-01 00:00:00")),
+      Fixtures.withRegistration(Some(3), Some("2019-01-01 00:00:01")),
       Fixtures.withRegistration(Some(4), Some("2019-12-31 23:59:59")),
-      Fixtures.withRegistration(Some(4), Some("2020-01-01 00:00:00"))).filter(new RegistrationInYearSelector(2019).filter) shouldEqual List(
-        Fixtures.withRegistration(Some(4), Some("2019-01-01 00:00:00")),
-        Fixtures.withRegistration(Some(4), Some("2019-01-01 00:00:01")),
-        Fixtures.withRegistration(Some(4), Some("2019-12-31 23:59:59")))
+      Fixtures.withRegistration(Some(5), Some("2020-01-01 00:00:00")))
+
+    registrations.filter(RegistrationInYearSelector(2019).filter) shouldEqual List(
+      Fixtures.withRegistration(Some(2), Some("2019-01-01 00:00:00")),
+      Fixtures.withRegistration(Some(3), Some("2019-01-01 00:00:01")),
+      Fixtures.withRegistration(Some(4), Some("2019-12-31 23:59:59")))
   }
 
   behavior of "RegistrationRangeSelector"
 
   it should "return empty list of Registrations, given startAt is undefined and endAt is undefined" in {
-    val classUnderTest = new RegistrationRangeSelector(None, None)
-    Fixtures.DefaultRegistrations.filter(new RegistrationRangeSelector(None, None).filter) shouldEqual List.empty
+    val registrations = List(
+      Fixtures.withRegistration(Some(1), Some("2018-12-31 23:59:59")),
+      Fixtures.withRegistration(Some(2), Some("2019-01-01 00:00:00")),
+      Fixtures.withRegistration(Some(3), Some("2019-01-01 00:00:01")),
+      Fixtures.withRegistration(Some(4), Some("2019-12-31 23:59:59")),
+      Fixtures.withRegistration(Some(5), Some("2020-01-01 00:00:00")))
+
+    registrations.filter(RegistrationRangeSelector(None, None).filter) shouldEqual registrations
   }
 
   it should "return correct list of Registrations, given startAt is '2019-03-01' and endAt is undefined" in {
-    val classUnderTest = new RegistrationRangeSelector(Some(LocalDate.of(2019, 3, 1)), None)
-    Fixtures.DefaultRegistrations.filter(classUnderTest.filter) shouldEqual List(
+    val registrations = List(
+      Fixtures.withRegistration(Some(1), Some("2018-12-31 23:59:59")),
+      Fixtures.withRegistration(Some(2), Some("2019-01-01 00:00:00")),
+      Fixtures.withRegistration(Some(3), Some("2019-01-01 00:00:01")),
       Fixtures.withRegistration(Some(4), Some("2019-03-01 00:00:00")),
-      Fixtures.withRegistration(Some(5), Some("2019-03-01 00:00:01")),
-      Fixtures.withRegistration(Some(6), Some("2019-05-31 23:59:59")),
-      Fixtures.withRegistration(Some(7), Some("2019-06-01 00:00:00")))
+      Fixtures.withRegistration(Some(5), Some("2019-12-31 23:59:59")),
+      Fixtures.withRegistration(Some(6), Some("2020-01-01 00:00:00")))
+
+    val classUnderTest = RegistrationRangeSelector(Some(LocalDate.of(2019, 3, 1)), None)
+
+    registrations.filter(classUnderTest.filter) shouldEqual List(
+      Fixtures.withRegistration(Some(4), Some("2019-03-01 00:00:00")),
+      Fixtures.withRegistration(Some(5), Some("2019-12-31 23:59:59")),
+      Fixtures.withRegistration(Some(6), Some("2020-01-01 00:00:00")))
   }
 
   it should "return correct list of Registrations, given startAt is undefined and endAt is '2019-03-01'" in {
-    val classUnderTest = new RegistrationRangeSelector(None, Some(LocalDate.of(2019, 3, 1)))
-    Fixtures.DefaultRegistrations.filter(classUnderTest.filter) shouldEqual List(
-      Fixtures.withRegistration(Some(1), Some("2019-01-01 00:00:00")),
-      Fixtures.withRegistration(Some(2), Some("2019-01-01 00:00:01")),
-      Fixtures.withRegistration(Some(3), Some("2019-02-28 23:59:59")))
+    val registrations = List(
+      Fixtures.withRegistration(Some(1), Some("2018-12-31 23:59:59")),
+      Fixtures.withRegistration(Some(2), Some("2019-01-01 00:00:00")),
+      Fixtures.withRegistration(Some(3), Some("2019-01-01 00:00:01")),
+      Fixtures.withRegistration(Some(4), Some("2019-03-01 00:00:00")),
+      Fixtures.withRegistration(Some(5), Some("2019-12-31 23:59:59")),
+      Fixtures.withRegistration(Some(6), Some("2020-01-01 00:00:00")))
+
+    val classUnderTest = RegistrationRangeSelector(None, Some(LocalDate.of(2019, 3, 1)))
+
+    registrations.filter(classUnderTest.filter) shouldEqual List(
+      Fixtures.withRegistration(Some(1), Some("2018-12-31 23:59:59")),
+      Fixtures.withRegistration(Some(2), Some("2019-01-01 00:00:00")),
+      Fixtures.withRegistration(Some(3), Some("2019-01-01 00:00:01")),
+      Fixtures.withRegistration(Some(4), Some("2019-03-01 00:00:00")))
   }
 
   it should "return correct list of Registrations, given startAt is '2019-01-01' and endAt is '2019-06-01'" in {
-    val classUnderTest = new RegistrationRangeSelector(Some(LocalDate.of(2019, 1, 1)), Some(LocalDate.of(2019, 6, 1)))
-    Fixtures.DefaultRegistrations.filter(classUnderTest.filter) shouldEqual Fixtures.DefaultRegistrations
+    val registrations = List(
+      Fixtures.withRegistration(Some(1), Some("2018-12-31 23:59:59")),
+      Fixtures.withRegistration(Some(2), Some("2019-01-01 00:00:00")),
+      Fixtures.withRegistration(Some(3), Some("2019-01-01 00:00:01")),
+      Fixtures.withRegistration(Some(4), Some("2019-03-01 00:00:00")),
+      Fixtures.withRegistration(Some(5), Some("2019-12-31 23:59:59")),
+      Fixtures.withRegistration(Some(6), Some("2020-01-01 00:00:00")))
+
+    val classUnderTest = RegistrationRangeSelector(Some(LocalDate.of(2019, 1, 1)), Some(LocalDate.of(2019, 6, 1)))
+    registrations.filter(classUnderTest.filter) shouldEqual List(
+      Fixtures.withRegistration(Some(2), Some("2019-01-01 00:00:00")),
+      Fixtures.withRegistration(Some(3), Some("2019-01-01 00:00:01")),
+      Fixtures.withRegistration(Some(4), Some("2019-03-01 00:00:00")))
   }
 
   object Fixtures {

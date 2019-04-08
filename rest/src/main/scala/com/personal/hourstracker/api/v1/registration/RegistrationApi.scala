@@ -13,8 +13,11 @@ import com.personal.hourstracker.api.v1.domain.RegistrationModel
 import com.personal.hourstracker.config.Configuration
 import com.personal.hourstracker.config.component.{ LoggingComponent, RegistrationComponent, SystemComponent }
 import com.personal.hourstracker.domain.Registration
+import com.personal.hourstracker.domain.Registration.Registrations
 import com.personal.hourstracker.service.RegistrationSelector.{ RegistrationRangeSelector, _ }
+import com.personal.hourstracker.service.Selector
 
+import scala.concurrent.Future
 import scala.util.{ Failure, Success }
 
 object RegistrationApi {
@@ -25,7 +28,13 @@ object RegistrationApi {
       LocalDate.parse(_, DateTimeFormatter.ISO_LOCAL_DATE)
     }
 
-  object ModelAdapter {
+  import ToModelAdapter._
+
+  implicit class RegistrationOps(registration: Registration) {
+    def convert(): RegistrationModel = toModel(registration)
+  }
+
+  object ToModelAdapter {
 
     def toModel(registration: Registration): RegistrationModel =
       RegistrationModel(
@@ -40,7 +49,6 @@ object RegistrationApi {
         registration.totalTimeAdjustment,
         registration.totalEarningsAdjustment)
   }
-
 }
 
 trait RegistrationApi extends RegistrationApiProtocol with RegistrationApiDoc with SystemComponent {
@@ -50,37 +58,87 @@ trait RegistrationApi extends RegistrationApiProtocol with RegistrationApiDoc wi
 
   lazy val registrationRoutes: Route = getRegistrations ~ importRegistrations
 
+  private def whenCompleteProcessRegistrations(
+    withFutureExecution: Future[Registrations])(process: Registrations => Registrations = collection => collection): Route = {
+    onComplete(withFutureExecution) {
+      case Success(registrations) =>
+        complete(process(registrations).map(_.convert()))
+
+      case Failure(e) =>
+        logger.error(e.getMessage)
+        complete(StatusCodes.NotFound, e.getMessage)
+    }
+  }
+
   override def getRegistrations: Route =
-    pathEndOrSingleSlash {
-      get {
-        parameters("startAt".as[String].?, "endAt".as[String].?) { (startAt: Option[String], endAt: Option[String]) =>
-          {
-            onComplete(registrationService.importRegistrationsFrom(Application.importFrom)) {
-              case Success(importedRegistrations) =>
-                importedRegistrations match {
-                  case Right(registrations) =>
-                    val models = registrations
-                      .filter(new RegistrationRangeSelector(startAt, endAt).filter)
-                      .map(ModelAdapter.toModel)
-                    complete(models)
-
-                  case Left(message) =>
-                    logger.error(message)
-                    complete(StatusCodes.NotFound, message)
+    get {
+      pathPrefix("registration") {
+        pathEnd {
+          parameters("startAt".as[String].?, "endAt".as[String].?) { (startAt: Option[String], endAt: Option[String]) =>
+            {
+              whenCompleteProcessRegistrations(registrationService.fetchRegistrations()) { registrations =>
+                {
+                  val selector = withSelectorFor(startAt, endAt)
+                  selector match {
+                    case None =>
+                      registrations
+                    case Some(s) =>
+                      registrations.filter(s.filter)
+                  }
                 }
-
-              case Failure(e) =>
-                logger.error(e.getMessage)
-                complete(StatusCodes.NotFound, e.getMessage)
+              }
             }
           }
-        }
+        } ~
+          path(Segment) { year =>
+            whenCompleteProcessRegistrations(registrationService.fetchRegistrations()) { registrations =>
+              registrations
+                .filter(filterRegistrations(year.toInt))
+            }
+          } ~
+          path(Segment / Segment) { (year, month) =>
+            whenCompleteProcessRegistrations(registrationService.fetchRegistrations()) { registrations =>
+              registrations.filter(filterRegistrations(year.toInt, month.toInt))
+            }
+          }
       }
     }
 
-  override def importRegistrations: Route = path("import") {
-    get {
-      complete(StatusCodes.OK)
+  private def withSelectorFor(startAt: Option[String], endAt: Option[String]): Option[Selector] = (startAt, endAt) match {
+    case (None, None) => None
+    case _ => Some(RegistrationRangeSelector(startAt, endAt))
+  }
+
+  private def filterRegistrations(year: Int): Registration => Boolean =
+    registration =>
+      registration.clockedIn match {
+        case None => false
+        case Some(clocked) => clocked.getYear == year
+      }
+
+  private def filterRegistrations(year: Int, month: Int): Registration => Boolean =
+    registration =>
+      registration.clockedIn match {
+        case None => false
+        case Some(clocked) => clocked.getYear == year && clocked.getMonthValue == month
+      }
+
+  override def importRegistrations: Route = path("registration" / "import") {
+    post {
+      onComplete(registrationService.importRegistrationsFrom(Application.importFrom)) {
+        case Success(importedRegistrations) =>
+          importedRegistrations match {
+            case Right(_) => complete(StatusCodes.Accepted)
+
+            case Left(message) =>
+              logger.error(message)
+              complete(StatusCodes.NotFound, message)
+          }
+
+        case Failure(e) =>
+          logger.error(e.getMessage)
+          complete(StatusCodes.NotFound, e.getMessage)
+      }
     }
   }
 }

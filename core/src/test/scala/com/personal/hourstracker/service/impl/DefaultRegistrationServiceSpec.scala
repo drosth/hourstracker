@@ -40,15 +40,17 @@ class DefaultRegistrationServiceSpec extends fixture.FlatSpec with BeforeAndAfte
     when(importerService.importRegistrationsFrom(fileName)).thenReturn(Future.successful(Right(expectedRegistrations)))
 
     val actual = Await.result(classUnderTest.importRegistrationsFrom(fileName), 1 second)
-    actual shouldEqual Right(expectedRegistrations)
+    actual shouldEqual Right(expectedRegistrations.size)
   }
 
   it should "return failure, given file could not be read" in { classUnderTest =>
     val fileName = "unreadableFile"
-    when(importerService.importRegistrationsFrom(fileName)).thenReturn(Future.successful(Left(s"Could not import from '$fileName'")))
+    when(importerService.importRegistrationsFrom(fileName)).thenReturn(Future.successful(Left(s"'$fileName' is unreadable")))
 
     val actual = Await.result(classUnderTest.importRegistrationsFrom(fileName), 1 second)
-    actual shouldEqual Left("Could not import from 'unreadableFile'")
+    actual shouldEqual Left("Could not import registrations")
+
+    verify(logger).warn(s"Could not import from 'unreadableFile': ''unreadableFile' is unreadable'")
   }
 
   behavior of "Storing registrations"
@@ -60,21 +62,28 @@ class DefaultRegistrationServiceSpec extends fixture.FlatSpec with BeforeAndAfte
     val registration2 = mock[Registration]
     when(registrationRepository.save(registration2)).thenReturn(Right(2L))
 
-    val actual = Await.result(classUnderTest.storeRegistrations(List(registration1, registration2)), 1 second)
-
-    actual shouldEqual Right(List(1L, 2L))
+    Await.result(classUnderTest.storeRegistrations(List(registration1, registration2)), 1 second) shouldEqual ()
   }
 
-  it should "return message, given could not store registration" in { classUnderTest =>
+  it should "log error, given some registration could not be stored" in { classUnderTest =>
     val registration1 = mock[Registration]
     when(registrationRepository.save(registration1)).thenReturn(Right(1L))
 
     val registration2 = mock[Registration]
     when(registrationRepository.save(registration2)).thenReturn(Left("Could not store #2"))
 
-    val actual = Await.result(classUnderTest.storeRegistrations(List(registration1, registration2)), 1 second)
+    Await.result(classUnderTest.storeRegistrations(List(registration1, registration2)), 1 second)
 
-    actual shouldEqual Left("Could not store #2")
+    verify(logger).warn(s"Could not store registration: 'Could not store #2'")
+  }
+
+  behavior of "Fetching registrations"
+
+  it should "return collection of registrations" in { classUnderTest =>
+    val registration = mock[Registration]
+    when(registrationRepository.findAll()).thenReturn(List(registration))
+
+    Await.result(classUnderTest.fetchRegistrations(), 1 second) shouldEqual List(registration)
   }
 
   object Fixtures {}

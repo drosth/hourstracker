@@ -12,7 +12,7 @@ class DefaultRegistrationService(registrationRepository: RegistrationRepository,
   logger: Logger,
   executionContext: ExecutionContext) extends RegistrationService {
 
-  override def importRegistrationsFrom(fileName: String): Future[Either[String, Registrations]] = {
+  override def importRegistrationsFrom(fileName: String): Future[Either[String, Int]] = {
     logger.info(s"Importing registrations from: '$fileName'")
 
     importService
@@ -23,7 +23,7 @@ class DefaultRegistrationService(registrationRepository: RegistrationRepository,
           Left("Could not import registrations")
         case Right(registrations) =>
           storeRegistrations(registrations)
-          Right(registrations)
+          Right(registrations.size)
       }
   }
 
@@ -31,18 +31,19 @@ class DefaultRegistrationService(registrationRepository: RegistrationRepository,
     logger.info(s"Storing #${registrations.size} registrations")
 
     Future({
-      registrations
-        .map(registration =>
+      registrations.foreach(
+        registration =>
           registrationRepository.save(registration) match {
-            case Left(message) =>
-              Left(s"Could not store registration: '$message'")
-            case _ => Right(())
+            case Left(error) => logger.warn(s"Could not store registration: '$error'")
+            case a => a
           })
-        .partition(_.isLeft) match {
-          case (messages, _) =>
-            for (Left(message) <- messages) yield message
-        }
-      ()
+    })
+  }
+
+  override def fetchRegistrations(): Future[Registrations] = {
+    logger.info(s"Fetching registrations")
+    Future({
+      registrationRepository.findAll()
     })
   }
 }

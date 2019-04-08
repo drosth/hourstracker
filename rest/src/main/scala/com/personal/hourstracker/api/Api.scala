@@ -16,10 +16,8 @@ trait Api extends RegistrationApi with ConsolidatedRegistrationApi {
   implicit def system: ActorSystem
 
   lazy val apiV1: Route = pathPrefix(s"v${version.value}") {
-    pathPrefix("registration") {
-      registrationRoutes ~
-        consolidatedRegistrationRoutes
-    } ~
+    registrationRoutes ~
+      consolidatedRegistrationRoutes ~
       swagger.routes
   }
 

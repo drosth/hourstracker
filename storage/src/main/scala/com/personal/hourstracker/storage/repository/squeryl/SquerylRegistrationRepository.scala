@@ -28,8 +28,6 @@ class SquerylRegistrationRepository extends RegistrationRepository {
   }
 
   override def save(registration: Registration): Either[String, Long] = transaction {
-    logger.info("Saving registration")
-
     val found: Seq[Registration] = findBy(registration.job, registration.clockedIn, registration.clockedOut)
     if (found.isEmpty) {
       logger.debug(s"Did not find registration with job: '${registration.job}', clockedIn: '${registration.clockedIn}', clockedOut: '${registration.clockedOut}'")

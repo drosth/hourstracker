@@ -17,6 +17,7 @@ object Application
   with ApplicationModule
   with NoopRegistrationRepositoryComponent {
 
+  /*
   sys.addShutdownHook(terminate)
 
   lazy val presenter: Presenter[ConsolidatedRegistrationsPerJob] = htmlPresenter
@@ -51,4 +52,5 @@ object Application
     system.terminate()
     Await.result(system.whenTerminated, 30 seconds)
   }
+*/
 }

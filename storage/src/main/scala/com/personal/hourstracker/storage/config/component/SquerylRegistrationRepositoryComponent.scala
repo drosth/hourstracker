@@ -21,7 +21,7 @@ trait SquerylRegistrationRepositoryComponent extends RegistrationRepositoryCompo
   def startDatabaseSession(): Unit = {
     val driver = Storage.Registrations.driver
 
-    logger.info(s"Creating DatabaseAdapter session for driver '$driver', connected to '${Storage.Registrations.url}' ('${Storage.Registrations.user}')")
+    logger.debug(s"Creating DatabaseAdapter session for driver '$driver', connected to '${Storage.Registrations.url}' ('${Storage.Registrations.user}')")
     Class.forName(driver)
 
     SessionFactory.concreteFactory = DatabaseAdapterFactory

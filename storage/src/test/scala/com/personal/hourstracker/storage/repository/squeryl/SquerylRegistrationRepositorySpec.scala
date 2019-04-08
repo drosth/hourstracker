@@ -75,7 +75,7 @@ class SquerylRegistrationRepositorySpec
 
   it should "update a record when registration can be found in storage" in { classUnderTest =>
     val insertedEntity = Fixtures.givenPersistedRegistration(Fixtures.DefaultRegistrationEntity)
-    val registration = insertedEntity.convert.copy(job = "Updated job")
+    val registration = insertedEntity.convert.copy(hourlyRate = Some("2.3".toDouble))
 
     classUnderTest.save(registration) match {
       case Left(_) => fail("Expected persisted ID")
@@ -85,16 +85,6 @@ class SquerylRegistrationRepositorySpec
           RegistrationSchema.registrations.lookup(id).map(_.convert) shouldEqual Some(registration)
         }
     }
-  }
-
-  it should "not be able to insert the same registration twice" in { classUnderTest =>
-    val insertedEntity = Fixtures.givenPersistedRegistration(Fixtures.DefaultRegistrationEntity)
-
-    val caught = intercept[Throwable] {
-      classUnderTest.save(insertedEntity.convert.copy(id = None))
-    }
-    caught shouldBe a[RuntimeException]
-    caught.getMessage shouldNot be(empty)
   }
 
   behavior of "find record by its identifier"
