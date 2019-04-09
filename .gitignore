@@ -3,4 +3,5 @@
 .idea
 target/
 output/
+data/
 resources/export/
