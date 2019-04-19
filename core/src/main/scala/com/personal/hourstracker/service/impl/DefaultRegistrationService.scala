@@ -31,6 +31,17 @@ class DefaultRegistrationService(registrationRepository: RegistrationRepository,
       }
   }
 
+  override def storeRegistration(registration: Registration): Future[Unit] = {
+    logger.info(s"Storing registration: '$registration'")
+
+    Future({
+      registrationRepository.save(registration) match {
+        case Left(error) => logger.warn(s"Could not store registration: '$error'")
+        case id => id
+      }
+    })
+  }
+
   override def storeRegistrations(registrations: Registrations): Future[Unit] = {
     logger.info(s"Storing #${registrations.size} registrations")
 

@@ -25,5 +25,7 @@ trait RegistrationService {
 
   def fetchRegistrations(request: RegistrationRequest): Source[Registration, NotUsed]
 
+  def storeRegistration(registration: Registration): Future[Unit]
+
   def storeRegistrations(registrations: Registrations): Future[Unit]
 }
