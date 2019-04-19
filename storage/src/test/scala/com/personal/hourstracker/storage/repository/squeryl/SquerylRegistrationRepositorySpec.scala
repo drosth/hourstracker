@@ -3,6 +3,9 @@ package com.personal.hourstracker.storage.repository.squeryl
 import java.sql.Timestamp
 import java.time.LocalDateTime
 
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
+import akka.stream.testkit.scaladsl.TestSink
 import com.personal.hourstracker.domain.Registration
 import com.personal.hourstracker.repository.RegistrationRepository
 import com.personal.hourstracker.storage.config.StorageConfiguration
@@ -11,7 +14,9 @@ import com.personal.hourstracker.storage.repository.squeryl.converter.Registrati
 import com.personal.hourstracker.storage.repository.squeryl.entities.RegistrationEntity
 import com.personal.hourstracker.storage.repository.squeryl.schema.RegistrationSchema
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{ fixture, BeforeAndAfterAll, Matchers, Outcome }
+import org.scalatest.{ BeforeAndAfterAll, Matchers, Outcome, fixture }
+
+import scala.concurrent.ExecutionContext
 
 class SquerylRegistrationRepositorySpec
   extends fixture.FlatSpec
@@ -22,6 +27,10 @@ class SquerylRegistrationRepositorySpec
   with StorageConfiguration {
 
   import org.squeryl.PrimitiveTypeMode._
+
+  private implicit val system: ActorSystem = ActorSystem()
+  private implicit val executionContext: ExecutionContext = system.dispatcher
+  private implicit val materializer: ActorMaterializer = ActorMaterializer()
 
   override type FixtureParam = RegistrationRepository
 
@@ -104,17 +113,18 @@ class SquerylRegistrationRepositorySpec
   behavior of "find all records"
 
   it should "return empty list given no registrations are present" in { classUnderTest =>
-    classUnderTest.findAll() shouldEqual List.empty
+    classUnderTest.findAll().runWith(TestSink.probe[Registration]).request(1)
+      .expectComplete()
   }
 
   it should "return list with one registration given single registration is persisted" in { classUnderTest =>
     val entity = Fixtures.DefaultRegistrationEntity
     Fixtures.givenPersistedRegistration(entity)
 
-    classUnderTest.findAll() shouldEqual List(entity.convert)
+    classUnderTest.findAll().runWith(TestSink.probe[Registration]).request(1)
+      .expectNext(entity.convert)
+      .expectComplete()
   }
-
-  behavior of "find record"
 
   object Fixtures {
 

@@ -3,8 +3,12 @@ package com.personal.hourstracker.storage.repository.squeryl
 import java.sql.Timestamp
 import java.time.LocalDateTime
 
+import akka.NotUsed
+import akka.stream.scaladsl.Source
 import com.personal.hourstracker.domain.Registration
+import com.personal.hourstracker.domain.Registration.Registrations
 import com.personal.hourstracker.repository.RegistrationRepository
+import com.personal.hourstracker.service.RegistrationService.RegistrationRequest
 import com.personal.hourstracker.storage.repository.squeryl.entities.RegistrationEntity
 import com.personal.hourstracker.storage.repository.squeryl.schema.RegistrationSchema
 import org.slf4j.{ Logger, LoggerFactory }
@@ -23,7 +27,19 @@ class SquerylRegistrationRepository extends RegistrationRepository {
     }
   }
 
-  override def findAll(): List[Registration] = transaction {
+  override def findAll(): Source[Registration, NotUsed] =
+    Source.fromIterator(() => {
+      val registrations = findAllRegistrations()
+      registrations.iterator
+    })
+
+  override def findByRequest(request: RegistrationRequest): Source[Registration, NotUsed] =
+    Source.fromIterator(() => {
+      val registrations = findAllRegistrations()
+      registrations.iterator
+    })
+
+  private def findAllRegistrations(): Registrations = transaction {
     registrations.toList.map(_.convert)
   }
 

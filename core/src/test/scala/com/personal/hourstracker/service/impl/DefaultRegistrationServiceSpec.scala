@@ -1,12 +1,16 @@
 package com.personal.hourstracker.service.impl
 
 import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
+import akka.stream.scaladsl.Source
+import akka.stream.testkit.scaladsl.TestSink
 import com.personal.hourstracker.domain.Registration
 import com.personal.hourstracker.repository.RegistrationRepository
+import com.personal.hourstracker.service.RegistrationService.{ RegistrationRequest, SelectByYear, SelectByYearAndMonth }
 import com.personal.hourstracker.service.{ ImporterService, RegistrationService }
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{ fixture, BeforeAndAfter, Matchers, Outcome }
+import org.scalatest.{ BeforeAndAfter, Matchers, Outcome, fixture }
 import org.slf4j.Logger
 
 import scala.concurrent.duration._
@@ -17,6 +21,7 @@ class DefaultRegistrationServiceSpec extends fixture.FlatSpec with BeforeAndAfte
   private implicit val logger: Logger = mock[Logger]
   private implicit val system: ActorSystem = ActorSystem()
   private implicit val executionContext: ExecutionContext = system.dispatcher
+  private implicit val materializer: ActorMaterializer = ActorMaterializer()
 
   private val importerService = mock[ImporterService]
   private val registrationRepository = mock[RegistrationRepository]
@@ -27,8 +32,6 @@ class DefaultRegistrationServiceSpec extends fixture.FlatSpec with BeforeAndAfte
     reset(logger, importerService, registrationRepository)
     test(new DefaultRegistrationService(registrationRepository, importerService))
   }
-
-  behavior of "DefaultRegistrationService"
 
   behavior of "Importing registrations"
 
@@ -79,11 +82,35 @@ class DefaultRegistrationServiceSpec extends fixture.FlatSpec with BeforeAndAfte
 
   behavior of "Fetching registrations"
 
-  it should "return collection of registrations" in { classUnderTest =>
+  it should "return all registrations" in { classUnderTest =>
     val registration = mock[Registration]
-    when(registrationRepository.findAll()).thenReturn(List(registration))
+    when(registrationRepository.findAll()).thenReturn(Source.fromIterator(() => List(registration).iterator))
 
-    Await.result(classUnderTest.fetchRegistrations(), 1 second) shouldEqual List(registration)
+    classUnderTest.fetchRegistrations().runWith(TestSink.probe[Registration]).request(1)
+      .expectNext(registration)
+      .expectComplete()
+  }
+
+  it should "return registrations selected by year" in { classUnderTest =>
+    val request: RegistrationRequest = SelectByYear(2000)
+
+    val registration = mock[Registration]
+    when(registrationRepository.findByRequest(request)).thenReturn(Source.fromIterator(() => List(registration).iterator))
+
+    classUnderTest.fetchRegistrations(request).runWith(TestSink.probe[Registration]).request(1)
+      .expectNext(registration)
+      .expectComplete()
+  }
+
+  it should "return registrations selected by year and month" in { classUnderTest =>
+    val request: RegistrationRequest = SelectByYearAndMonth(2000, 1)
+
+    val registration = mock[Registration]
+    when(registrationRepository.findByRequest(request)).thenReturn(Source.fromIterator(() => List(registration).iterator))
+
+    classUnderTest.fetchRegistrations(request).runWith(TestSink.probe[Registration]).request(1)
+      .expectNext(registration)
+      .expectComplete()
   }
 
   object Fixtures {}

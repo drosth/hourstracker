@@ -4,11 +4,14 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 import akka.http.scaladsl.model.StatusCodes
+import akka.stream.scaladsl.Source
 import com.personal.hourstracker.api.v1.ApiSpec
 import com.personal.hourstracker.api.v1.domain.RegistrationModel
 import com.personal.hourstracker.config.component._
 import com.personal.hourstracker.domain.Registration
+import com.personal.hourstracker.domain.Registration.Registrations
 import com.personal.hourstracker.repository.RegistrationRepository
+import com.personal.hourstracker.service.RegistrationService.{ SelectByYear, SelectByYearAndMonth }
 import com.personal.hourstracker.service.{ ImporterService, RegistrationService }
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
@@ -38,7 +41,7 @@ class RegistrationApiSpec
   behavior of "Fetching registrations"
 
   it should "be able retrieve all registrations" in {
-    givenSomeRegistrations()
+    givenFetchingRegistrationsReturns(registrationsWithMonthlyBoundaries)
 
     Get("/registration") ~> registrationRoutes ~> check {
       status shouldEqual StatusCodes.OK
@@ -50,65 +53,25 @@ class RegistrationApiSpec
     }
   }
 
-  it should "be able retrieve registrations before a boundary" in {
-    givenSomeRegistrations()
-
-    val endAt = registrationInFirstDayOfCurrentMonth.clockedIn.get.format(formatter) // 2019-04-01
-    Get(s"/registration?endAt=$endAt") ~> registrationRoutes ~> check {
-      status shouldEqual StatusCodes.OK
-      responseAs[Seq[RegistrationModel]] shouldBe Seq(registrationInLastDayOfPreviousMonth, registrationInFirstDayOfCurrentMonth).map(
-        _.convert())
-    }
-  }
-
-  it should "be able retrieve registrations after a boundary" in {
-    givenSomeRegistrations()
-
-    val startAt = registrationInFirstDayOfCurrentMonth.clockedIn.get.format(formatter)
-    Get(s"/registration?startAt=$startAt") ~> registrationRoutes ~> check {
-      status shouldEqual StatusCodes.OK
-      responseAs[Seq[RegistrationModel]] shouldBe Seq(
-        registrationInFirstDayOfCurrentMonth,
-        registrationInLastDayOfCurrentMonth,
-        registrationInFirstDayOfNextMonth).map(_.convert())
-    }
-  }
-
-  it should "be able retrieve registrations of between two boundaries" in {
-    givenSomeRegistrations()
-
-    val startAt = LocalDateTime.now().withDayOfMonth(1).format(formatter)
-    val endAt = LocalDateTime.now().plusMonths(1).withDayOfMonth(1).minusDays(1).format(formatter)
-    Get(s"/registration?startAt=$startAt&endAt=$endAt") ~> registrationRoutes ~> check {
-      status shouldEqual StatusCodes.OK
-      responseAs[Seq[RegistrationModel]] shouldBe Seq(registrationInFirstDayOfCurrentMonth, registrationInLastDayOfCurrentMonth).map(
-        _.convert())
-    }
-  }
-
   it should "be able retrieve registrations of a year" in {
-    givenSomeRegistrationsOverYears()
-
     val year = LocalDateTime.now().getYear
+    givenFetchingRegistrationsOfAYearReturns(year, registrationsWithYearlyBoundaries)
+
     Get(s"/registration/$year") ~> registrationRoutes ~> check {
       status shouldEqual StatusCodes.OK
-      responseAs[Seq[RegistrationModel]] shouldBe Seq(registrationInFirstDayOfCurrentYear, registrationInLastDayOfCurrentYear).map(
-        _.convert())
+      responseAs[List[RegistrationModel]] shouldBe registrationsWithYearlyBoundaries.map(_.convert())
     }
   }
 
   it should "be able retrieve registrations in a month of a year" in {
-    when(registrationService.fetchRegistrations())
-      .thenReturn(Future.successful(registrationsWithMonthlyBoundaries ::: registrationsWithYearlyBoundaries))
-
     val year = LocalDateTime.now().getYear
     val month = LocalDateTime.now().getMonthValue
+    val registrations = registrationsWithMonthlyBoundaries ::: registrationsWithYearlyBoundaries
+    givenFetchingRegistrationsOfAMonthInAYearReturns(year, month, registrations)
 
     Get(s"/registration/$year/$month") ~> registrationRoutes ~> check {
       status shouldEqual StatusCodes.OK
-      responseAs[Seq[RegistrationModel]] shouldBe Seq(
-        registrationInFirstDayOfCurrentMonth,
-        registrationInLastDayOfCurrentMonth).map(_.convert())
+      responseAs[List[RegistrationModel]] shouldBe registrations.map(_.convert())
     }
   }
 
@@ -155,8 +118,15 @@ class RegistrationApiSpec
         registrationInLastDayOfCurrentMonth,
         registrationInFirstDayOfNextMonth)
 
-    def givenSomeRegistrations() =
-      when(registrationService.fetchRegistrations()).thenReturn(Future.successful(registrationsWithMonthlyBoundaries))
+    def givenFetchingRegistrationsReturns(registrations: Registrations = List.empty) =
+      when(registrationService.fetchRegistrations()).thenReturn(Source.fromIterator(() => registrations.iterator))
+
+    def givenFetchingRegistrationsOfAYearReturns(year: Int, registrations: Registrations = List.empty) =
+      when(registrationService.fetchRegistrations(SelectByYear(year))).thenReturn(Source.fromIterator(() => registrations.iterator))
+
+    def givenFetchingRegistrationsOfAMonthInAYearReturns(year: Int, month: Int, registrations: Registrations = List.empty) =
+      when(registrationService.fetchRegistrations(SelectByYearAndMonth(year, month)))
+        .thenReturn(Source.fromIterator(() => registrations.iterator))
 
     val registrationsWithYearlyBoundaries =
       List(
@@ -164,9 +134,6 @@ class RegistrationApiSpec
         registrationInFirstDayOfCurrentYear,
         registrationInLastDayOfCurrentYear,
         registrationInFirstDayOfNextYear)
-
-    def givenSomeRegistrationsOverYears() =
-      when(registrationService.fetchRegistrations()).thenReturn(Future.successful(registrationsWithYearlyBoundaries))
 
     def givenImportingRegistrationsIsSuccessful() =
       when(registrationService.importRegistrationsFrom(any[String])).thenReturn(Future.successful(Right(4)))

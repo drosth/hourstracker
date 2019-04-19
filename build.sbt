@@ -33,6 +33,7 @@ lazy val core = (project in file("core"))
         dependencies.`commons-io`,
         dependencies.`scala-csv`,
         dependencies.`spray-json`,
+        dependencies.`akka-stream`,
         dependencies.spdf,
         dependencies.rxscala
       ),
@@ -50,6 +51,7 @@ lazy val storage = (project in file("storage"))
       name := "hourstracker-storage",
       organization := "com.personal.hourstracker",
       libraryDependencies ++= commonDependencies ++ testDependencies ++ cucumberDependencies ++ Seq(
+        dependencies.`akka-stream`,
         dependencies.squeryl,
         dependencies.`mysql-connector-java`,
         dependencies.h2
@@ -79,7 +81,7 @@ lazy val dependencies =
   new {
     val akkaHttpCorsVersion = "0.3.0"
     val akkaHttpVersion = "10.0.11"
-    val akkaVersion = "2.5.17"
+    val akkaVersion = "2.5.19"
     val commonsIoVersion = "2.6"
     val cucumberRunnerVersion = "0.1.5"
     val cucumberVersion = "2.0.1"

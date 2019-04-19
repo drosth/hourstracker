@@ -1,7 +1,11 @@
 package com.personal.hourstracker.service.impl
 
+import akka.NotUsed
+import akka.stream.scaladsl.Source
+import com.personal.hourstracker.domain.Registration
 import com.personal.hourstracker.domain.Registration.Registrations
 import com.personal.hourstracker.repository.RegistrationRepository
+import com.personal.hourstracker.service.RegistrationService.RegistrationRequest
 import com.personal.hourstracker.service.{ ImporterService, RegistrationService }
 import org.slf4j.Logger
 
@@ -40,10 +44,13 @@ class DefaultRegistrationService(registrationRepository: RegistrationRepository,
     })
   }
 
-  override def fetchRegistrations(): Future[Registrations] = {
-    logger.info(s"Fetching registrations")
-    Future({
-      registrationRepository.findAll()
-    })
+  override def fetchRegistrations(): Source[Registration, NotUsed] = {
+    logger.info(s"Fetching all registrations")
+    registrationRepository.findAll()
+  }
+
+  override def fetchRegistrations(request: RegistrationRequest): Source[Registration, NotUsed] = {
+    logger.info(s"Fetching registrations by request: '${request.getClass}': $request")
+    registrationRepository.findByRequest(request)
   }
 }

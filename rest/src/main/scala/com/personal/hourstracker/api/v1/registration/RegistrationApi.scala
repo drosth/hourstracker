@@ -4,6 +4,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+import akka.http.scaladsl.common.{ EntityStreamingSupport, JsonEntityStreamingSupport }
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
@@ -15,6 +16,7 @@ import com.personal.hourstracker.config.component.{ LoggingComponent, Registrati
 import com.personal.hourstracker.domain.Registration
 import com.personal.hourstracker.domain.Registration.Registrations
 import com.personal.hourstracker.service.RegistrationSelector.{ RegistrationRangeSelector, _ }
+import com.personal.hourstracker.service.RegistrationService.{ SelectByYear, SelectByYearAndMonth }
 import com.personal.hourstracker.service.Selector
 
 import scala.concurrent.Future
@@ -33,6 +35,8 @@ object RegistrationApi {
   implicit class RegistrationOps(registration: Registration) {
     def convert(): RegistrationModel = toModel(registration)
   }
+
+  case class Range(startAt: Option[String], endAt: Option[String])
 
   object ToModelAdapter {
 
@@ -70,39 +74,32 @@ trait RegistrationApi extends RegistrationApiProtocol with RegistrationApiDoc wi
     }
   }
 
-  override def getRegistrations: Route =
+  override def getRegistrations: Route = {
+    implicit val jsonStreamingSupport: JsonEntityStreamingSupport =
+      EntityStreamingSupport
+        .json()
+        .withParallelMarshalling(parallelism = 8, unordered = false)
+
     get {
       pathPrefix("registration") {
         pathEnd {
-          parameters("startAt".as[String].?, "endAt".as[String].?) { (startAt: Option[String], endAt: Option[String]) =>
-            {
-              whenCompleteProcessRegistrations(registrationService.fetchRegistrations()) { registrations =>
-                {
-                  val selector = withSelectorFor(startAt, endAt)
-                  selector match {
-                    case None =>
-                      registrations
-                    case Some(s) =>
-                      registrations.filter(s.filter)
-                  }
-                }
-              }
-            }
-          }
+          complete(registrationService.fetchRegistrations().map(_.convert()))
         } ~
           path(Segment) { year =>
-            whenCompleteProcessRegistrations(registrationService.fetchRegistrations()) { registrations =>
-              registrations
-                .filter(filterRegistrations(year.toInt))
-            }
+            complete(
+              registrationService
+                .fetchRegistrations(request = SelectByYear(year.toInt))
+                .map(_.convert()))
           } ~
           path(Segment / Segment) { (year, month) =>
-            whenCompleteProcessRegistrations(registrationService.fetchRegistrations()) { registrations =>
-              registrations.filter(filterRegistrations(year.toInt, month.toInt))
-            }
+            complete(
+              registrationService
+                .fetchRegistrations(request = SelectByYearAndMonth(year.toInt, month.toInt))
+                .map(_.convert()))
           }
       }
     }
+  }
 
   private def withSelectorFor(startAt: Option[String], endAt: Option[String]): Option[Selector] = (startAt, endAt) match {
     case (None, None) => None
