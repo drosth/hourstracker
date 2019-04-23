@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.{ Operation, Parameter }
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{ Content, Schema }
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.tags.{ Tag, Tags }
 import javax.ws.rs.{ GET, Path, Produces }
 
 @Path("/api/v1/registration")
@@ -14,35 +15,35 @@ protected[registration] trait RegistrationApiDoc {
 
   @GET
   @Operation(
-    summary = "Retrieve all registrations",
-    description = "Retrieves all known registrations",
+    summary = "Retrieve registrations",
     parameters = Array(
       new Parameter(
         in = ParameterIn.QUERY,
-        name = "startAt",
+        name = "year",
         required = false,
         schema = new Schema(implementation = classOf[String]),
-        example = "2018-09-01"),
+        example = "2019"),
       new Parameter(
         in = ParameterIn.QUERY,
-        name = "endAt",
+        name = "month",
         required = false,
         schema = new Schema(implementation = classOf[String]),
-        example = "2018-09-30")),
+        example = "1")),
     responses = Array(
       new ApiResponse(
         description = "The registrations",
         content = Array(new Content(mediaType = "application/json", schema = new Schema(implementation = classOf[RegistrationModels])))),
       new ApiResponse(responseCode = "404", description = "Registrations not found")))
+  @Tags(Array(new Tag(name = "Registration")))
   def getRegistrations: Route
 
   @GET
   @Path("/import")
   @Operation(
-    summary = "Import registrations",
-    description = "Import and store registrations",
+    summary = "Import and store registrations",
     responses = Array(
-      new ApiResponse(responseCode = "200", description = "Registrations are imported"),
+      new ApiResponse(responseCode = "202", description = "Registrations will be imported"),
       new ApiResponse(responseCode = "404", description = "Could not import registrations")))
+  @Tags(Array(new Tag(name = "Registration")))
   def importRegistrations: Route
 }

@@ -38,8 +38,10 @@ trait SquerylRegistrationRepositoryComponent extends RegistrationRepositoryCompo
   object DatabaseAdapterFactory {
 
     def create(driver: String): Option[DatabaseAdapter] = driver match {
-      case "org.h2.Driver" => Some(new H2Adapter)
-      case "com.mysql.cj.jdbc.Driver" => Some(new MySQLAdapter)
+      case "org.h2.Driver" =>
+        Some(new H2Adapter)
+      case "com.mysql.cj.jdbc.Driver" =>
+        Some(new MySQLAdapter)
       case _ =>
         logger.error(s"==== Could not create DatabaseAdapter for driver: $driver")
         None

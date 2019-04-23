@@ -11,14 +11,19 @@ object RegistrationSchema extends Schema {
 
   private lazy val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  private lazy val nameToTableMap: Map[String, Table[_]] = {
+  private def nameToTableMap(): Map[String, Table[_]] = {
     transaction {
-      tables.map(table => table.name -> table).toMap
+      tables
+        .map(table => {
+          println(s"Table present: $table")
+          table
+        })
+        .map(table => table.name -> table).toMap
     }
   }
 
   def initialize(): Unit =
-    if (!nameToTableMap.contains("REGISTRATION")) {
+    if (!nameToTableMap().contains("REGISTRATION")) {
       transaction {
         logger.info("Create Registration schema")
         RegistrationSchema.create

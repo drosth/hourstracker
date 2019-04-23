@@ -15,8 +15,9 @@ services:
     volumes:
       - ./resources:/opt/resources
     environment:
-      - IMPORT_FROM=/opt/resources/import/CSVExport.csv
-      - EXPORT_TO=/opt/resources/export
+      IMPORT_FROM: '/opt/resources/import/CSVExport.csv'
+      EXPORT_TO: '/opt/resources/export'
+      STORAGE_DB_CONNECTION_STRING: 'jdbc:mysql://registration-storage/hourstracker?autoReconnect=true&useSSL=false&defaultReadOnly=false'
 
   swagger-ui:
     image: swaggerapi/swagger-ui:v3.19.3

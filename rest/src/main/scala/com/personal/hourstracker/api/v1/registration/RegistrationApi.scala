@@ -14,12 +14,8 @@ import com.personal.hourstracker.api.v1.domain.RegistrationModel
 import com.personal.hourstracker.config.Configuration
 import com.personal.hourstracker.config.component.{ LoggingComponent, RegistrationComponent, SystemComponent }
 import com.personal.hourstracker.domain.Registration
-import com.personal.hourstracker.domain.Registration.Registrations
-import com.personal.hourstracker.service.RegistrationSelector.{ RegistrationRangeSelector, _ }
 import com.personal.hourstracker.service.RegistrationService.{ SelectByYear, SelectByYearAndMonth }
-import com.personal.hourstracker.service.Selector
 
-import scala.concurrent.Future
 import scala.util.{ Failure, Success }
 
 object RegistrationApi {
@@ -62,18 +58,6 @@ trait RegistrationApi extends RegistrationApiProtocol with RegistrationApiDoc wi
 
   lazy val registrationRoutes: Route = getRegistrations ~ importRegistrations
 
-  private def whenCompleteProcessRegistrations(
-    withFutureExecution: Future[Registrations])(process: Registrations => Registrations = collection => collection): Route = {
-    onComplete(withFutureExecution) {
-      case Success(registrations) =>
-        complete(process(registrations).map(_.convert()))
-
-      case Failure(e) =>
-        logger.error(e.getMessage)
-        complete(StatusCodes.NotFound, e.getMessage)
-    }
-  }
-
   override def getRegistrations: Route = {
     implicit val jsonStreamingSupport: JsonEntityStreamingSupport =
       EntityStreamingSupport
@@ -100,25 +84,6 @@ trait RegistrationApi extends RegistrationApiProtocol with RegistrationApiDoc wi
       }
     }
   }
-
-  private def withSelectorFor(startAt: Option[String], endAt: Option[String]): Option[Selector] = (startAt, endAt) match {
-    case (None, None) => None
-    case _ => Some(RegistrationRangeSelector(startAt, endAt))
-  }
-
-  private def filterRegistrations(year: Int): Registration => Boolean =
-    registration =>
-      registration.clockedIn match {
-        case None => false
-        case Some(clocked) => clocked.getYear == year
-      }
-
-  private def filterRegistrations(year: Int, month: Int): Registration => Boolean =
-    registration =>
-      registration.clockedIn match {
-        case None => false
-        case Some(clocked) => clocked.getYear == year && clocked.getMonthValue == month
-      }
 
   override def importRegistrations: Route = path("registration" / "import") {
     post {
