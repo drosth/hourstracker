@@ -3,7 +3,7 @@ organization := "com.personal"
 version := "0.1"
 maintainer := "h.drost@gmail.com"
 
-scalaVersion := "2.12.6"
+scalaVersion := "2.12.7"
 
 lazy val framework = new TestFramework("com.waioeka.sbt.runner.CucumberFramework")
 

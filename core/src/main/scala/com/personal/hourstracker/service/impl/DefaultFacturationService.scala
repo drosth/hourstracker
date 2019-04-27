@@ -12,7 +12,7 @@ class DefaultFacturationService()(implicit logger: Logger, locale: Locale) exten
 
   private lazy val format: NumberFormat = NumberFormat.getInstance(locale)
 
-  override val splitRegistrationForFacturation: Registration => Registrations = {
+  override lazy val splitRegistrationForFacturation: Registration => Registrations = {
     logger.info("Splitting for facturation")
     registration =>
       splitOnTags(registration)
@@ -33,7 +33,7 @@ class DefaultFacturationService()(implicit logger: Logger, locale: Locale) exten
     }
   }
 
-  private def splitOnTags(registration: Registration): Registrations =
+  override def splitOnTags(registration: Registration): Registrations =
     registration.tags match {
       case None => List(registration)
       case Some(tags) =>

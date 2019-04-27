@@ -23,18 +23,21 @@ trait ConsolidatedRegistrationsHtmlPresenter extends HtmlPresenter[ConsolidatedR
       ConsolidatedRegistrationsPresenter.render(model).toString()
     }
 
-    override val renderRegistrationsPerJob: ConsolidatedRegistrationsPerJob => Seq[File] = consolidatedRegistrationsPerJob => {
+    override val renderRegistrationsPerJobs: ConsolidatedRegistrationsPerJob => Seq[File] = consolidatedRegistrationsPerJob => {
       consolidatedRegistrationsPerJob.map {
-        case (job, consolidatedRegistrations) =>
-          logger.info(s"Rendering #${consolidatedRegistrations.size} consolidated registrations for job '$job' to HTML")
-
-          val outputFileName: String = fileName(job, consolidatedRegistrations, ".html")
-          withWriterTo(outputFileName) { writer =>
-            writer.write(renderConsolidatedRegistrations(consolidatedRegistrations))
-            writer.flush()
-          }
-          new File(outputFileName)
+        case (job, consolidatedRegistrations) => renderRegistrationsPerSingleJob(job, consolidatedRegistrations)
       }.toSeq
+    }
+
+    override def renderRegistrationsPerSingleJob(job: String, registrations: ConsolidatedRegistrations): File = {
+      logger.info(s"Rendering #${registrations.size} consolidated registrations for job '$job' to HTML")
+
+      val outputFileName: String = fileName(job, registrations, ".html")
+      withWriterTo(outputFileName) { writer =>
+        writer.write(renderConsolidatedRegistrations(registrations))
+        writer.flush()
+      }
+      new File(outputFileName)
     }
   }
 

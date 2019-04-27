@@ -8,7 +8,7 @@ import akka.stream.scaladsl.Source
 import com.personal.hourstracker.domain.Registration
 import com.personal.hourstracker.domain.Registration.Registrations
 import com.personal.hourstracker.repository.RegistrationRepository
-import com.personal.hourstracker.service.RegistrationService.RegistrationRequest
+import com.personal.hourstracker.service.RegistrationService.{ RegistrationRequest, SelectByYear, SelectByYearAndMonth }
 import com.personal.hourstracker.storage.repository.squeryl.entities.RegistrationEntity
 import com.personal.hourstracker.storage.repository.squeryl.schema.RegistrationSchema
 import org.slf4j.{ Logger, LoggerFactory }
@@ -33,11 +33,39 @@ class SquerylRegistrationRepository extends RegistrationRepository {
       registrations.iterator
     })
 
-  override def findByRequest(request: RegistrationRequest): Source[Registration, NotUsed] =
-    Source.fromIterator(() => {
-      val registrations = findAllRegistrations()
-      registrations.iterator
-    })
+  override def findByRequest(request: RegistrationRequest): Source[Registration, NotUsed] = {
+    val requestedRegistrations: Registrations = request match {
+      case SelectByYear(year) =>
+        selectRegistrationsByYear(year)
+      case SelectByYearAndMonth(year, month) =>
+        selectRegistrationsByYearAndMonth(year, month)
+      case _ => List()
+    }
+
+    Source.fromIterator(() => requestedRegistrations.iterator)
+  }
+
+  import org.squeryl.PrimitiveTypeMode._
+
+  private def selectRegistrationsByYear(year: Int): Registrations = transaction {
+    val lower = Timestamp.valueOf(LocalDateTime.of(year, 1, 1, 0, 0, 0))
+    val upper = Timestamp.valueOf(LocalDateTime.of(year, 1, 1, 0, 0, 0).plusYears(1).minusDays(1))
+
+    registrations.where(r =>
+      (r.clockedIn isNotNull)
+        and (
+          (r.clockedIn.get gt lower) and (r.clockedIn.get lt upper))).toList.map(_.convert)
+  }
+
+  private def selectRegistrationsByYearAndMonth(year: Int, month: Int): Registrations = transaction {
+    val lower = Timestamp.valueOf(LocalDateTime.of(year, month, 1, 0, 0, 0))
+    val upper = Timestamp.valueOf(LocalDateTime.of(year, month, 1, 0, 0, 0).plusMonths(1).minusDays(1))
+
+    registrations.where(r =>
+      (r.clockedIn isNotNull)
+        and (
+          (r.clockedIn.get gt lower) and (r.clockedIn.get lt upper))).toList.map(_.convert)
+  }
 
   private def findAllRegistrations(): Registrations = transaction {
     registrations.toList.map(_.convert)

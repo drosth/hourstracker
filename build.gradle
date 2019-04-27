@@ -1,0 +1,68 @@
+task compile {
+    description 'compile the source code of the project'
+    group 'lifecycle'
+
+    doLast {
+        println 'Compiling...'
+        exec {
+            executable 'sbt'
+            args 'compile'
+            args 'scalastyle'
+        }
+    }
+}
+
+task test {
+    description 'test the compiled source code using a suitable unit testing framework. These tests should not require the code be packaged or deployed'
+    group 'lifecycle'
+
+    doLast {
+        println 'Testing...'
+        exec {
+            executable 'sbt'
+            args 'test:scalastyle'
+            args 'test'
+        }
+    }
+}
+
+test.mustRunAfter compile
+
+task install {
+    description 'take the compiled code and package it in its distributable format, such as a JAR.'
+    group 'lifecycle'
+
+    doLast {
+        println 'Installing...'
+        exec {
+            executable 'sbt'
+            args 'docker:publishLocal'
+        }
+        exec {
+            executable 'docker-compose'
+            args 'build'
+        }
+    }
+}
+
+install.mustRunAfter test
+
+task runDocker(dependsOn:[install]) {
+    description 'Run Docker image'
+    group 'docker'
+
+    doLast {
+        println 'Running...'
+        exec {
+            executable 'docker-compose'
+            args 'up'
+            args '-d'
+        }
+        exec {
+            executable 'docker-compose'
+            args 'ps'
+        }
+    }
+}
+
+runDocker.mustRunAfter install

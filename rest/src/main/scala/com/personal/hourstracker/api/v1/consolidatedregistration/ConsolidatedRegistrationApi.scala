@@ -152,7 +152,7 @@ trait ConsolidatedRegistrationApi extends ConsolidatedRegistrationApiDoc with Co
   }
 
   private def processConsolidatedRegistrationsPerJob(consolidatedRegistrationsPerJob: ConsolidatedRegistrationsPerJob): Seq[File] = {
-    pdfPresenter.renderRegistrationsPerJob(consolidatedRegistrationsPerJob)
+    pdfPresenter.renderRegistrationsPerJobs(consolidatedRegistrationsPerJob)
   }
 
   private def fileName(job: String, registrations: ConsolidatedRegistrations) =

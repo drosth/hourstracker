@@ -8,4 +8,6 @@ trait FacturationService {
     registrations.flatMap(splitRegistrationForFacturation(_))
 
   val splitRegistrationForFacturation: Registration => Registrations
+
+  def splitOnTags(registration: Registration): Registrations
 }

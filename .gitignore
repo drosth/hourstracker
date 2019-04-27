@@ -1,7 +1,11 @@
-*.class
-*.log
-.idea
-target/
-output/
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+build
+
+# Ignore resources
+resources/
+
+# Ignore data files
 data/
-resources/export/

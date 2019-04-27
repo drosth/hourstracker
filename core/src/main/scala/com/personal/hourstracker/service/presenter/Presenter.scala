@@ -9,7 +9,9 @@ import com.personal.hourstracker.domain.ConsolidatedRegistration.ConsolidatedReg
 trait Presenter[T] {
   this: Configuration =>
 
-  val renderRegistrationsPerJob: T => Seq[File]
+  val renderRegistrationsPerJobs: T => Seq[File]
+
+  def renderRegistrationsPerSingleJob(job: String, registrations: ConsolidatedRegistrations): File
 
   def fileName(job: String, consolidatedRegistrations: ConsolidatedRegistrations, extension: String): String =
     s"${Application.exportTo}/[Timesheet] - $job - ${dateRangeAsStringOf(consolidatedRegistrations)}$extension"

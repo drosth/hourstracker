@@ -1,8 +1,8 @@
 package com.personal.hourstracker.config
 
 import scala.concurrent.ExecutionContext
-
 import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 import com.personal.hourstracker.config.component._
 import com.personal.hourstracker.service.presenter.config.PresenterComponents
 
@@ -19,4 +19,5 @@ trait ApplicationModule
 
   override implicit val system: ActorSystem = ActorSystem("event-replay")
   override implicit val executionContext: ExecutionContext = system.dispatcher
+  override implicit val materializer: ActorMaterializer = ActorMaterializer()
 }
