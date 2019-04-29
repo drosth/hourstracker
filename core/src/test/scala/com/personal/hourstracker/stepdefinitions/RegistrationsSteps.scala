@@ -1,12 +1,13 @@
 package com.personal.hourstracker.stepdefinitions
 
 import java.text.SimpleDateFormat
+import java.util.Locale
 
 import akka.actor.ActorSystem
 import com.personal.hourstracker.domain.Registration
 import com.personal.hourstracker.repository.RegistrationRepository
 import com.personal.hourstracker.service.impl.DefaultRegistrationService
-import com.personal.hourstracker.service.{ ImporterService, RegistrationService }
+import com.personal.hourstracker.service.{ FacturationService, ImporterService, RegistrationService }
 import cucumber.api.DataTable
 import cucumber.api.scala.{ EN, ScalaDsl }
 import org.mockito.Mockito._
@@ -24,10 +25,12 @@ class RegistrationsSteps extends ScalaDsl with EN with Matchers with MockitoSuga
   private implicit val logger: Logger = mock[Logger]
   private implicit val system: ActorSystem = ActorSystem()
   private implicit lazy val executionContext: ExecutionContext = system.dispatcher
+  private implicit lazy val locale: Locale = new Locale("nl", "NL")
 
   private val registrationRepository: RegistrationRepository = mock[RegistrationRepository]
   private val importService: ImporterService = mock[ImporterService]
-  private val registrationService: RegistrationService = new DefaultRegistrationService(registrationRepository, importService)
+  private val facturationService: FacturationService = mock[FacturationService]
+  private val registrationService: RegistrationService = new DefaultRegistrationService(registrationRepository, importService, facturationService)
 
   Given("""^a CSV file named '(.*)' with the following registrations:$""") { (fileName: String, dataTable: DataTable) =>
     val dateTimeFormatter = new SimpleDateFormat("dd/MM/yyyy hh:mm")

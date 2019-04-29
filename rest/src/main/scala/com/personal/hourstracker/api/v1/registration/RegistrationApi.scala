@@ -1,24 +1,19 @@
 package com.personal.hourstracker.api.v1.registration
 
-import java.io.File
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-import akka.NotUsed
 import akka.http.scaladsl.common.{ EntityStreamingSupport, JsonEntityStreamingSupport }
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import akka.http.scaladsl.unmarshalling.Unmarshaller
-import akka.stream.scaladsl.{ Source, _ }
-import com.personal.hourstracker.Application.consolidatedRegistrationService
 import com.personal.hourstracker.api.v1.domain.RegistrationModel
 import com.personal.hourstracker.config.Configuration
 import com.personal.hourstracker.config.component.{ FacturationComponent, LoggingComponent, RegistrationComponent, SystemComponent }
 import com.personal.hourstracker.domain.Registration
-import com.personal.hourstracker.domain.Registration.Registrations
 import com.personal.hourstracker.service.RegistrationService.{ SelectByYear, SelectByYearAndMonth }
 import com.personal.hourstracker.service.presenter.ConsolidatedRegistrationsPdfPresenter
 
@@ -62,7 +57,7 @@ trait RegistrationApi extends RegistrationApiProtocol with RegistrationApiDoc wi
 
   import RegistrationApi._
 
-  lazy val registrationRoutes: Route = getConsolidatedRegistrationsWithSource ~ getRegistrations ~ importRegistrations
+  lazy val registrationRoutes: Route = getConsolidatedRegistrations ~ getRegistrations ~ importRegistrations
 
   implicit val jsonStreamingSupport: JsonEntityStreamingSupport =
     EntityStreamingSupport
@@ -91,48 +86,29 @@ trait RegistrationApi extends RegistrationApiProtocol with RegistrationApiDoc wi
     }
   }
 
-  private val splitRegistrationByTags: Flow[Registration, List[Registration], NotUsed] = Flow[Registration]
-    .map(facturationService.splitOnTags)
-    .alsoTo(Sink.foreach(i => logger.info(s"Number of Registrations after splitting #${i.head.id}: ${i.size}")))
-
-  private val consolidateAndProcessRegistrations: Flow[Registrations, Seq[String], NotUsed] = {
-    def renderPdfForConsolidatedRegistrations(registrations: Registrations): List[File] = {
-      consolidatedRegistrationService.consolidateAndProcessRegistrations(registrations) {
-        _.map {
-          case (job, consolidatedRegistrations) =>
-            pdfPresenter.renderRegistrationsPerSingleJob(job, consolidatedRegistrations)
-        }.toList
-      }
-    }
-
-    Flow[Registrations].map(registrations => {
-      logger.info(s"Number of Registrations to render PDF for: ${registrations.size}")
-
-      val y: Seq[File] = renderPdfForConsolidatedRegistrations(registrations)
-      logger.info(s"Rendered #${y.size} files for #${registrations.size} Registrations for id's: ${registrations.map(_.id).toSet}")
-      y.map(_.getAbsolutePath)
-    })
-  }
-
-  def getConsolidatedRegistrationsWithSource: Route = {
+  def getConsolidatedRegistrations: Route = {
     get {
       pathPrefix("registrations") {
         path(Segment / "consolidated") { year =>
           {
-            complete(
-              registrationService.fetchRegistrations(request = SelectByYear(year.toInt))
-                .via(splitRegistrationByTags)
-                .fold[List[Registration]](List[Registration]())((aggr, registrations) => aggr ::: registrations)
-                .via(consolidateAndProcessRegistrations))
+            val source = registrationService.fetchRegistrations(request = SelectByYear(year.toInt))
+            complete(registrationService.consolidateRegistrations(source) {
+              _.map {
+                case (job, consolidatedRegistrations) =>
+                  pdfPresenter.renderRegistrationsPerSingleJob(job, consolidatedRegistrations)
+              }.map(_.getAbsolutePath).toList
+            })
           }
         } ~
           path(Segment / Segment / "consolidated") { (year, month) =>
             {
-              complete(
-                registrationService.fetchRegistrations(request = SelectByYearAndMonth(year.toInt, month.toInt))
-                  .via(splitRegistrationByTags)
-                  .fold[List[Registration]](List[Registration]())((aggr, registrations) => aggr ::: registrations)
-                  .via(consolidateAndProcessRegistrations))
+              val source = registrationService.fetchRegistrations(request = SelectByYearAndMonth(year.toInt, month.toInt))
+              complete(registrationService.consolidateRegistrations(source) {
+                _.map {
+                  case (job, consolidatedRegistrations) =>
+                    pdfPresenter.renderRegistrationsPerSingleJob(job, consolidatedRegistrations)
+                }.map(_.getAbsolutePath).toList
+              })
             }
           }
       }

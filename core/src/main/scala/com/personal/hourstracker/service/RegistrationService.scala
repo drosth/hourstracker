@@ -1,11 +1,11 @@
 package com.personal.hourstracker.service
 
-import java.time.LocalDate
+import java.util.Locale
 
 import akka.NotUsed
 import akka.stream.scaladsl.Source
+import com.personal.hourstracker.domain.ConsolidatedRegistration.ConsolidatedRegistrationsPerJob
 import com.personal.hourstracker.domain.Registration
-import com.personal.hourstracker.domain.Registration.Registrations
 
 import scala.concurrent.Future
 
@@ -25,7 +25,6 @@ trait RegistrationService {
 
   def fetchRegistrations(request: RegistrationRequest): Source[Registration, NotUsed]
 
-  def storeRegistration(registration: Registration): Future[Unit]
-
-  def storeRegistrations(registrations: Registrations): Future[Unit]
+  def consolidateRegistrations[T](registrations: Source[Registration, NotUsed])(
+    processConsolidatedRegistrations: ConsolidatedRegistrationsPerJob => T): Source[T, NotUsed]
 }

@@ -46,7 +46,7 @@ class RegistrationApiSpec
   it should "be able retrieve all registrations" in {
     givenFetchingRegistrationsReturns(registrationsWithMonthlyBoundaries)
 
-    Get("/registration") ~> registrationRoutes ~> check {
+    Get("/registrations") ~> registrationRoutes ~> check {
       status shouldEqual StatusCodes.OK
       responseAs[Seq[RegistrationModel]] shouldBe Seq(
         registrationInLastDayOfPreviousMonth,
@@ -60,7 +60,7 @@ class RegistrationApiSpec
     val year = LocalDateTime.now().getYear
     givenFetchingRegistrationsOfAYearReturns(year, registrationsWithYearlyBoundaries)
 
-    Get(s"/registration/$year") ~> registrationRoutes ~> check {
+    Get(s"/registrations/$year") ~> registrationRoutes ~> check {
       status shouldEqual StatusCodes.OK
       responseAs[List[RegistrationModel]] shouldBe registrationsWithYearlyBoundaries.map(_.convert())
     }
@@ -72,7 +72,7 @@ class RegistrationApiSpec
     val registrations = registrationsWithMonthlyBoundaries ::: registrationsWithYearlyBoundaries
     givenFetchingRegistrationsOfAMonthInAYearReturns(year, month, registrations)
 
-    Get(s"/registration/$year/$month") ~> registrationRoutes ~> check {
+    Get(s"/registrations/$year/$month") ~> registrationRoutes ~> check {
       status shouldEqual StatusCodes.OK
       responseAs[List[RegistrationModel]] shouldBe registrations.map(_.convert())
     }
@@ -83,7 +83,7 @@ class RegistrationApiSpec
   it should "be able to import registrations" in {
     givenImportingRegistrationsIsSuccessful()
 
-    Post(s"/registration/import") ~> registrationRoutes ~> check {
+    Post(s"/registrations/import") ~> registrationRoutes ~> check {
       status shouldEqual StatusCodes.Accepted
     }
   }

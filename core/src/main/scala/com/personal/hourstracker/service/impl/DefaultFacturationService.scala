@@ -8,7 +8,7 @@ import com.personal.hourstracker.domain.Registration.Registrations
 import com.personal.hourstracker.service.FacturationService
 import org.slf4j.Logger
 
-class DefaultFacturationService()(implicit logger: Logger, locale: Locale) extends FacturationService {
+class DefaultFacturationService()(implicit logger: Logger, locale: Locale = new Locale("nl", "NL")) extends FacturationService {
 
   private lazy val format: NumberFormat = NumberFormat.getInstance(locale)
 

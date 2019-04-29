@@ -1,5 +1,7 @@
 package com.personal.hourstracker.service.impl
 
+import java.util.Locale
+
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Source
@@ -7,7 +9,7 @@ import akka.stream.testkit.scaladsl.TestSink
 import com.personal.hourstracker.domain.Registration
 import com.personal.hourstracker.repository.RegistrationRepository
 import com.personal.hourstracker.service.RegistrationService.{ RegistrationRequest, SelectByYear, SelectByYearAndMonth }
-import com.personal.hourstracker.service.{ ImporterService, RegistrationService }
+import com.personal.hourstracker.service.{ FacturationService, ImporterService, RegistrationService }
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{ BeforeAndAfter, Matchers, Outcome, fixture }
@@ -22,15 +24,17 @@ class DefaultRegistrationServiceSpec extends fixture.FlatSpec with BeforeAndAfte
   private implicit val system: ActorSystem = ActorSystem()
   private implicit val executionContext: ExecutionContext = system.dispatcher
   private implicit val materializer: ActorMaterializer = ActorMaterializer()
+  private implicit lazy val locale: Locale = new Locale("nl", "NL")
 
   private val importerService = mock[ImporterService]
   private val registrationRepository = mock[RegistrationRepository]
+  private val facturationService: FacturationService = mock[FacturationService]
 
   override type FixtureParam = RegistrationService
 
   override protected def withFixture(test: OneArgTest): Outcome = {
-    reset(logger, importerService, registrationRepository)
-    test(new DefaultRegistrationService(registrationRepository, importerService))
+    reset(logger, importerService, registrationRepository, facturationService)
+    test(new DefaultRegistrationService(registrationRepository, importerService, facturationService))
   }
 
   behavior of "Importing registrations"
@@ -54,30 +58,6 @@ class DefaultRegistrationServiceSpec extends fixture.FlatSpec with BeforeAndAfte
     actual shouldEqual Left("Could not import registrations")
 
     verify(logger).warn(s"Could not import from 'unreadableFile': ''unreadableFile' is unreadable'")
-  }
-
-  behavior of "Storing registrations"
-
-  it should "return ids of stored registrations" in { classUnderTest =>
-    val registration1 = mock[Registration]
-    when(registrationRepository.save(registration1)).thenReturn(Right(1L))
-
-    val registration2 = mock[Registration]
-    when(registrationRepository.save(registration2)).thenReturn(Right(2L))
-
-    Await.result(classUnderTest.storeRegistrations(List(registration1, registration2)), 1 second) shouldEqual ()
-  }
-
-  it should "log error, given some registration could not be stored" in { classUnderTest =>
-    val registration1 = mock[Registration]
-    when(registrationRepository.save(registration1)).thenReturn(Right(1L))
-
-    val registration2 = mock[Registration]
-    when(registrationRepository.save(registration2)).thenReturn(Left("Could not store #2"))
-
-    Await.result(classUnderTest.storeRegistrations(List(registration1, registration2)), 1 second)
-
-    verify(logger).warn(s"Could not store registration: 'Could not store #2'")
   }
 
   behavior of "Fetching registrations"

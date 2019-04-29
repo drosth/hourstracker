@@ -8,6 +8,6 @@ import com.personal.hourstracker.service.impl.DefaultFacturationService
 trait FacturationComponent {
   this: LoggingComponent with SystemComponent =>
 
-  def facturationService(implicit locale: Locale): FacturationService = new DefaultFacturationService()
+  def facturationService: FacturationService = new DefaultFacturationService()
 }
 

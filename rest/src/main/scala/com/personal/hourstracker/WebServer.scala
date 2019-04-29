@@ -16,8 +16,6 @@ import com.personal.hourstracker.config.WebModule
 
 object WebServer extends App with ApiV1 with WebModule {
 
-  implicit def locale: Locale = new Locale("nl", "NL")
-
   private val corsSettings = CorsSettings.defaultSettings
     .withAllowedOrigins(HttpOriginRange.*)
     .withAllowedMethods(List(HttpMethods.GET, HttpMethods.PUT, HttpMethods.DELETE, HttpMethods.POST, HttpMethods.HEAD, HttpMethods.OPTIONS))

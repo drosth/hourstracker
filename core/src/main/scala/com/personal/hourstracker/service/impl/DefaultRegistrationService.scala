@@ -1,19 +1,29 @@
 package com.personal.hourstracker.service.impl
 
+import java.io.File
+import java.util.Locale
+
 import akka.NotUsed
-import akka.stream.scaladsl.Source
+import akka.stream.scaladsl.{ Flow, Sink, Source }
+import com.personal.hourstracker.Application.consolidatedRegistrationService
+import com.personal.hourstracker.config.component.FacturationComponent
+import com.personal.hourstracker.domain.ConsolidatedRegistration.ConsolidatedRegistrationsPerJob
 import com.personal.hourstracker.domain.Registration
 import com.personal.hourstracker.domain.Registration.Registrations
 import com.personal.hourstracker.repository.RegistrationRepository
 import com.personal.hourstracker.service.RegistrationService.RegistrationRequest
-import com.personal.hourstracker.service.{ ImporterService, RegistrationService }
+import com.personal.hourstracker.service.{ FacturationService, ImporterService, RegistrationService }
 import org.slf4j.Logger
 
 import scala.concurrent.{ ExecutionContext, Future }
 
-class DefaultRegistrationService(registrationRepository: RegistrationRepository, importService: ImporterService)(
+class DefaultRegistrationService(
+  registrationRepository: RegistrationRepository,
+  importService: ImporterService,
+  facturationService: FacturationService)(
   implicit
   logger: Logger,
+  locale: Locale,
   executionContext: ExecutionContext) extends RegistrationService {
 
   override def importRegistrationsFrom(fileName: String): Future[Either[String, Int]] = {
@@ -31,18 +41,7 @@ class DefaultRegistrationService(registrationRepository: RegistrationRepository,
       }
   }
 
-  override def storeRegistration(registration: Registration): Future[Unit] = {
-    logger.info(s"Storing registration: '$registration'")
-
-    Future({
-      registrationRepository.save(registration) match {
-        case Left(error) => logger.warn(s"Could not store registration: '$error'")
-        case id => id
-      }
-    })
-  }
-
-  override def storeRegistrations(registrations: Registrations): Future[Unit] = {
+  def storeRegistrations(registrations: Registrations): Future[Unit] = {
     logger.info(s"Storing #${registrations.size} registrations")
 
     Future({
@@ -63,5 +62,28 @@ class DefaultRegistrationService(registrationRepository: RegistrationRepository,
   override def fetchRegistrations(request: RegistrationRequest): Source[Registration, NotUsed] = {
     logger.info(s"Fetching registrations by request: '${request.getClass}': $request")
     registrationRepository.findByRequest(request)
+  }
+
+  // ---------------------------------------------
+
+  private val splitRegistrationByTags: Flow[Registration, List[Registration], NotUsed] = Flow[Registration]
+    .map(facturationService.splitOnTags)
+    .alsoTo(Sink.foreach(i => logger.info(s"Number of Registrations after splitting #${i.head.id}: ${i.size}")))
+
+  private def consolidateAndProcessRegistrations[T](
+    processConsolidatedRegistrations: ConsolidatedRegistrationsPerJob => T): Flow[Registrations, T, NotUsed] = {
+    Flow[Registrations].map(registrations => {
+      logger.info(s"Number of Registrations to render PDF for: ${registrations.size}")
+
+      consolidatedRegistrationService.consolidateAndProcessRegistrations(registrations)(processConsolidatedRegistrations)
+    })
+  }
+
+  override def consolidateRegistrations[T](
+    registrations: Source[Registration, NotUsed])(processConsolidatedRegistrations: ConsolidatedRegistrationsPerJob => T): Source[T, NotUsed] = {
+    registrations
+      .via(splitRegistrationByTags)
+      .fold[List[Registration]](List[Registration]())((aggr, registrations) => aggr ::: registrations)
+      .via(consolidateAndProcessRegistrations(processConsolidatedRegistrations))
   }
 }
