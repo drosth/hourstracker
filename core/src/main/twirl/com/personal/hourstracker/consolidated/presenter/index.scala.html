@@ -1,6 +1,5 @@
 @(model: com.personal.hourstracker.service.presenter.Model)
 @title = { Timesheet }
-@footerText = { dé maat in ondernemen - www.the-future-group-com }
 <!DOCTYPE html>
 <html>
     <head>
@@ -99,11 +98,8 @@
     </head>
     <body>
         @for(groupedRegistration <- model.groupedRegistrations) {
-            <div class="keep-together break-after">
-                <div class="page">
-                    @page(header(model.consultantName)(model.fullMonthNameOf(groupedRegistration._2.head.date), groupedRegistration._2.head.date.getYear()))(timesheet(groupedRegistration._2))(signature())
-                </div>
-                <div class="footer">@footerText</div>
+            <div class="keep-together">
+                @page(header(model.consultantName)(model.fullMonthNameOf(groupedRegistration._2.head.date), groupedRegistration._2.head.date.getYear()))(timesheet(groupedRegistration._2))(signature())
             </div>
         }
     </body>

@@ -52,7 +52,7 @@ task runDocker(dependsOn:[install]) {
     group 'docker'
 
     doLast {
-        println 'Running...'
+        println 'Running docker...'
         exec {
             executable 'docker-compose'
             args 'up'
@@ -66,3 +66,23 @@ task runDocker(dependsOn:[install]) {
 }
 
 runDocker.mustRunAfter install
+
+task stopDocker {
+    description 'Stop Docker image'
+    group 'docker'
+
+    doLast {
+        println 'Stopping docker...'
+        exec {
+            executable 'docker-compose'
+            args 'down'
+        }
+    }
+}
+
+runDocker.mustRunAfter stopDocker
+
+task restartDocker(dependsOn: [stopDocker, install, runDocker]) {
+    description 'Restart Docker image'
+    group 'docker'
+}

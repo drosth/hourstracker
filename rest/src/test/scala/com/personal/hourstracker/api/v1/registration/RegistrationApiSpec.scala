@@ -1,20 +1,23 @@
 package com.personal.hourstracker.api.v1.registration
 
-import java.time.LocalDateTime
+import java.time.{ LocalDate, LocalDateTime }
 import java.time.format.DateTimeFormatter
 
+import akka.NotUsed
 import akka.http.scaladsl.model.StatusCodes
 import akka.stream.scaladsl.Source
 import com.personal.hourstracker.api.v1.ApiSpec
 import com.personal.hourstracker.api.v1.domain.RegistrationModel
 import com.personal.hourstracker.config.component._
-import com.personal.hourstracker.domain.Registration
+import com.personal.hourstracker.domain.ConsolidatedRegistration.ConsolidatedRegistrations
+import com.personal.hourstracker.domain.{ ConsolidatedRegistration, Registration }
 import com.personal.hourstracker.domain.Registration.Registrations
 import com.personal.hourstracker.repository.RegistrationRepository
 import com.personal.hourstracker.service.RegistrationService.{ SelectByYear, SelectByYearAndMonth }
 import com.personal.hourstracker.service.presenter.ConsolidatedRegistrationsPdfPresenter
 import com.personal.hourstracker.service.presenter.config.HtmlPresenterComponent
 import com.personal.hourstracker.service.{ ImporterService, RegistrationService }
+import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 
@@ -23,7 +26,9 @@ import scala.concurrent.Future
 class RegistrationApiSpec
   extends ApiSpec
   with RegistrationApi
-  with FacturationComponent with ConsolidatedRegistrationsPdfPresenter with HtmlPresenterComponent
+  with FacturationComponent
+  with ConsolidatedRegistrationsPdfPresenter
+  with HtmlPresenterComponent
   with RegistrationComponent
   with RegistrationRepositoryComponent
   with ImporterServiceComponent
@@ -39,7 +44,15 @@ class RegistrationApiSpec
 
   private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
-  behavior of "RegistrationApi"
+  behavior of "Importing registrations"
+
+  it should "be able to import registrations" in {
+    givenImportingRegistrationsIsSuccessful()
+
+    Post(s"/registrations/import") ~> registrationRoutes ~> check {
+      status shouldEqual StatusCodes.Accepted
+    }
+  }
 
   behavior of "Fetching registrations"
 
@@ -75,16 +88,6 @@ class RegistrationApiSpec
     Get(s"/registrations/$year/$month") ~> registrationRoutes ~> check {
       status shouldEqual StatusCodes.OK
       responseAs[List[RegistrationModel]] shouldBe registrations.map(_.convert())
-    }
-  }
-
-  behavior of "Importing registrations"
-
-  it should "be able to import registrations" in {
-    givenImportingRegistrationsIsSuccessful()
-
-    Post(s"/registrations/import") ~> registrationRoutes ~> check {
-      status shouldEqual StatusCodes.Accepted
     }
   }
 
