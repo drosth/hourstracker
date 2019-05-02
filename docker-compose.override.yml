@@ -3,11 +3,11 @@ version: '2.4'
 services:
   hourstracker:
     ports:
-      - 8080:8080
+      - 9080:8080
 
   swagger-ui:
     ports:
-    - 8079:8080
+    - 9079:8080
 
   registration-storage:
     ports:

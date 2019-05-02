@@ -20,6 +20,7 @@ trait RegistrationService {
   import RegistrationService._
 
   def importRegistrationsFrom(fileName: String): Future[Either[String, Int]]
+  def importRegistrationsFromSource(fileName: String): Source[Either[String, Registration], NotUsed]
 
   def fetchRegistrations(): Source[Registration, NotUsed]
 

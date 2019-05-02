@@ -7,24 +7,24 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{ Content, Schema }
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.{ Tag, Tags }
-import javax.ws.rs.{ GET, Path, Produces }
+import javax.ws.rs.{ GET, POST, Path, PathParam, Produces }
 
-@Path("/api/v1/registration")
 @Produces(Array("application/json"))
 protected[registration] trait RegistrationApiDoc {
 
   @GET
+  @Path("/api/v1/registrations/{year}/{month}")
   @Operation(
     summary = "Retrieve registrations",
     parameters = Array(
       new Parameter(
-        in = ParameterIn.QUERY,
+        in = ParameterIn.PATH,
         name = "year",
         required = false,
         schema = new Schema(implementation = classOf[String]),
         example = "2019"),
       new Parameter(
-        in = ParameterIn.QUERY,
+        in = ParameterIn.PATH,
         name = "month",
         required = false,
         schema = new Schema(implementation = classOf[String]),
@@ -38,12 +38,35 @@ protected[registration] trait RegistrationApiDoc {
   def getRegistrations: Route
 
   @GET
-  @Path("/import")
+  @Path("/registrations/{year}/{month}/consolidated")
+  @Operation(
+    summary = "Retrieve consolidated registrations",
+    parameters = Array(
+      new Parameter(
+        in = ParameterIn.PATH,
+        name = "year",
+        required = true,
+        schema = new Schema(implementation = classOf[String]),
+        example = "2019"),
+      new Parameter(
+        in = ParameterIn.PATH,
+        name = "month",
+        required = false,
+        schema = new Schema(implementation = classOf[String]),
+        example = "1")),
+    responses = Array(
+      new ApiResponse(description = "The filenames of the generated, consolidated registrations"),
+      new ApiResponse(responseCode = "404", description = "Registrations not found")))
+  @Tags(Array(new Tag(name = "Registration")))
+  def getConsolidatedRegistrations: Route
+
+  @GET
+  @Path("/api/v1/registrations/import")
   @Operation(
     summary = "Import and store registrations",
     responses = Array(
       new ApiResponse(responseCode = "202", description = "Registrations will be imported"),
       new ApiResponse(responseCode = "404", description = "Could not import registrations")))
   @Tags(Array(new Tag(name = "Registration")))
-  def importRegistrations: Route
+  def importRegistrationsFromSource: Route
 }

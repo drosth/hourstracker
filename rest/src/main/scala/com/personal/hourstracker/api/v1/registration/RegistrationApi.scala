@@ -4,12 +4,14 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+import akka.NotUsed
 import akka.http.scaladsl.common.{ EntityStreamingSupport, JsonEntityStreamingSupport }
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import akka.http.scaladsl.unmarshalling.Unmarshaller
+import akka.stream.scaladsl.{ Flow, Keep, Sink, Source }
 import com.personal.hourstracker.api.v1.domain.RegistrationModel
 import com.personal.hourstracker.config.Configuration
 import com.personal.hourstracker.config.component.{ FacturationComponent, LoggingComponent, RegistrationComponent, SystemComponent }
@@ -57,7 +59,7 @@ trait RegistrationApi extends RegistrationApiProtocol with RegistrationApiDoc wi
 
   import RegistrationApi._
 
-  lazy val registrationRoutes: Route = getConsolidatedRegistrations ~ getRegistrations ~ importRegistrations
+  lazy val registrationRoutes: Route = getConsolidatedRegistrations ~ importRegistrationsFromSource ~ getRegistrations
 
   implicit val jsonStreamingSupport: JsonEntityStreamingSupport =
     EntityStreamingSupport
@@ -86,51 +88,43 @@ trait RegistrationApi extends RegistrationApiProtocol with RegistrationApiDoc wi
     }
   }
 
-  def getConsolidatedRegistrations: Route = {
+  override def getConsolidatedRegistrations: Route = {
     get {
       pathPrefix("registrations") {
         path(Segment / "consolidated") { year =>
           {
             val source = registrationService.fetchRegistrations(request = SelectByYear(year.toInt))
-            complete(registrationService.consolidateRegistrations(source) {
-              _.map {
-                case (job, consolidatedRegistrations) =>
-                  pdfPresenter.renderRegistrationsPerSingleJob(job, consolidatedRegistrations)
-              }.map(_.getAbsolutePath).toList
-            })
+            complete(consolidateRegistrationsFor(source))
           }
         } ~
           path(Segment / Segment / "consolidated") { (year, month) =>
             {
-              val source = registrationService.fetchRegistrations(request = SelectByYearAndMonth(year.toInt, month.toInt))
-              complete(registrationService.consolidateRegistrations(source) {
-                _.map {
-                  case (job, consolidatedRegistrations) =>
-                    pdfPresenter.renderRegistrationsPerSingleJob(job, consolidatedRegistrations)
-                }.map(_.getAbsolutePath).toList
-              })
+              val source: Source[Registration, NotUsed] =
+                registrationService.fetchRegistrations(request = SelectByYearAndMonth(year.toInt, month.toInt))
+              complete(consolidateRegistrationsFor(source))
             }
           }
       }
     }
   }
 
-  override def importRegistrations: Route = path("registrations" / "import") {
-    post {
-      onComplete(registrationService.importRegistrationsFrom(Application.importFrom)) {
-        case Success(importedRegistrations) =>
-          importedRegistrations match {
-            case Right(_) => complete(StatusCodes.Accepted)
+  private def consolidateRegistrationsFor(source: Source[Registration, NotUsed]): Source[List[String], NotUsed] =
+    registrationService.consolidateRegistrations(source) {
+      _.map {
+        case (job, consolidatedRegistrations) =>
+          pdfPresenter.renderRegistrationsPerSingleJob(job, consolidatedRegistrations)
+      }.map(_.getAbsolutePath).toList
+    }
 
-            case Left(message) =>
-              logger.error(message)
-              complete(StatusCodes.NotFound, message)
-          }
+  override def importRegistrationsFromSource: Route = path("registrations" / "import") {
+    get {
+      val source: Source[Either[String, Registration], NotUsed] = registrationService.importRegistrationsFromSource(Application.importFrom)
 
-        case Failure(e) =>
-          logger.error(e.getMessage)
-          complete(StatusCodes.NotFound, e.getMessage)
-      }
+      complete(
+        source
+          .map(_.toOption)
+          .filter(_.isDefined)
+          .map(_.get.convert()))
     }
   }
 }

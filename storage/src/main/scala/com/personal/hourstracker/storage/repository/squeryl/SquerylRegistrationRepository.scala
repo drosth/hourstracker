@@ -12,7 +12,7 @@ import com.personal.hourstracker.service.RegistrationService.{ RegistrationReque
 import com.personal.hourstracker.storage.repository.squeryl.entities.RegistrationEntity
 import com.personal.hourstracker.storage.repository.squeryl.schema.RegistrationSchema
 import org.slf4j.{ Logger, LoggerFactory }
-import org.squeryl.PrimitiveTypeMode.{ transaction, _ }
+import org.squeryl.PrimitiveTypeMode.transaction
 
 class SquerylRegistrationRepository extends RegistrationRepository {
   import RegistrationSchema._
@@ -48,40 +48,46 @@ class SquerylRegistrationRepository extends RegistrationRepository {
   import org.squeryl.PrimitiveTypeMode._
 
   private def selectRegistrationsByYear(year: Int): Registrations = transaction {
-    val lower = Timestamp.valueOf(LocalDateTime.of(year, 1, 1, 0, 0, 0))
-    val upper = Timestamp.valueOf(LocalDateTime.of(year, 1, 1, 0, 0, 0).plusYears(1).minusDays(1))
+    val lower = LocalDateTime.of(year, 1, 1, 0, 0, 0)
+    val upper = LocalDateTime.of(year, 1, 1, 0, 0, 0).plusYears(1).minusSeconds(1)
 
-    registrations.where(r =>
-      (r.clockedIn isNotNull)
-        and (
-          (r.clockedIn.get gt lower) and (r.clockedIn.get lt upper))).toList.map(_.convert)
+    registrations
+      .where(
+        r =>
+          (r.clockedIn isNotNull)
+            and ((r.clockedIn.get gte Timestamp.valueOf(lower)) and (r.clockedIn.get lte Timestamp.valueOf(upper))))
+      .toList
+      .map(_.convert)
   }
 
   private def selectRegistrationsByYearAndMonth(year: Int, month: Int): Registrations = transaction {
-    val lower = Timestamp.valueOf(LocalDateTime.of(year, month, 1, 0, 0, 0))
-    val upper = Timestamp.valueOf(LocalDateTime.of(year, month, 1, 0, 0, 0).plusMonths(1).minusDays(1))
+    val lower = LocalDateTime.of(year, month, 1, 0, 0, 0)
+    val upper = LocalDateTime.of(year, month, 1, 0, 0, 0).plusMonths(1).minusSeconds(1)
 
-    registrations.where(r =>
-      (r.clockedIn isNotNull)
-        and (
-          (r.clockedIn.get gt lower) and (r.clockedIn.get lt upper))).toList.map(_.convert)
+    registrations
+      .where(
+        r =>
+          (r.clockedIn isNotNull)
+            and ((r.clockedIn.get gte Timestamp.valueOf(lower)) and (r.clockedIn.get lte Timestamp.valueOf(upper))))
+      .toList
+      .map(_.convert)
   }
 
   private def findAllRegistrations(): Registrations = transaction {
     registrations.toList.map(_.convert)
   }
 
-  override def save(registration: Registration): Either[String, Long] = transaction {
-    val found: Seq[Registration] = findBy(registration.job, registration.clockedIn, registration.clockedOut)
-    if (found.isEmpty) {
-      Right(registrations.insert(registration.copy(id = None).convert).id)
-    } else {
-      updateRegistration(registration)
+  override def save(registration: Registration): Either[String, Registration] = transaction {
+    findBy(registration.job, registration.clockedIn, registration.clockedOut).headOption match {
+      case None =>
+        Right(registrations.insert(registration.copy(id = None).convert).convert)
+      case Some(found) =>
+        updateRegistration(registration.copy(id = found.id))
     }
   }
 
-  private def updateRegistration(registration: Registration): Either[String, Long] = {
-    def updateEntity(id: Long, entity: RegistrationEntity): Long = transaction {
+  private def updateRegistration(registration: Registration): Either[String, Registration] = {
+    def updateEntity(id: Long, entity: RegistrationEntity): RegistrationEntity = transaction {
       update(registrations)(
         r =>
           where(r.id === id)
@@ -95,12 +101,14 @@ class SquerylRegistrationRepository extends RegistrationRepository {
               r.tags := entity.tags,
               r.totalTimeAdjustment := entity.totalTimeAdjustment,
               r.totalEarningsAdjustment := entity.totalEarningsAdjustment))
-      id
+      entity
     }
 
-    registration.id.map(id => updateEntity(id, registration.convert)) match {
-      case None => Left("Could not update record")
-      case Some(id) => Right(id)
+    registration.id.map(id => updateEntity(id, registration.convert)).map(_.convert) match {
+      case None =>
+        Left(s"Could not update registration #${registration.id}")
+      case Some(registration) =>
+        Right(registration)
     }
   }
 

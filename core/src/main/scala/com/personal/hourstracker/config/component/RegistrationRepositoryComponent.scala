@@ -17,7 +17,7 @@ trait NoopRegistrationRepositoryComponent extends RegistrationRepositoryComponen
   class NoopRegistrationRepository extends RegistrationRepository {
     override def findAll(): Source[Registration, NotUsed] = Source.empty
     override def findByRequest(request: RegistrationRequest): Source[Registration, NotUsed] = Source.empty
-    override def save(entity: Registration): Either[String, Long] = Right(0L)
+    override def save(entity: Registration): Either[String, Registration] = Left("Not implemented")
     override def findById(id: Long): Option[Registration] = None
     override def findBy(job: String, clockedIn: Option[LocalDateTime], clockedOut: Option[LocalDateTime]): Seq[Registration] = Seq.empty
   }

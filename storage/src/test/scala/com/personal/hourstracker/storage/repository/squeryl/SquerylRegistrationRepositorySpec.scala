@@ -15,6 +15,7 @@ import com.personal.hourstracker.storage.repository.squeryl.entities.Registratio
 import com.personal.hourstracker.storage.repository.squeryl.schema.RegistrationSchema
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{ BeforeAndAfterAll, Matchers, Outcome, fixture }
+import org.squeryl.KeyedEntity
 
 import scala.concurrent.ExecutionContext
 
@@ -59,8 +60,8 @@ class SquerylRegistrationRepositorySpec
 
     classUnderTest.save(registration) match {
       case Left(_) => fail("Expected persisted ID")
-      case Right(id) =>
-        val expectedRegistration = registration.copy(id = Some(id))
+      case Right(expectedRegistration) =>
+        val id = expectedRegistration.convert.id
         inTransaction {
           RegistrationSchema.registrations.lookup(id).map(_.convert) shouldEqual Some(expectedRegistration)
         }
@@ -72,10 +73,11 @@ class SquerylRegistrationRepositorySpec
 
     classUnderTest.save(registration) match {
       case Left(_) => fail("Expected persisted ID")
-      case Right(id) =>
+      case Right(expectedRegistration) =>
+        val id = expectedRegistration.convert.id
+
         id shouldNot be(999L)
 
-        val expectedRegistration = registration.copy(id = Some(id))
         inTransaction {
           RegistrationSchema.registrations.lookup(id).map(_.convert) shouldEqual Some(expectedRegistration)
         }
@@ -88,7 +90,8 @@ class SquerylRegistrationRepositorySpec
 
     classUnderTest.save(registration) match {
       case Left(_) => fail("Expected persisted ID")
-      case Right(id) =>
+      case Right(expectedRegistration) =>
+        val id = expectedRegistration.convert.id
         id shouldEqual insertedEntity.id
         inTransaction {
           RegistrationSchema.registrations.lookup(id).map(_.convert) shouldEqual Some(registration)
