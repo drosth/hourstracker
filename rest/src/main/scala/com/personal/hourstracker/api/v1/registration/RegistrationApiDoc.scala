@@ -2,18 +2,19 @@ package com.personal.hourstracker.api.v1.registration
 
 import akka.http.scaladsl.server.Route
 import com.personal.hourstracker.api.v1.domain.RegistrationModel.RegistrationModels
-import io.swagger.v3.oas.annotations.{ Operation, Parameter }
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{ Content, Schema }
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.{ Tag, Tags }
-import javax.ws.rs.{ GET, POST, Path, PathParam, Produces }
+import io.swagger.v3.oas.annotations.{ Operation, Parameter }
+import javax.ws.rs.{ GET, Path, Produces }
 
+@Path("/api/v1")
 @Produces(Array("application/json"))
 protected[registration] trait RegistrationApiDoc {
 
   @GET
-  @Path("/api/v1/registrations/{year}/{month}")
+  @Path("/registrations/{year}/{month}")
   @Operation(
     summary = "Retrieve registrations",
     parameters = Array(
@@ -61,7 +62,7 @@ protected[registration] trait RegistrationApiDoc {
   def getConsolidatedRegistrations: Route
 
   @GET
-  @Path("/api/v1/registrations/import")
+  @Path("/registrations/import")
   @Operation(
     summary = "Import and store registrations",
     responses = Array(

@@ -49,8 +49,13 @@ class RegistrationApiSpec
   it should "be able to import registrations" in {
     givenImportingRegistrationsIsSuccessful()
 
-    Post(s"/registrations/import") ~> registrationRoutes ~> check {
-      status shouldEqual StatusCodes.Accepted
+    Get(s"/registrations/import") ~> registrationRoutes ~> check {
+      status shouldEqual StatusCodes.OK
+      responseAs[Seq[RegistrationModel]] shouldBe Seq(
+        registrationInLastDayOfPreviousMonth,
+        registrationInFirstDayOfCurrentMonth,
+        registrationInLastDayOfCurrentMonth,
+        registrationInFirstDayOfNextMonth).map(_.convert())
     }
   }
 
@@ -142,6 +147,7 @@ class RegistrationApiSpec
         registrationInFirstDayOfNextYear)
 
     def givenImportingRegistrationsIsSuccessful() =
-      when(registrationService.importRegistrationsFrom(any[String])).thenReturn(Future.successful(Right(4)))
+      when(registrationService.importRegistrationsFromSource(any[String])).thenReturn( // Future.successful(Right(4))
+        Source.fromIterator(() => registrationsWithMonthlyBoundaries.map(Right.apply).iterator))
   }
 }

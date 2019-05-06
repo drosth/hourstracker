@@ -12,7 +12,7 @@ task compile {
     }
 }
 
-task test {
+task test(dependsOn: [compile]) {
     description 'test the compiled source code using a suitable unit testing framework. These tests should not require the code be packaged or deployed'
     group 'lifecycle'
 
@@ -28,7 +28,7 @@ task test {
 
 test.mustRunAfter compile
 
-task install {
+task install(dependsOn: [test]) {
     description 'take the compiled code and package it in its distributable format, such as a JAR.'
     group 'lifecycle'
 
