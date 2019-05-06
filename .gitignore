@@ -9,3 +9,6 @@ resources/
 
 # Ignore data files
 data/
+
+# Visual Paradigm
+docs/*.vpp.bak*
