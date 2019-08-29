@@ -8,6 +8,7 @@
  
 ### Import updated registered hours
 
+1. [#start-application](Start application)
 1. Update file: `resources/import/CSVExport.csv`
 1. In a browser open: <br/> [http://0.0.0.0:9080/api/v1/registrations/import][http://0.0.0.0:9080/api/v1/registrations/import]
 1. or, when using the shell, execute: <br/>
@@ -20,8 +21,8 @@
 
 ### Download registered hours as .PDF file
 
-1. Start application
-1. Import updated registered hours
+1. [#start-application](Start application)
+1. [#import-updated-registered-hours](Import updated registered hours)
 1. Retrieve the so called 'consolidated registrations':
     1. In a browser open: <br/>```http://0.0.0.0:9080/api/v1/registrations/{year}/{month}/consolidated```, <br/>for instance: [http://0.0.0.0:9080/api/v1/registrations/2019/1/consolidated](http://0.0.0.0:9080/api/v1/registrations/2019/1/consolidated)
     
