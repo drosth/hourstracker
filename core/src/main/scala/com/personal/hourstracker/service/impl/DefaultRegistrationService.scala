@@ -1,20 +1,15 @@
 package com.personal.hourstracker.service.impl
 
-import java.io.File
 import java.util.Locale
 
 import akka.NotUsed
-import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{ Flow, Sink, Source }
-import com.personal.hourstracker.Application.consolidatedRegistrationService
-import com.personal.hourstracker.config.component.FacturationComponent
 import com.personal.hourstracker.domain.ConsolidatedRegistration.ConsolidatedRegistrationsPerJob
 import com.personal.hourstracker.domain.Registration
 import com.personal.hourstracker.domain.Registration.Registrations
 import com.personal.hourstracker.repository.RegistrationRepository
 import com.personal.hourstracker.service.RegistrationService.RegistrationRequest
-import com.personal.hourstracker.service.{ FacturationService, ImporterService, RegistrationService }
+import com.personal.hourstracker.service.{ ConsolidatedRegistrationService, FacturationService, ImporterService, RegistrationService }
 import org.slf4j.Logger
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -22,7 +17,8 @@ import scala.concurrent.{ ExecutionContext, Future }
 class DefaultRegistrationService(
   registrationRepository: RegistrationRepository,
   importService: ImporterService,
-  facturationService: FacturationService)(
+  facturationService: FacturationService,
+  consolidatedRegistrationService: ConsolidatedRegistrationService)(
   implicit
   logger: Logger,
   locale: Locale,
@@ -43,13 +39,14 @@ class DefaultRegistrationService(
       }
   }
 
-  val storeRegistration: Flow[Registration, Either[String, Registration], NotUsed] = Flow[Registration].map(r =>
-    registrationRepository.save(r) match {
-      case Left(message) =>
-        Left(s"Could not persist registration: $message")
+  val storeRegistration: Flow[Registration, Either[String, Registration], NotUsed] = Flow[Registration].map(
+    r =>
+      registrationRepository.save(r) match {
+        case Left(message) =>
+          Left(s"Could not persist registration: $message")
 
-      case Right(registration) => Right(registration)
-    })
+        case Right(registration) => Right(registration)
+      })
 
   override def importRegistrationsFromSource(fileName: String): Source[Either[String, Registration], NotUsed] = {
     logger.info(s"Importing registrations from: '$fileName' to Source")

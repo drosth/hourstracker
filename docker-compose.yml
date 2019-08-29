@@ -3,11 +3,11 @@ version: '2.4'
 services:
   hourstracker:
     build:
-      context: rest
-      dockerfile: Dockerfile
-      args:
-        TARGET_DIR: /opt/webapp
-    image: hourstracker
+      context: .
+      dockerfile: rest/Dockerfile
+#      args:
+#        TARGET_DIR: /opt/webapp
+    image: hourstracker-rest
     container_name: hourstracker
     depends_on:
       registration-storage:

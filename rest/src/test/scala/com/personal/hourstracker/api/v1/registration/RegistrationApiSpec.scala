@@ -9,13 +9,15 @@ import akka.stream.scaladsl.Source
 import com.personal.hourstracker.api.v1.ApiSpec
 import com.personal.hourstracker.api.v1.domain.RegistrationModel
 import com.personal.hourstracker.config.component._
+import com.personal.hourstracker.config.module.{ ImporterModule, RegistrationModule }
 import com.personal.hourstracker.domain.ConsolidatedRegistration.ConsolidatedRegistrations
 import com.personal.hourstracker.domain.{ ConsolidatedRegistration, Registration }
 import com.personal.hourstracker.domain.Registration.Registrations
 import com.personal.hourstracker.repository.RegistrationRepository
 import com.personal.hourstracker.service.RegistrationService.{ SelectByYear, SelectByYearAndMonth }
 import com.personal.hourstracker.service.presenter.ConsolidatedRegistrationsPdfPresenter
-import com.personal.hourstracker.service.presenter.config.HtmlPresenterComponent
+import com.personal.hourstracker.service.presenter.config.component.HtmlPresenterComponent
+import com.personal.hourstracker.service.presenter.config.module.PresenterModule
 import com.personal.hourstracker.service.{ ImporterService, RegistrationService }
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers._
@@ -26,12 +28,9 @@ import scala.concurrent.Future
 class RegistrationApiSpec
   extends ApiSpec
   with RegistrationApi
-  with FacturationComponent
-  with ConsolidatedRegistrationsPdfPresenter
-  with HtmlPresenterComponent
-  with RegistrationComponent
-  with RegistrationRepositoryComponent
-  with ImporterServiceComponent
+  with RegistrationModule
+  with ImporterModule
+  with PresenterModule
   with LoggingComponent
   with SystemComponent {
 

@@ -5,7 +5,7 @@ import java.io.File
 import com.personal.hourstracker.config.Configuration
 import com.personal.hourstracker.config.component.LoggingComponent
 import com.personal.hourstracker.domain.ConsolidatedRegistration.{ ConsolidatedRegistrations, ConsolidatedRegistrationsPerJob }
-import com.personal.hourstracker.service.presenter.config.{ HtmlPresenterComponent, PdfPresenter }
+import com.personal.hourstracker.service.presenter.config.component.{ HtmlPresenterComponent, PdfPresenter }
 import io.github.cloudify.scala.spdf.{ Pdf, PdfConfig, Portrait }
 
 trait ConsolidatedRegistrationsPdfPresenter extends PdfPresenter[ConsolidatedRegistrationsPerJob] {

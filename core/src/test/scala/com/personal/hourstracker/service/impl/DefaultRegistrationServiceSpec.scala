@@ -9,10 +9,10 @@ import akka.stream.testkit.scaladsl.TestSink
 import com.personal.hourstracker.domain.Registration
 import com.personal.hourstracker.repository.RegistrationRepository
 import com.personal.hourstracker.service.RegistrationService.{ RegistrationRequest, SelectByYear, SelectByYearAndMonth }
-import com.personal.hourstracker.service.{ FacturationService, ImporterService, RegistrationService }
+import com.personal.hourstracker.service.{ ConsolidatedRegistrationService, FacturationService, ImporterService, RegistrationService }
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{ BeforeAndAfter, Matchers, Outcome, fixture }
+import org.scalatest.{ fixture, BeforeAndAfter, Matchers, Outcome }
 import org.slf4j.Logger
 
 import scala.concurrent.duration._
@@ -29,12 +29,13 @@ class DefaultRegistrationServiceSpec extends fixture.FlatSpec with BeforeAndAfte
   private val importerService = mock[ImporterService]
   private val registrationRepository = mock[RegistrationRepository]
   private val facturationService: FacturationService = mock[FacturationService]
+  private val consolidatedRegistrationService: ConsolidatedRegistrationService = mock[ConsolidatedRegistrationService]
 
   override type FixtureParam = RegistrationService
 
   override protected def withFixture(test: OneArgTest): Outcome = {
-    reset(logger, importerService, registrationRepository, facturationService)
-    test(new DefaultRegistrationService(registrationRepository, importerService, facturationService))
+    reset(logger, importerService, registrationRepository, facturationService, consolidatedRegistrationService)
+    test(new DefaultRegistrationService(registrationRepository, importerService, facturationService, consolidatedRegistrationService))
   }
 
   behavior of "Importing registrations"
@@ -66,7 +67,10 @@ class DefaultRegistrationServiceSpec extends fixture.FlatSpec with BeforeAndAfte
     val registration = mock[Registration]
     when(registrationRepository.findAll()).thenReturn(Source.fromIterator(() => List(registration).iterator))
 
-    classUnderTest.fetchRegistrations().runWith(TestSink.probe[Registration]).request(1)
+    classUnderTest
+      .fetchRegistrations()
+      .runWith(TestSink.probe[Registration])
+      .request(1)
       .expectNext(registration)
       .expectComplete()
   }
@@ -77,7 +81,10 @@ class DefaultRegistrationServiceSpec extends fixture.FlatSpec with BeforeAndAfte
     val registration = mock[Registration]
     when(registrationRepository.findByRequest(request)).thenReturn(Source.fromIterator(() => List(registration).iterator))
 
-    classUnderTest.fetchRegistrations(request).runWith(TestSink.probe[Registration]).request(1)
+    classUnderTest
+      .fetchRegistrations(request)
+      .runWith(TestSink.probe[Registration])
+      .request(1)
       .expectNext(registration)
       .expectComplete()
   }
@@ -88,7 +95,10 @@ class DefaultRegistrationServiceSpec extends fixture.FlatSpec with BeforeAndAfte
     val registration = mock[Registration]
     when(registrationRepository.findByRequest(request)).thenReturn(Source.fromIterator(() => List(registration).iterator))
 
-    classUnderTest.fetchRegistrations(request).runWith(TestSink.probe[Registration]).request(1)
+    classUnderTest
+      .fetchRegistrations(request)
+      .runWith(TestSink.probe[Registration])
+      .request(1)
       .expectNext(registration)
       .expectComplete()
   }

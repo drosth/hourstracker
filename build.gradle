@@ -1,3 +1,5 @@
+apply from: "./gradle/docker.gradle"
+
 task compile {
     description 'compile the source code of the project'
     group 'lifecycle'
@@ -47,42 +49,17 @@ task install(dependsOn: [test]) {
 
 install.mustRunAfter test
 
-task runDocker(dependsOn:[install]) {
-    description 'Run Docker image'
-    group 'docker'
+task start(dependsOn:[install]) {
+    description 'Start webserver'
+    group 'webserver'
 
     doLast {
-        println 'Running docker...'
+        println 'Running webserver...'
         exec {
-            executable 'docker-compose'
-            args 'up'
-            args '-d'
-        }
-        exec {
-            executable 'docker-compose'
-            args 'ps'
+            executable 'sbt'
+            args 'rest/run'
         }
     }
 }
 
-runDocker.mustRunAfter install
-
-task stopDocker {
-    description 'Stop Docker image'
-    group 'docker'
-
-    doLast {
-        println 'Stopping docker...'
-        exec {
-            executable 'docker-compose'
-            args 'down'
-        }
-    }
-}
-
-runDocker.mustRunAfter stopDocker
-
-task restartDocker(dependsOn: [stopDocker, install, runDocker]) {
-    description 'Restart Docker image'
-    group 'docker'
-}
+start.mustRunAfter install

@@ -7,13 +7,13 @@ import akka.actor.ActorSystem
 import com.personal.hourstracker.domain.Registration
 import com.personal.hourstracker.repository.RegistrationRepository
 import com.personal.hourstracker.service.impl.DefaultRegistrationService
-import com.personal.hourstracker.service.{ FacturationService, ImporterService, RegistrationService }
+import com.personal.hourstracker.service.{ ConsolidatedRegistrationService, FacturationService, ImporterService, RegistrationService }
 import cucumber.api.DataTable
 import cucumber.api.scala.{ EN, ScalaDsl }
 import org.mockito.Mockito._
+import org.scalatest.Matchers
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{ BeforeAndAfter, Matchers }
 import org.slf4j.Logger
 
 import scala.concurrent.duration._
@@ -30,7 +30,10 @@ class RegistrationsSteps extends ScalaDsl with EN with Matchers with MockitoSuga
   private val registrationRepository: RegistrationRepository = mock[RegistrationRepository]
   private val importService: ImporterService = mock[ImporterService]
   private val facturationService: FacturationService = mock[FacturationService]
-  private val registrationService: RegistrationService = new DefaultRegistrationService(registrationRepository, importService, facturationService)
+  private val consolidatedRegistrationService: ConsolidatedRegistrationService = mock[ConsolidatedRegistrationService]
+
+  private val registrationService: RegistrationService =
+    new DefaultRegistrationService(registrationRepository, importService, facturationService, consolidatedRegistrationService)
 
   Given("""^a CSV file named '(.*)' with the following registrations:$""") { (fileName: String, dataTable: DataTable) =>
     val dateTimeFormatter = new SimpleDateFormat("dd/MM/yyyy hh:mm")

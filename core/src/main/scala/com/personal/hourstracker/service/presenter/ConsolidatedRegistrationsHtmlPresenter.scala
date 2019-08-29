@@ -5,8 +5,8 @@ import java.io.File
 import com.personal.hourstracker.config.component.LoggingComponent
 import com.personal.hourstracker.config.Configuration
 import com.personal.hourstracker.domain.ConsolidatedRegistration.{ ConsolidatedRegistrations, ConsolidatedRegistrationsPerJob }
-import com.personal.hourstracker.service.presenter.config.HtmlPresenter
 import com.personal.hourstracker.consolidated.presenter
+import com.personal.hourstracker.service.presenter.config.component.HtmlPresenter
 
 trait ConsolidatedRegistrationsHtmlPresenter extends HtmlPresenter[ConsolidatedRegistrationsPerJob] with Configuration {
   this: LoggingComponent =>

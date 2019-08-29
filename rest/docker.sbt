@@ -5,6 +5,7 @@ enablePlugins(
 )
 
 dockerBaseImage := "openjdk:8-jre-alpine"
+dockerExposedPorts := Seq(8080)
 
 dockerAliases ++= Set(
   dockerAlias.value.withTag(Some("latest")),
@@ -13,3 +14,4 @@ dockerAliases ++= Set(
 
 maintainer in Docker := "h.drost@gmail.com"
 packageName in Docker := name.value
+

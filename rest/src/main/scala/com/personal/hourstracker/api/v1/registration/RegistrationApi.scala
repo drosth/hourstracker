@@ -5,7 +5,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 import akka.NotUsed
-import akka.http.scaladsl.common.{EntityStreamingSupport, JsonEntityStreamingSupport}
+import akka.http.scaladsl.common.{ EntityStreamingSupport, JsonEntityStreamingSupport }
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
@@ -13,9 +13,9 @@ import akka.http.scaladsl.unmarshalling.Unmarshaller
 import akka.stream.scaladsl.Source
 import com.personal.hourstracker.api.v1.domain.RegistrationModel
 import com.personal.hourstracker.config.Configuration
-import com.personal.hourstracker.config.component.{FacturationComponent, LoggingComponent, RegistrationComponent, SystemComponent}
+import com.personal.hourstracker.config.component.{ FacturationComponent, LoggingComponent, RegistrationComponent, SystemComponent }
 import com.personal.hourstracker.domain.Registration
-import com.personal.hourstracker.service.RegistrationService.{SelectByYear, SelectByYearAndMonth}
+import com.personal.hourstracker.service.RegistrationService.{ SelectByYear, SelectByYearAndMonth }
 import com.personal.hourstracker.service.presenter.ConsolidatedRegistrationsPdfPresenter
 
 object RegistrationApi {

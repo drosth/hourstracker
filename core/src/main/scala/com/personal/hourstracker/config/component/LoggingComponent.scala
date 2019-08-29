@@ -1,7 +1,7 @@
 package com.personal.hourstracker.config.component
 
-import org.slf4j.{ Logger, LoggerFactory }
+import org.slf4j.Logger
 
 trait LoggingComponent {
-  implicit val logger: Logger = LoggerFactory.getLogger("com.personal.hourstracker")
+  implicit def logger: Logger
 }

@@ -1,25 +1,22 @@
 FROM openjdk:8
-# Download and install wkhtmltopdf
-RUN apt-get update \
-    && apt-get install -y \
-        curl \
+
+RUN apt-get -q update \
+    && apt-get install -qy --no-install-recommends \
         xfonts-base \
         xfonts-75dpi \
-    && apt-get clean
+    && apt-get -q clean update
 
-RUN curl "https://downloads.wkhtmltopdf.org/0.12/0.12.5/wkhtmltox_0.12.5-1.stretch_amd64.deb" -L -o "wkhtmltopdf.deb"
-RUN dpkg -i ./wkhtmltopdf.deb
+ADD third-party/wkhtmltox_0.12.5-1.stretch_amd64.deb /tmp
+
+# Download and install wkhtmltopdf
+
+# RUN wget -nv -O "/tmp/wkhtmltox.deb" "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.stretch_amd64.deb"
+RUN apt-get -qy install "/tmp/wkhtmltox_0.12.5-1.stretch_amd64.deb"
 RUN apt-get install -f
-RUN rm -rf wkhtmlto*
 
-#FROM openjdk:8
 LABEL MAINTAINER="h.drost@gmail.com"
-# working dir
-ARG TARGET_DIR
-
-WORKDIR ${TARGET_DIR}
-ADD --chown=daemon:daemon target/docker/stage/opt/docker ${TARGET_DIR}
+WORKDIR /opt/docker
+ADD --chown=daemon:daemon rest/target/docker/stage/opt /opt
 USER daemon
-
-ENTRYPOINT ["./bin/hourstracker-rest"]
+ENTRYPOINT ["/opt/docker/bin/hourstracker-rest"]
 CMD []
