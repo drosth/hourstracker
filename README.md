@@ -33,4 +33,10 @@
 | ```curl``` |  ```curl --request GET --url http://0.0.0.0:9080/api/v1/registrations/{year}/{month}/consolidated``` | ```curl --request GET --url http://0.0.0.0:9080/api/v1/registrations/2019/1/consolidated``` |
 | ```http``` |  ```http GET http://0.0.0.0:9080/api/v1/registrations/{year}/{month}/consolidated```                 |  ```http GET http://0.0.0.0:9080/api/v1/registrations/2019/1/consolidated```                |
 | ```wget``` |  ```wget http://0.0.0.0:9080/api/v1/registrations/{year}/{month}/consolidated```                     |  ```wget http://0.0.0.0:9080/api/v1/registrations/2019/1/consolidated```                    |
- 
+
+N.B.: when done, the location of the generated .PDF files will be shown in JSON format, for example: <br/> 
+```
+[
+    ["/opt/resources/export/[Timesheet] - de Persgroep Online Services - DPES004 - jan-2019.pdf"]
+]
+```
