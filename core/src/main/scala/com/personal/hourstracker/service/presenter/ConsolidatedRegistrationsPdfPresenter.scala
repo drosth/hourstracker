@@ -27,6 +27,10 @@ trait ConsolidatedRegistrationsPdfPresenter extends PdfPresenter[ConsolidatedReg
     })
 
     override val renderRegistrationsPerJobs: ConsolidatedRegistrationsPerJob => Seq[File] = registrationsPerJob => {
+      logger.info(s"Rendering to HTML")
+      htmlPresenter.renderRegistrationsPerJobs(registrationsPerJob)
+      logger.info(s"Done rendering to HTML")
+
       registrationsPerJob.map {
         case (job, registrations) => renderRegistrationsPerSingleJob(job, registrations)
       }.toSeq
@@ -34,9 +38,23 @@ trait ConsolidatedRegistrationsPdfPresenter extends PdfPresenter[ConsolidatedReg
 
     override def renderRegistrationsPerSingleJob(job: String, registrations: ConsolidatedRegistrations): File = {
       logger.info(s"Rendering #${registrations.size} consolidated registrations to PDF")
+      logger.debug(registrations.toString())
 
       val outputFile = new File(fileName(job, registrations, ".pdf"))
-      pdf.run(htmlPresenter.renderConsolidatedRegistrations(registrations), outputFile)
+
+      val exists = outputFile.exists()
+      logger.debug(s"'${outputFile.getAbsolutePath}' exists? (${if (exists) "yes" else "NO"})")
+
+      val makeWritable = outputFile.setWritable(true)
+      logger.debug(s"'${outputFile.getAbsolutePath}' could make writable? (${if (makeWritable) "yes" else "NO"})")
+
+      val canWrite = outputFile.canWrite()
+      logger.debug(s"'${outputFile.getAbsolutePath}' can write to file? (${if (canWrite) "yes" else "NO"})")
+
+      val rendered: String = htmlPresenter.renderConsolidatedRegistrations(registrations)
+
+      logger.debug(s"writing to .PDF")
+      pdf.run(rendered, outputFile)
       outputFile
     }
   }

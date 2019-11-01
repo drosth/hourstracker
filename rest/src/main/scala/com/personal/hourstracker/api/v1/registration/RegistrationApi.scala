@@ -109,6 +109,7 @@ trait RegistrationApi extends RegistrationApiProtocol with RegistrationApiDoc wi
     registrationService.consolidateRegistrations(source) {
       _.map {
         case (job, consolidatedRegistrations) =>
+          logger.info(s"Rendering ${consolidatedRegistrations.size} registrations for job - '${job}'")
           pdfPresenter.renderRegistrationsPerSingleJob(job, consolidatedRegistrations)
       }.map(_.getAbsolutePath).toList
     }

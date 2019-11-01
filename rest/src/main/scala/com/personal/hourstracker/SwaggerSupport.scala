@@ -17,7 +17,7 @@ abstract class SwaggerSupport(url: String, path: String, apiVersion: String, ove
   //  def securitySchemes: Map[String, SecurityScheme] = Map.empty
   override val externalDocs: Option[ExternalDocumentation] = None
   override val vendorExtensions: Map[String, Object] = Map.empty
-  override val unwantedDefinitions = Seq("Function1RequestContextFutureRouteResult")
+  override val unwantedDefinitions = Seq("Function1RequestContextFutureRouteResult", "Function1")
 
   /*
   override val securitySchemeDefinitions = Map(

@@ -10,7 +10,7 @@
 
 1. [Start application](#start-application)
 1. Update file: `resources/import/CSVExport.csv`
-1. In a browser open: <br/> [http://0.0.0.0:9080/api/v1/registrations/import][http://0.0.0.0:9080/api/v1/registrations/import]
+1. In a browser open: <br/> [http://0.0.0.0:9080/api/v1/registrations/import](http://0.0.0.0:9080/api/v1/registrations/import)
 1. or, when using the shell, execute: <br/>
 
 | using      | execute                                                                         |

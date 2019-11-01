@@ -15,7 +15,7 @@ class DefaultConsolidatedRegistrationService(implicit logger: Logger, executionC
   extends ConsolidatedRegistrationService {
 
   lazy implicit val localDateOrdering: Ordering[LocalDate] = Ordering.by(_.toEpochDay)
-  private lazy val dateFormatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE
+
   private lazy val asConsolidatedRegistration: Registration => ConsolidatedRegistration = registration =>
     ConsolidatedRegistration(
       registration.clockedIn.get.toLocalDate,

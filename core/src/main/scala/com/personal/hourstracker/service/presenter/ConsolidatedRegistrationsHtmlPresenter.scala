@@ -16,9 +16,13 @@ trait ConsolidatedRegistrationsHtmlPresenter extends HtmlPresenter[ConsolidatedR
   class ConsolidatedRegistrationsHtmlPresenter extends HtmlPresenter[ConsolidatedRegistrationsPerJob] with Configuration {
 
     override val renderConsolidatedRegistrations: ConsolidatedRegistrations => String = consolidatedRegistrations => {
+      logger.info(s"ConsolidatedRegistrationsHtmlPresenter should be writing to: ${Application.exportTo}")
+
       val model: Model = Model(
         consultantName = Application.consultantName,
         registrations = consolidatedRegistrations)
+
+      logger.debug(s"ConsolidatedRegistrationsHtmlPresenter:renderConsolidatedRegistrations - consolidatedRegistrations = $consolidatedRegistrations")
 
       presenter.html.index.render(model).toString()
     }
