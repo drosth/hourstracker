@@ -12,3 +12,5 @@ data/
 
 # Visual Paradigm
 docs/*.vpp.bak*
+resources/import
+resources/export
