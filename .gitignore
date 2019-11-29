@@ -5,7 +5,7 @@
 build
 
 # Ignore resources
-resources/
+./resources/
 
 # Ignore data files
 data/
