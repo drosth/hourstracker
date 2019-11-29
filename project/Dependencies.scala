@@ -52,18 +52,23 @@ object Dependencies {
   val rxscala = "io.reactivex" %% "rxscala" % "0.26.5"
   val zip4j = "net.lingala.zip4j" % "zip4j" % "1.3.2"
   val `spring-scala` = "org.springframework.scala" % "spring-scala" % "1.0.0.M2"
+  val `commons-dbcp2` = "org.apache.commons" % "commons-dbcp2" % "2.7.0"
+
   // Cucumber libraries
   val `cucumber-core` = "io.cucumber" % "cucumber-core" % cucumberVersion
   val `cucumber-junit` = "io.cucumber" % "cucumber-junit" % cucumberVersion
   val `cucumber-jvm` = "io.cucumber" % "cucumber-jvm" % cucumberVersion
   val `cucumber-runner` = "com.waioeka.sbt" %% "cucumber-runner" % cucumberRunnerVersion
   val `cucumber-scala` = "io.cucumber" %% "cucumber-scala" % cucumberVersion
+
   // database
   val squeryl = "org.squeryl" %% "squeryl" % "0.9.5-7"
   val h2 = "com.h2database" % "h2" % "1.4.197"
   val `mysql-connector-java` = "mysql" % "mysql-connector-java" % "8.0.13"
   val logback = "ch.qos.logback" % "logback-classic" % logbackVersion
   val spdf = "io.github.cloudify" %% "spdf" % spdfVersion
+  val postgresql = "org.postgresql" % "postgresql" % "42.2.8"
+
   // Test libraries
   val scalatest = "org.scalatest" %% "scalatest" % scalatestVersion
   val `mockito-core` = "org.mockito" % "mockito-core" % mockitoVersion

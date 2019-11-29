@@ -9,6 +9,10 @@ trait StorageConfiguration extends Configuration {
       lazy val password: String = config.getString(s"$Namespace.storage.registrations.user.password")
       lazy val url: String = config.getString(s"$Namespace.storage.registrations.db.connectionString")
       lazy val driver: String = config.getString(s"$Namespace.storage.registrations.db.driver")
+
+      object ConnectionPool {
+        lazy val initialSize: Int = config.getInt(s"$Namespace.storage.registrations.db.connectionpool.initialSize")
+      }
     }
   }
 }

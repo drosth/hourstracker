@@ -5,6 +5,7 @@ import akka.stream.ActorMaterializer
 import com.personal.hourstracker.config.Configuration
 import com.personal.hourstracker.config.component.{ LoggingComponent, SystemComponent }
 import com.personal.hourstracker.service.presenter.config.module.PresenterModule
+import com.personal.hourstracker.storage.config.module.StorageModule
 import org.slf4j.{ Logger, LoggerFactory }
 
 import scala.concurrent.ExecutionContext

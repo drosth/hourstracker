@@ -11,29 +11,45 @@ object RegistrationSchema extends Schema {
 
   private lazy val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  private def nameToTableMap(): Map[String, Table[_]] = {
+  /*
+  private val retrieveAvailableTablesAsMap: Map[String, Table[_]] = {
     transaction {
       tables
         .map(table => {
-          println(s"Table present: $table")
+          logger.info(s"Table present: $table")
           table
         })
-        .map(table => table.name -> table).toMap
+        .map(table => table.name.toUpperCase -> table)
+        .toMap
     }
   }
+  */
 
-  def initialize(): Unit =
-    if (!nameToTableMap().contains("REGISTRATION")) {
-      transaction {
-        logger.info("Create Registration schema")
-        RegistrationSchema.create
-      }
-    }
+  def initialize(): Unit = transaction {
+    logger.info("Initializing schema")
+    RegistrationSchema.create
+  }
+
+  //  def initialize(): Unit = {
+  //    logger.info("Initializing schema")
+  //
+  //    transaction {
+  //      tables.find(_.name.toLowerCase == "registration") match {
+  //        case None =>
+  //          logger.info("Table 'registration' not present in schema")
+  //          RegistrationSchema.create
+  //
+  //        case Some(table) =>
+  //          val fields = table.posoMetaData.fieldsMetaData
+  //          logger.info(s"Table 'registration' IS present in schema with fields: ${fields.map(_.columnName).mkString(", ")}")
+  //      }
+  //    }
+  //  }
 
   implicit def localDateTimeToTimestamp(source: LocalDateTime): Timestamp =
     Timestamp.valueOf(source)
 
-  val registrations: Table[RegistrationEntity] = table[RegistrationEntity]("REGISTRATION")
+  val registrations: Table[RegistrationEntity] = table[RegistrationEntity]("registration")
 
   on(registrations)(r => declare(r.job is indexed, columns(r.job, r.clockedIn, r.clockedOut) are (indexed, unique)))
 }

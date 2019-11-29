@@ -54,7 +54,9 @@ lazy val storage = (project in file("storage"))
       Dependencies.`akka-stream`,
       Dependencies.squeryl,
       Dependencies.`mysql-connector-java`,
-      Dependencies.h2
+      Dependencies.postgresql,
+      Dependencies.`commons-dbcp2`,
+      Dependencies.h2 % "test"
     )
   )
 

@@ -12,7 +12,7 @@ import com.personal.hourstracker.config.module.WebModule
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-object WebServer extends App with ApiV1 with WebModule {
+object HourstrackerAPI extends App with ApiV1 with WebModule {
 
   private val corsSettings = CorsSettings.defaultSettings
     .withAllowedOrigins(HttpOriginRange.*)
