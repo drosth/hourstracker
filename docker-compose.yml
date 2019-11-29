@@ -17,7 +17,8 @@ services:
     environment:
       IMPORT_FROM: '/opt/resources/import/CSVExport.csv'
       EXPORT_TO: '/opt/resources/export'
-      JDBC_DATABASE_URL: 'jdbc:mysql://registration-storage/hourstracker?autoReconnect=true&useSSL=false&defaultReadOnly=false'
+      DATABASE_URL: 'jdbc:mysql://registration-storage/hourstracker?autoReconnect=true&useSSL=false&defaultReadOnly=false'
+      DATABASE_DRIVER: 'com.mysql.cj.jdbc.Driver'
 
   swagger-ui:
     image: swaggerapi/swagger-ui:v3.19.3

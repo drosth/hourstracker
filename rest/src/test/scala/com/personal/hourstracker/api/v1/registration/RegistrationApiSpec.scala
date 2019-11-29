@@ -1,29 +1,22 @@
 package com.personal.hourstracker.api.v1.registration
 
-import java.time.{ LocalDate, LocalDateTime }
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-import akka.NotUsed
-import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.model.{ContentTypes, HttpEntity, Multipart, StatusCodes}
 import akka.stream.scaladsl.Source
 import com.personal.hourstracker.api.v1.ApiSpec
 import com.personal.hourstracker.api.v1.domain.RegistrationModel
 import com.personal.hourstracker.config.component._
-import com.personal.hourstracker.config.module.{ ImporterModule, RegistrationModule }
-import com.personal.hourstracker.domain.ConsolidatedRegistration.ConsolidatedRegistrations
-import com.personal.hourstracker.domain.{ ConsolidatedRegistration, Registration }
+import com.personal.hourstracker.config.module.{ImporterModule, RegistrationModule}
+import com.personal.hourstracker.domain.Registration
 import com.personal.hourstracker.domain.Registration.Registrations
 import com.personal.hourstracker.repository.RegistrationRepository
-import com.personal.hourstracker.service.RegistrationService.{ SelectByYear, SelectByYearAndMonth }
-import com.personal.hourstracker.service.presenter.ConsolidatedRegistrationsPdfPresenter
-import com.personal.hourstracker.service.presenter.config.component.HtmlPresenterComponent
+import com.personal.hourstracker.service.RegistrationService.{SelectByYear, SelectByYearAndMonth}
 import com.personal.hourstracker.service.presenter.config.module.PresenterModule
-import com.personal.hourstracker.service.{ ImporterService, RegistrationService }
-import org.mockito.ArgumentMatchers
+import com.personal.hourstracker.service.{ImporterService, RegistrationService}
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
-
-import scala.concurrent.Future
 
 class RegistrationApiSpec
   extends ApiSpec
@@ -92,6 +85,29 @@ class RegistrationApiSpec
     Get(s"/registrations/$year/$month") ~> registrationRoutes ~> check {
       status shouldEqual StatusCodes.OK
       responseAs[List[RegistrationModel]] shouldBe registrations.map(_.convert())
+    }
+  }
+
+  behavior of "Uploading registrations"
+
+  it should "behave" in {
+    givenImportingRegistrationsIsSuccessful()
+
+    val multipartForm =
+      Multipart.FormData(Multipart.FormData.BodyPart.Strict(
+        "csv",
+        HttpEntity(
+          ContentTypes.`text/plain(UTF-8)`,
+          //          "2,3,5\n7,11,13,17,23\n29,31,37\n"
+          """sep=,
+            |"Job","Clocked In","Clocked Out","Duration","Hourly Rate","Earnings","Comment","Tags","Breaks","Adjustments","TotalTimeAdjustment","TotalEarningsAdjustment"
+            |"Johan Enschedé","14/11/2011 10:45","14/11/2011 17:49","7","74,38","520,66","","","","","",""
+            |""".stripMargin),
+        Map("filename" -> "exported.csv")))
+
+    Post("/registrations/upload", multipartForm) ~> registrationRoutes ~> check {
+      status shouldEqual StatusCodes.OK
+      //      responseAs[String] shouldEqual "Sum: 178"
     }
   }
 
