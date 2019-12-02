@@ -18,7 +18,8 @@ import com.personal.hourstracker.config.Configuration
 import com.personal.hourstracker.config.component.{FacturationComponent, LoggingComponent, RegistrationComponent, SystemComponent}
 import com.personal.hourstracker.domain.Registration
 import com.personal.hourstracker.service.RegistrationService.{SelectByYear, SelectByYearAndMonth}
-import com.personal.hourstracker.service.presenter.ConsolidatedRegistrationsPdfPresenter
+import com.personal.hourstracker.service.presenter.Presenter
+import com.personal.hourstracker.service.presenter.config.module.PresenterModule
 
 object RegistrationApi {
   implicit lazy val locale: Locale = new Locale("nl", "NL")
@@ -54,7 +55,7 @@ object RegistrationApi {
 }
 
 trait RegistrationApi extends RegistrationApiProtocol with RegistrationApiDoc with SystemComponent {
-  this: RegistrationComponent with FacturationComponent with ConsolidatedRegistrationsPdfPresenter with LoggingComponent with Configuration =>
+  this: RegistrationComponent with FacturationComponent with PresenterModule with LoggingComponent with Configuration =>
 
   import RegistrationApi._
 
@@ -93,32 +94,50 @@ trait RegistrationApi extends RegistrationApiProtocol with RegistrationApiDoc wi
         path(Segment / "consolidated") { year =>
           {
             val source = registrationService.fetchRegistrations(request = SelectByYear(year.toInt))
-            complete(consolidateRegistrationsFor(source))
+            complete(consolidateRegistrationsFor(source)(jsonPresenter))
           }
         } ~
           path(Segment / Segment / "consolidated") { (year, month) =>
-            {
-              val source: Source[Registration, NotUsed] =
-                registrationService.fetchRegistrations(request = SelectByYearAndMonth(year.toInt, month.toInt))
-              complete(consolidateRegistrationsFor(source))
+            parameters('type.?) { as: Option[String] =>
+              as match {
+                case Some("pdf") =>
+                  complete(s"The type to export to is '$as'")
+                  val source = registrationService.fetchRegistrations(request = SelectByYearAndMonth(year.toInt, month.toInt))
+                  complete(consolidateRegistrationsFor(source)(pdfPresenter))
+
+                case Some("html") =>
+                  complete(s"The type to export to is 'html'")
+                  val source = registrationService.fetchRegistrations(request = SelectByYearAndMonth(year.toInt, month.toInt))
+                  complete(consolidateRegistrationsFor(source)(htmlPresenter))
+
+                case Some("json") =>
+                  complete(s"The type to export to is 'json'")
+                  val source = registrationService.fetchRegistrations(request = SelectByYearAndMonth(year.toInt, month.toInt))
+                  complete(consolidateRegistrationsFor(source)(jsonPresenter))
+
+                case None =>
+                  val source = registrationService.fetchRegistrations(request = SelectByYearAndMonth(year.toInt, month.toInt))
+                  complete(consolidateRegistrationsFor(source)(jsonPresenter))
+              }
             }
           }
       }
     }
   }
 
-  private def consolidateRegistrationsFor(source: Source[Registration, NotUsed]): Source[List[String], NotUsed] =
+  private def consolidateRegistrationsFor(source: Source[Registration, NotUsed])(presenter: Presenter): Source[List[String], NotUsed] =
     registrationService.consolidateRegistrations(source) {
       _.map {
         case (job, consolidatedRegistrations) =>
           logger.info(s"Rendering ${consolidatedRegistrations.size} registrations for job - '${job}'")
-          pdfPresenter.renderRegistrationsPerSingleJob(job, consolidatedRegistrations)
+          presenter.renderRegistrationsPerSingleJob(job, consolidatedRegistrations)
       }.map(_.getAbsolutePath).toList
     }
 
   override def importRegistrationsFromSource: Route = path("registrations" / "import") {
     get {
-      val source: Source[Either[String, Registration], NotUsed] = registrationService.importRegistrationsFromSource(s"${Application.importFrom}/CSVExport.csv")
+      val source: Source[Either[String, Registration], NotUsed] =
+        registrationService.importRegistrationsFromSource(s"${Application.importFrom}/CSVExport.csv")
 
       complete(
         source
@@ -133,7 +152,7 @@ trait RegistrationApi extends RegistrationApiProtocol with RegistrationApiDoc wi
   override def uploadRegistrations: Route = path("registrations" / "upload") {
     storeUploadedFile("csv", createTempFile) {
       case (_, file: File) =>
-        logger.info(s"Reading registrations from: '${file.getAbsolutePath}'")
+        logger.debug(s"Reading registrations from: '${file.getAbsolutePath}'")
         val source: Source[Either[String, Registration], NotUsed] = registrationService.importRegistrationsFromSource(file.getAbsolutePath)
 
         complete(

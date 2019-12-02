@@ -6,11 +6,11 @@ import akka.http.scaladsl.server.Route
 import com.personal.hourstracker.api.v1.Swagger
 import com.personal.hourstracker.api.v1.registration.RegistrationApi
 import com.personal.hourstracker.config.Configuration
-import com.personal.hourstracker.config.component.{ FacturationComponent, RegistrationComponent }
+import com.personal.hourstracker.config.component.{FacturationComponent, LoggingComponent, RegistrationComponent}
 import com.personal.hourstracker.service.presenter.config.module.PresenterModule
 
 trait Api extends RegistrationApi {
-  this: RegistrationComponent with FacturationComponent with PresenterModule with Configuration =>
+  this: RegistrationComponent with FacturationComponent with PresenterModule with LoggingComponent with Configuration =>
 
   implicit def system: ActorSystem
 
