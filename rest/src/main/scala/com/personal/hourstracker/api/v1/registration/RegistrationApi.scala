@@ -7,12 +7,13 @@ import java.util.Locale
 
 import akka.NotUsed
 import akka.http.scaladsl.common.{EntityStreamingSupport, JsonEntityStreamingSupport}
+import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.FileInfo
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import akka.http.scaladsl.unmarshalling.Unmarshaller
-import akka.stream.scaladsl.Source
+import akka.stream.scaladsl.{Sink, Source}
 import com.personal.hourstracker.api.v1.domain.RegistrationModel
 import com.personal.hourstracker.config.Configuration
 import com.personal.hourstracker.config.component.{FacturationComponent, LoggingComponent, RegistrationComponent, SystemComponent}
@@ -20,6 +21,8 @@ import com.personal.hourstracker.domain.Registration
 import com.personal.hourstracker.service.RegistrationService.{SelectByYear, SelectByYearAndMonth}
 import com.personal.hourstracker.service.presenter.Presenter
 import com.personal.hourstracker.service.presenter.config.module.PresenterModule
+
+import scala.util.{Failure, Success}
 
 object RegistrationApi {
   implicit lazy val locale: Locale = new Locale("nl", "NL")
@@ -98,25 +101,25 @@ trait RegistrationApi extends RegistrationApiProtocol with RegistrationApiDoc wi
           }
         } ~
           path(Segment / Segment / "consolidated") { (year, month) =>
+            val source = registrationService.fetchRegistrations(request = SelectByYearAndMonth(year.toInt, month.toInt))
+
             parameters('type.?) { as: Option[String] =>
               as match {
                 case Some("pdf") =>
-                  complete(s"The type to export to is '$as'")
-                  val source = registrationService.fetchRegistrations(request = SelectByYearAndMonth(year.toInt, month.toInt))
                   complete(consolidateRegistrationsFor(source)(pdfPresenter))
 
                 case Some("html") =>
-                  complete(s"The type to export to is 'html'")
-                  val source = registrationService.fetchRegistrations(request = SelectByYearAndMonth(year.toInt, month.toInt))
-                  complete(consolidateRegistrationsFor(source)(htmlPresenter))
+                  onComplete(consolidateRegistrationsFor(source)(htmlPresenter).runWith(Sink.last)) {
+                    case Success(consolidatedFiles) if consolidatedFiles.nonEmpty =>
+                      getFromFile(consolidatedFiles.head)
 
-                case Some("json") =>
-                  complete(s"The type to export to is 'json'")
-                  val source = registrationService.fetchRegistrations(request = SelectByYearAndMonth(year.toInt, month.toInt))
-                  complete(consolidateRegistrationsFor(source)(jsonPresenter))
+                    case Success(consolidatedFiles) if consolidatedFiles.isEmpty =>
+                      complete("nothing here...")
 
-                case None =>
-                  val source = registrationService.fetchRegistrations(request = SelectByYearAndMonth(year.toInt, month.toInt))
+                    case Failure(ex) => complete((StatusCodes.InternalServerError, s"An error occurred: ${ex.getMessage}"))
+                  }
+
+                case Some("json") | None =>
                   complete(consolidateRegistrationsFor(source)(jsonPresenter))
               }
             }
