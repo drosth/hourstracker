@@ -11,7 +11,7 @@ object ConsolidatedRegistration {
 
   type ConsolidatedRegistrationsPerJob = Map[String, ConsolidatedRegistrations]
 
-  object JsonProtocol extends CommonJsonSupport {
+  trait Protocol extends CommonJsonSupport {
     implicit lazy val consolidatedRegistrationFormat: JsonFormat[ConsolidatedRegistration] = jsonFormat4(
       ConsolidatedRegistration.apply)
   }
@@ -23,7 +23,6 @@ object ConsolidatedRegistration {
         case x => x
       }
   }
-
 }
 
 final case class ConsolidatedRegistration(
