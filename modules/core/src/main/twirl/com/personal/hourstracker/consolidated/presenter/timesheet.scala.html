@@ -1,0 +1,36 @@
+@(registrations: com.personal.hourstracker.domain.ConsolidatedRegistration.ConsolidatedRegistrations)
+@
+
+<div class="timesheet">
+    <table width="100%">
+        <thead>
+            <tr>
+                <th width="15%">Dag</th>
+                <th width="40%">Bedrijf</th>
+                <th width="10%">Uren</th>
+                <th width="35%">Omschrijving</th>
+            </tr>
+        </thead>
+        <tbody>
+        @sortConsolidatedRegistrations(registrations).map { registration =>
+            <tr>
+                <td width="15%" class="date">@toHumanReadable(registration.date)</td>
+                <td width="40%" class="job">@registration.duration.filter(_ > 0).map(_ => registration.job).getOrElse("")</td>
+                <td width="10%" class="duration">@registration.duration.filter(_ > 0).map(d => toHumanReadableHours(d)).getOrElse("")</td>
+                <td width="35%" class="comment">@registration.comment.getOrElse("")</td>
+            </tr>
+        }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="4">&nbsp;</td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align: right">Totaal aantal uren deze maand</td>
+                <td width="10%" class="duration">@calculateTotalDuration(registrations)</td>
+                <td width="40%">&nbsp</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+

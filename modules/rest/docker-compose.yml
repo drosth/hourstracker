@@ -1,0 +1,10 @@
+version: '2.4'
+services:
+  rest:
+    image: hourstracker-rest
+    container_name: hourstracker-rest
+    volumes:
+      - ./resources:/opt/resources
+    environment:
+      EXPORT_TO:   '/opt/resources/export'
+      IMPORT_FROM: '/opt/resources/import/CSVExport.csv'

@@ -1,0 +1,38 @@
+version: '2.4'
+services:
+  web:
+    depends_on:
+      - rest
+      - employee-rest
+    ports:
+      - 9000:9000
+    environment:
+      HOURSTRACKER_REST_HOST: rest
+      HOURSTRACKER_REST_PORT: 8100
+      EMPLOYEE_REST_HOST: employee-rest
+      EMPLOYEE_REST_PORT: 8000
+
+  rest:
+    env_file:
+      - docker/env/heroku/heroku.env
+    environment:
+      EXPORT_TO:   '/opt/resources/export'
+      IMPORT_FROM: '/opt/resources/import/CSVExport.csv'
+    ports:
+      - 8100:8100
+
+  employee-rest:
+    image: employee-rest:latest
+    container_name: employee-rest
+    ports:
+      - 8000:8000
+
+  swagger:
+    image: swaggerapi/swagger-ui:v3.19.3
+    container_name: hourstracker-swagger
+    depends_on:
+      - rest
+    environment:
+      API_URL: 'http://0.0.0.0:8100/api/v1/api-docs/swagger.json'
+    ports:
+      - 8101:8080

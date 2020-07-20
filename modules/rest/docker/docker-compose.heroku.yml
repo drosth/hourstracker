@@ -1,0 +1,20 @@
+version: '2.4'
+services:
+  rest:
+    env_file:
+      - docker/env/heroku/heroku.env
+    environment:
+      EXPORT_TO:   '/opt/resources/export'
+      IMPORT_FROM: '/opt/resources/import/CSVExport.csv'
+    ports:
+      - 8100:8100
+
+  swagger:
+    image: swaggerapi/swagger-ui:v3.19.3
+    container_name: hourstracker-swagger
+    depends_on:
+      - rest
+    environment:
+      - API_URL=http://0.0.0.0:8100/api/v1/api-docs/swagger.json
+    ports:
+      - 8101:8080

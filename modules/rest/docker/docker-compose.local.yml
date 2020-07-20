@@ -1,0 +1,40 @@
+version: '2.4'
+services:
+  rest:
+    depends_on:
+      storage:
+        condition: service_healthy
+    env_file:
+      - docker/env/local/local.env
+    environment:
+      - DATABASE_URL=jdbc:mysql://storage/hourstracker?autoReconnect=true&useSSL=false&defaultReadOnly=false
+    ports:
+      - 8100:8100
+
+  swagger:
+    image: swaggerapi/swagger-ui:v3.19.3
+    container_name: hourstracker-swagger
+    depends_on:
+      - rest
+    environment:
+      - API_URL=http://0.0.0.0:8100/api/v1/api-docs/swagger.json
+    ports:
+      - 8101:8080
+
+  storage:
+    image: mysql:5.7
+    container_name: hourstracker-storage
+    volumes:
+      - "./data/mysql:/var/lib/mysql"
+      - "./storage/docker/create-schema.sql:/docker-entrypoint-initdb.d/create-schema.sql"
+    env_file:
+      - docker/env/local/local.env
+    environment:
+      - MYSQL_DATABASE=hourstracker
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+    healthcheck:
+      test: "/etc/init.d/mysql status"
+      interval: 1s
+      retries: 120
+    ports:
+      - 3306:3306

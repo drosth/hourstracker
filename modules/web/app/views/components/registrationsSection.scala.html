@@ -1,0 +1,25 @@
+@(registrations: Seq[RegistrationViewModel])(implicit messagesProvider: MessagesProvider)
+<section class="employees">
+    <h2>@messagesProvider.messages("employees.section.title")</h2>
+
+    <main class="content">
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>@messagesProvider.messages("employees.table.header.name")</th>
+                    <th>@messagesProvider.messages("employees.table.header.actions")</th>
+                </tr>
+            </thead>
+            <tbody>
+            @for(registration <- registrations) {
+                <tr>
+                    <td>@registration.id</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </main>
+</section>
+
