@@ -1,12 +1,5 @@
 package com.personal.hourstracker.service.presenter.config.module
 
-import com.personal.hourstracker.config.Configuration
-import com.personal.hourstracker.config.component.LoggingComponent
-import com.personal.hourstracker.service.presenter.config.component.{ConsolidatedRegistrationsHtmlPresenterComponent, ConsolidatedRegistrationsPdfPresenterComponent, DefaultJsonPresenterComponent}
+import com.personal.hourstracker.service.presenter.config.component.{HtmlPresenterComponent, JsonPresenterComponent, PdfPresenterComponent}
 
-trait PresenterModule
-  extends DefaultJsonPresenterComponent
-    with ConsolidatedRegistrationsHtmlPresenterComponent
-    with ConsolidatedRegistrationsPdfPresenterComponent {
-  this: LoggingComponent with Configuration =>
-}
+trait PresenterModule extends JsonPresenterComponent with HtmlPresenterComponent with PdfPresenterComponent

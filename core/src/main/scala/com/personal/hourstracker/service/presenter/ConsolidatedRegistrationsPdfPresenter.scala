@@ -1,18 +1,19 @@
-package com.personal.hourstracker.service.presenter.config.component
+package com.personal.hourstracker.service.presenter
 
 import java.io.File
 
 import com.personal.hourstracker.config.Configuration
 import com.personal.hourstracker.config.component.LoggingComponent
 import com.personal.hourstracker.domain.ConsolidatedRegistration.{ConsolidatedRegistrations, ConsolidatedRegistrationsPerJob}
+import com.personal.hourstracker.service.presenter.config.component.{HtmlPresenterComponent, PdfPresenter}
 import io.github.cloudify.scala.spdf.{Pdf, PdfConfig, Portrait}
 
-trait ConsolidatedRegistrationsPdfPresenterComponent extends PdfPresenterComponent {
+trait ConsolidatedRegistrationsPdfPresenter extends PdfPresenter[ConsolidatedRegistrationsPerJob] {
   this: HtmlPresenterComponent with LoggingComponent =>
 
-  val pdfPresenter: PdfPresenter = new ConsolidatedRegistrationsPdfPresenter(htmlPresenter)
+  val pdfPresenter: Presenter[ConsolidatedRegistrationsPerJob] = new ConsolidatedRegistrationsPdfPresenter()
 
-  class ConsolidatedRegistrationsPdfPresenter(htmlPresenter: HtmlPresenter) extends PdfPresenter with Configuration {
+  class ConsolidatedRegistrationsPdfPresenter extends Presenter[ConsolidatedRegistrationsPerJob] with Configuration {
 
     val executablePath = "/usr/local/bin/wkhtmltopdf"
 
@@ -56,7 +57,5 @@ trait ConsolidatedRegistrationsPdfPresenterComponent extends PdfPresenterCompone
       pdf.run(rendered, outputFile)
       outputFile
     }
-
-    override def renderConsolidatedRegistrations: ConsolidatedRegistrations => String = ???
   }
 }

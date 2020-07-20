@@ -1,4 +1,4 @@
-package com.personal.hourstracker.service.presenter.config.component
+package com.personal.hourstracker.service.presenter
 
 import java.io.File
 
@@ -6,14 +6,14 @@ import com.personal.hourstracker.config.Configuration
 import com.personal.hourstracker.config.component.LoggingComponent
 import com.personal.hourstracker.consolidated.presenter
 import com.personal.hourstracker.domain.ConsolidatedRegistration.{ConsolidatedRegistrations, ConsolidatedRegistrationsPerJob}
-import com.personal.hourstracker.service.presenter.Model
+import com.personal.hourstracker.service.presenter.config.component.HtmlPresenter
 
-trait ConsolidatedRegistrationsHtmlPresenterComponent extends HtmlPresenterComponent {
-  this: Configuration with LoggingComponent =>
+trait ConsolidatedRegistrationsHtmlPresenter extends HtmlPresenter[ConsolidatedRegistrationsPerJob] with Configuration {
+  this: LoggingComponent =>
 
-  override val htmlPresenter: HtmlPresenter = new ConsolidatedRegistrationsHtmlPresenter()
+  val htmlPresenter: ConsolidatedRegistrationsHtmlPresenter = new ConsolidatedRegistrationsHtmlPresenter()
 
-  class ConsolidatedRegistrationsHtmlPresenter extends HtmlPresenter with Configuration {
+  class ConsolidatedRegistrationsHtmlPresenter extends HtmlPresenter[ConsolidatedRegistrationsPerJob] with Configuration {
 
     override val renderConsolidatedRegistrations: ConsolidatedRegistrations => String = consolidatedRegistrations => {
       logger.info(s"ConsolidatedRegistrationsHtmlPresenter should be writing to: ${Application.exportTo}")

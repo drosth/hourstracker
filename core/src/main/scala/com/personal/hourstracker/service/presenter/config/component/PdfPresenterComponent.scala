@@ -1,15 +1,15 @@
 package com.personal.hourstracker.service.presenter.config.component
 
-import com.personal.hourstracker.config.Configuration
-import com.personal.hourstracker.service.presenter.Presenter
+import com.personal.hourstracker.service.presenter.{ConsolidatedRegistrationsPdfPresenter, Presenter}
 
-trait PdfPresenterComponent {
+trait PdfPresenterComponent extends ConsolidatedRegistrationsPdfPresenter {
   this: HtmlPresenterComponent =>
 
-  def pdfPresenter: PdfPresenter
 }
 
-trait PdfPresenter extends Presenter {
-  this: Configuration =>
+trait PdfPresenter[T] {
+  this: HtmlPresenterComponent =>
+
+  val pdfPresenter: Presenter[T]
 }
 
