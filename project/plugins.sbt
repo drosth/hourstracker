@@ -20,7 +20,7 @@ addSbtPlugin("com.olaq" % "sbt-sonar-scanner-plugin" % "1.3.0")
 
 // Display your sbt project's dependency updates.
 // see also: https://github.com/rtimush/sbt-updates
-addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.5.0")
+addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.5.1")
 
 // SBT native packager lets you build application packages in native formats.
 // see also: https://github.com/sbt/sbt-native-packager
