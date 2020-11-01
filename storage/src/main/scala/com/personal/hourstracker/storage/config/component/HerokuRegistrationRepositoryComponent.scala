@@ -1,4 +1,5 @@
 package com.personal.hourstracker.storage.config.component
+
 import java.net.URI
 
 import com.personal.hourstracker.config.component.RegistrationRepositoryComponent
@@ -15,9 +16,32 @@ trait HerokuRegistrationRepositoryComponent extends RegistrationRepositoryCompon
 
   private lazy val logger: Logger = LoggerFactory.getLogger(classOf[HerokuRegistrationRepositoryComponent])
 
-  private val constructUrlFromUri: URI => String = uri => s"jdbc:postgresql://${uri.getHost}:${uri.getPort}${uri.getPath}"
+  private val constructUrlFromUri: URI => String = { uri =>
+    logger.info("-" * 120)
+    logger.info(s"jdbc:postgresql://${uri.getHost}:${uri.getPort}${uri.getPath}")
+    logger.info("-" * 120)
+    s"jdbc:postgresql://${uri.getHost}:${uri.getPort}${uri.getPath}"
+  }
 
-  private val datasource: BasicDataSource = ConnectionFactory.createDataSource(Storage.Registrations.url)(constructUrlFromUri)
+  private def createDataSource(url: String)(constructUrlFromUri: URI => String): Either[String, BasicDataSource] = {
+    createDataSource(new URI(url))(constructUrlFromUri)
+  }
+
+  private def createDataSource(uri: URI)(constructUrlFromUri: URI => String): Either[String, BasicDataSource] = {
+    for {
+      userInfo <- Option(uri.getUserInfo)
+        .map(_.split(":"))
+        .map(Right.apply)
+        .getOrElse(Left(s"No UserInfo defined in: ${uri.toString}"))
+    } yield ConnectionFactory.createDataSource(constructUrlFromUri(uri), userInfo(0), userInfo(1))
+  }
+
+  private val datasource: BasicDataSource = createDataSource(Storage.Registrations.url)(constructUrlFromUri) match {
+    case Left(message) =>
+      logger.error(s"Could not create DataSource: $message")
+      throw new IllegalArgumentException(s"Properties not configured correctly: $message")
+    case Right(dataSource) => dataSource
+  }
 
   override lazy val registrationRepository: RegistrationRepository = new HerokuRegistrationRepository(datasource).registrationRepository
 
@@ -41,4 +65,5 @@ trait HerokuRegistrationRepositoryComponent extends RegistrationRepositoryCompon
       }
     }
   }
+
 }

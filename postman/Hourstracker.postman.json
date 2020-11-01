@@ -1,0 +1,86 @@
+{
+	"info": {
+		"_postman_id": "a26b8f84-0824-41ca-abc9-d49a38d8bd99",
+		"name": "Hourstracker",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Download registered hours as JSON",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{HOURSTRACKER-API}}/api/v1/registrations/2020/10/consolidated?type=json",
+					"host": [
+						"{{HOURSTRACKER-API}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"registrations",
+						"2020",
+						"10",
+						"consolidated"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "json"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Download registered hours as PDF",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{HOURSTRACKER-API}}/api/v1/registrations/2020/10/consolidated?type=pdf",
+					"host": [
+						"{{HOURSTRACKER-API}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"registrations",
+						"2020",
+						"10",
+						"consolidated"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "pdf"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Import registered hours",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{HOURSTRACKER-API}}/api/v1/registrations/import",
+					"host": [
+						"{{HOURSTRACKER-API}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"registrations",
+						"import"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

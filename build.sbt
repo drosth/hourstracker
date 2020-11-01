@@ -10,6 +10,8 @@ lazy val framework = new TestFramework("com.waioeka.sbt.runner.CucumberFramework
 enablePlugins(CucumberPlugin)
 com.waioeka.sbt.CucumberPlugin.projectSettings
 
+envFileName in ThisBuild := Option(System.getProperty("envfile")).getOrElse(".env")
+
 // PROJECTS
 
 lazy val root = project

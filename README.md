@@ -2,6 +2,13 @@
 
 ### Start application
 
+#### Start from command-line
+
+```
+> hourstracker$  sbt 'project rest' clean run
+```
+
+#### Start from Docker (wip)
 1. Build and publish new docker image:<br/>```sbt clean docker:publishLocal``` 
 1. Start new docker image:<br/>```gradle runDocker```
 1. To see if the application is working, open the [swagger-ui page](http://0.0.0.0:9079)

@@ -1,16 +1,16 @@
-# Ignore Gradle project-specific cache directory
-.gradle
-
-# Ignore Gradle build output directory
-build
-
-# Ignore resources
+*.iml
 ./resources/
-
-# Ignore data files
+.env
+.gradle
+.idea/
+.metals/
+.secret.env
+/.gradle
+/.sbt-version
+/data/
+build
 data/
-
-# Visual Paradigm
 docs/*.vpp.bak*
-resources/import
 resources/export
+resources/import
+target/

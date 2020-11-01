@@ -1,10 +1,10 @@
 package com.personal.hourstracker.service.presenter
 
-import java.io.{File, PrintWriter, Writer}
+import java.io.{ File, PrintWriter, Writer }
 
 import com.personal.hourstracker._
 import com.personal.hourstracker.config.Configuration
-import com.personal.hourstracker.domain.ConsolidatedRegistration.{ConsolidatedRegistrations, ConsolidatedRegistrationsPerJob}
+import com.personal.hourstracker.domain.ConsolidatedRegistration.{ ConsolidatedRegistrations, ConsolidatedRegistrationsPerJob }
 
 trait Presenter {
   this: Configuration =>

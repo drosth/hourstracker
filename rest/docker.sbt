@@ -3,8 +3,7 @@ enablePlugins(
   JavaAppPackaging,
   AshScriptPlugin
 )
-
-dockerBaseImage := "openjdk:8-jre-alpine"
+dockerBaseImage := "openjdk:8"
 dockerExposedPorts := Seq(8080)
 
 dockerAliases ++= Set(

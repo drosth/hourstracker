@@ -4,8 +4,8 @@ import java.io.File
 
 import com.personal.hourstracker.config.Configuration
 import com.personal.hourstracker.config.component.LoggingComponent
-import com.personal.hourstracker.domain.ConsolidatedRegistration.{ConsolidatedRegistrations, ConsolidatedRegistrationsPerJob}
-import io.github.cloudify.scala.spdf.{Pdf, PdfConfig, Portrait}
+import com.personal.hourstracker.domain.ConsolidatedRegistration.{ ConsolidatedRegistrations, ConsolidatedRegistrationsPerJob }
+import io.github.cloudify.scala.spdf.{ Pdf, PdfConfig, Portrait }
 
 trait ConsolidatedRegistrationsPdfPresenterComponent extends PdfPresenterComponent {
   this: HtmlPresenterComponent with LoggingComponent =>

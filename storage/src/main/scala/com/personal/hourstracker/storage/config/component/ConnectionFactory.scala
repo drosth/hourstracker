@@ -22,15 +22,6 @@ object ConnectionFactory extends StorageConfiguration {
     basicDataSource
   }
 
-  def createDataSource(url: String)(constructUrlFromUri: URI => String): BasicDataSource = {
-    createDataSource(new URI(url))(constructUrlFromUri)
-  }
-
-  def createDataSource(uri: URI)(constructUrlFromUri: URI => String): BasicDataSource = {
-    val userInfo = uri.getUserInfo.split(":")
-    createDataSource(constructUrlFromUri(uri), userInfo(0), userInfo(1))
-  }
-
   def createDataSource(url: String, username: String, password: String): BasicDataSource = {
     logger.info(s"Creating DataSource for '$username@$url'...")
     connectionPool(url, username, password)

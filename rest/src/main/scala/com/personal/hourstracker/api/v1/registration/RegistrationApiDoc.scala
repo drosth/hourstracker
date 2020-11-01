@@ -3,11 +3,11 @@ package com.personal.hourstracker.api.v1.registration
 import akka.http.scaladsl.server.Route
 import com.personal.hourstracker.api.v1.domain.RegistrationModel.RegistrationModels
 import io.swagger.v3.oas.annotations.enums.ParameterIn
-import io.swagger.v3.oas.annotations.media.{Content, Schema}
+import io.swagger.v3.oas.annotations.media.{ Content, Schema }
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.tags.{Tag, Tags}
-import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import javax.ws.rs.{GET, POST, Path, Produces}
+import io.swagger.v3.oas.annotations.tags.{ Tag, Tags }
+import io.swagger.v3.oas.annotations.{ Operation, Parameter }
+import javax.ws.rs.{ GET, POST, Path, Produces }
 
 @Path("/api/v1")
 @Produces(Array("application/json"))

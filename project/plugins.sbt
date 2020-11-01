@@ -13,3 +13,6 @@ addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "1.0.0")
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.6.0-M3")
 
 
+// sbt plugin to load environment variables from .env into the JVM System Environment for local development.
+// see also: https://github.com/mefellows/sbt-dotenv
+addSbtPlugin("au.com.onegeek" %% "sbt-dotenv" % "2.1.146")

@@ -5,7 +5,7 @@ import java.io.File
 import com.personal.hourstracker.config.Configuration
 import com.personal.hourstracker.config.component.LoggingComponent
 import com.personal.hourstracker.domain.ConsolidatedRegistration.ConsolidatedRegistrations
-import com.personal.hourstracker.service.presenter.{Model, Presenter}
+import com.personal.hourstracker.service.presenter.{ Model, Presenter }
 import spray.json._
 
 trait JsonPresenterComponent {
