@@ -18,13 +18,15 @@ services:
     volumes:
       - ../resources:/opt/resources
     environment:
-      IMPORT_FROM: '/opt/resources/import/CSVExport.csv'
+      IMPORT_FROM: '/opt/resources/import'
       EXPORT_TO: '/opt/resources/export'
-      DATABASE_URL: 'postgresql://hourstracker:password@postgresql:5432/hourstracker'
+      DATABASE_USER: 'hourstracker'
+      DATABASE_PASSWORD: 'password'
+      DATABASE_URL: 'jdbc:postgresql://postgresql:5432/hourstracker'
       DATABASE_DRIVER: 'org.postgresql.Driver'
     depends_on:
       postgresql:
-        condition: service_started
+        condition: service_healthy
 
   postgresql:
     image: bitnami/postgresql
@@ -37,3 +39,8 @@ services:
       - POSTGRESQL_DATABASE=hourstracker
       - POSTGRESQL_USERNAME=hourstracker
       - POSTGRESQL_PASSWORD=password
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c '/opt/bitnami/postgresql/bin/pg_isready -h 0.0.0.0 -p 5432 -d hourstracker -U hourstracker'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

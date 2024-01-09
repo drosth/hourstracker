@@ -22,13 +22,15 @@ class SquerylRegistrationRepository extends RegistrationRepository {
 
   def initialize(): Unit = {
     transaction {
-      tables.find(_.name.toUpperCase == "REGISTRATION") match {
-        case None =>
-          RegistrationSchema.initialize()
-          RegistrationSchema.printDdl(message => logger.debug(message))
-        case _ =>
-          logger.info("Table 'REGISTRATION' already exists")
-      }
+      tables
+        .find(_.name.toUpperCase == "hours_registered") match {
+          case None =>
+            RegistrationSchema.initialize()
+            RegistrationSchema.printDdl(message => logger.info(message))
+          case _ =>
+            logger.info("Table 'REGISTRATION' already exists")
+            RegistrationSchema.printDdl(message => logger.info(message))
+        }
     }
   }
 

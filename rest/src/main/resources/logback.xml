@@ -8,8 +8,8 @@
         </encoder>
     </appender>
 
-    <logger name="akka" level="INFO" />
-    <logger name="io.grpc.netty" level="INFO" />
+    <logger name="akka" level="DEBUG" />
+    <logger name="io.grpc.netty" level="DEBUG" />
 
     <root level="DEBUG">
         <appender-ref ref="STDOUT" />

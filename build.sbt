@@ -3,7 +3,7 @@ organization := "com.personal"
 version := "0.1"
 maintainer := "h.drost@gmail.com"
 
-scalaVersion := "2.12.7"
+scalaVersion := "2.12.17"
 
 lazy val framework = new TestFramework("com.waioeka.sbt.runner.CucumberFramework")
 
@@ -124,7 +124,7 @@ lazy val commonSettings = Seq(
   coverageMinimum := 80,
   coverageFailOnMinimum := false,
   coverageHighlighting := true
-//  coverageExcludedPackages := """.*\.config\..*;nl\.dpes\.b2b\.v[0-9]+\..*;nl\.dpes\.b2b\.salesforce\.v[0-9]+\..*;nl\.dpes\.b2b\.jobmanager\.v[0-9]+\..*"""
+  //  coverageExcludedPackages := """.*\.config\..*;nl\.dpes\.b2b\.v[0-9]+\..*;nl\.dpes\.b2b\.salesforce\.v[0-9]+\..*;nl\.dpes\.b2b\.jobmanager\.v[0-9]+\..*"""
 )
 
 lazy val cucumberSettings = Seq(

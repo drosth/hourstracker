@@ -4,6 +4,7 @@ import com.personal.hourstracker.config.Configuration
 trait StorageConfiguration extends Configuration {
 
   object Storage {
+
     object Registrations {
       lazy val user: String = config.getString(s"$Namespace.storage.registrations.user.name")
       lazy val password: String = config.getString(s"$Namespace.storage.registrations.user.password")

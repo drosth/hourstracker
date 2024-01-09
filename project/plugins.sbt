@@ -1,3 +1,5 @@
+dependencyOverrides += "org.scala-lang.modules" %% "scala-xml" % "2.1.0"
+
 addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.5")
 addSbtPlugin("com.geirsson" % "sbt-scalafmt" % "1.5.1")
 addSbtPlugin("com.sksamuel.scapegoat" %% "sbt-scapegoat" % "1.0.9") // integrates the scapegoat static code analysis library - https://github.com/sksamuel/sbt-scapegoat

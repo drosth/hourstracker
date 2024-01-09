@@ -16,31 +16,26 @@ trait HerokuRegistrationRepositoryComponent extends RegistrationRepositoryCompon
 
   private lazy val logger: Logger = LoggerFactory.getLogger(classOf[HerokuRegistrationRepositoryComponent])
 
-  private val constructUrlFromUri: URI => String = { uri =>
+  private def createDataSource(username: String, password: String, dataSourceUri: URI): Either[String, BasicDataSource] = {
     logger.info("-" * 120)
-    logger.info(s"jdbc:postgresql://${uri.getHost}:${uri.getPort}${uri.getPath}")
+    logger.info(s"creating DataSource:")
+    logger.info(s"\turi = ${dataSourceUri.toString}")
+    logger.info(s"\tusername = $username")
+    logger.info(s"\tpassword = $password")
     logger.info("-" * 120)
-    s"jdbc:postgresql://${uri.getHost}:${uri.getPort}${uri.getPath}"
+
+    Right(ConnectionFactory.createDataSource(url = dataSourceUri.toString, username = username, password = password))
   }
 
-  private def createDataSource(url: String)(constructUrlFromUri: URI => String): Either[String, BasicDataSource] = {
-    createDataSource(new URI(url))(constructUrlFromUri)
-  }
-
-  private def createDataSource(uri: URI)(constructUrlFromUri: URI => String): Either[String, BasicDataSource] = {
-    for {
-      userInfo <- Option(uri.getUserInfo)
-        .map(_.split(":"))
-        .map(Right.apply)
-        .getOrElse(Left(s"No UserInfo defined in: ${uri.toString}"))
-    } yield ConnectionFactory.createDataSource(constructUrlFromUri(uri), userInfo(0), userInfo(1))
-  }
-
-  private val datasource: BasicDataSource = createDataSource(Storage.Registrations.url)(constructUrlFromUri) match {
+  private val datasource: BasicDataSource = createDataSource(
+    username = Storage.Registrations.user,
+    password = Storage.Registrations.password,
+    dataSourceUri = new URI(Storage.Registrations.url)) match {
     case Left(message) =>
       logger.error(s"Could not create DataSource: $message")
       throw new IllegalArgumentException(s"Properties not configured correctly: $message")
-    case Right(dataSource) => dataSource
+    case Right(dataSource) =>
+      dataSource
   }
 
   override lazy val registrationRepository: RegistrationRepository = new HerokuRegistrationRepository(datasource).registrationRepository
@@ -49,13 +44,16 @@ trait HerokuRegistrationRepositoryComponent extends RegistrationRepositoryCompon
     private val driver = Storage.Registrations.driver
 
     private def startDatabaseSession(): Unit = {
-      logger.debug(
+      logger.info(
         s"Starting Database session for driver '$driver', connected to '${Storage.Registrations.url}' ('${Storage.Registrations.user}')")
       Class.forName(driver)
 
       SessionFactory.concreteFactory = DatabaseAdapterFactory
         .retrieveDatabaseAdapterFor(driver)
-        .map(databaseAdapter => () => Session.create(dataSource.getConnection(), databaseAdapter))
+        .map { databaseAdapter => () =>
+          Session.create(dataSource.getConnection(), databaseAdapter)
+
+        }
     }
 
     val registrationRepository: RegistrationRepository = {

@@ -3,18 +3,18 @@ package com.personal.hourstracker.api.v1.registration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, Multipart, StatusCodes}
+import akka.http.scaladsl.model.{ ContentTypes, HttpEntity, Multipart, StatusCodes }
 import akka.stream.scaladsl.Source
 import com.personal.hourstracker.api.v1.ApiSpec
 import com.personal.hourstracker.api.v1.domain.RegistrationModel
 import com.personal.hourstracker.config.component._
-import com.personal.hourstracker.config.module.{ImporterModule, RegistrationModule}
+import com.personal.hourstracker.config.module.{ ImporterModule, RegistrationModule }
 import com.personal.hourstracker.domain.Registration
 import com.personal.hourstracker.domain.Registration.Registrations
 import com.personal.hourstracker.repository.RegistrationRepository
-import com.personal.hourstracker.service.RegistrationService.{SelectByYear, SelectByYearAndMonth}
+import com.personal.hourstracker.service.RegistrationService.{ SelectByYear, SelectByYearAndMonth }
 import com.personal.hourstracker.service.presenter.config.module.PresenterModule
-import com.personal.hourstracker.service.{ImporterService, RegistrationService}
+import com.personal.hourstracker.service.{ ImporterService, RegistrationService }
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 

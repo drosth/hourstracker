@@ -45,7 +45,8 @@ class DefaultRegistrationService(
         case Left(message) =>
           Left(s"Could not persist registration: $message")
 
-        case Right(registration) => Right(registration)
+        case Right(registration) =>
+          Right(registration)
       })
 
   override def importRegistrationsFromSource(fileName: String): Source[Either[String, Registration], NotUsed] = {
