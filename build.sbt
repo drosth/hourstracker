@@ -57,6 +57,7 @@ lazy val storage = (project in file("storage"))
       Dependencies.squeryl,
       Dependencies.`mysql-connector-java`,
       Dependencies.postgresql,
+      Dependencies.flyway,
       Dependencies.`commons-dbcp2`,
       Dependencies.h2 % "test"
     )

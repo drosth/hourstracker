@@ -24,7 +24,7 @@ object HourstrackerAPI extends App with ApiV1 with WebModule {
     }
   }
 
-  Http().bindAndHandle(apiRoutes, Server.host, Server.port).map { binding =>
+  Http().bindAndHandle(apiRoutes, Server.host, Server.port).map { _ =>
     println(s"Server online at http://${Server.host}:${Server.port}/")
   }
 

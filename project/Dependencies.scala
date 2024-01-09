@@ -69,6 +69,7 @@ object Dependencies {
   val logback = "ch.qos.logback" % "logback-classic" % logbackVersion
   val spdf = "io.github.cloudify" %% "spdf" % spdfVersion
   val postgresql = "org.postgresql" % "postgresql" % "42.2.8"
+  val flyway = "org.flywaydb" % "flyway-core" % "7.5.1"
 
   // Test libraries
   val scalatest = "org.scalatest" %% "scalatest" % scalatestVersion

@@ -26,4 +26,6 @@ trait WebModule
   override implicit val system: ActorSystem = ActorSystem("hourstracker-rest")
   override implicit val executionContext: ExecutionContext = system.dispatcher
   override implicit val materializer: ActorMaterializer = ActorMaterializer()
+
+  runMigrations()
 }

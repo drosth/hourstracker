@@ -1,4 +1,7 @@
 package com.personal.hourstracker.storage.config.component
+
+import java.net.URI
+
 import com.personal.hourstracker.config.component.RegistrationRepositoryComponent
 import com.personal.hourstracker.repository.RegistrationRepository
 import com.personal.hourstracker.storage.config.StorageConfiguration
@@ -13,30 +16,44 @@ trait DefaultRegistrationRepositoryComponent extends RegistrationRepositoryCompo
 
   private lazy val logger: Logger = LoggerFactory.getLogger(classOf[DefaultRegistrationRepositoryComponent])
 
-  private val datasource: BasicDataSource =
-    ConnectionFactory.createDataSource(Storage.Registrations.url, Storage.Registrations.user, Storage.Registrations.password)
+  private def createDataSource(username: String, password: String, dataSourceUri: URI): Either[String, BasicDataSource] = {
+    logger.info("-" * 120)
+    logger.info(s"creating DataSource:")
+    logger.info(s"\turi = ${dataSourceUri.toString}")
+    logger.info(s"\tusername = $username")
+    logger.info(s"\tpassword = $password")
+    logger.info("-" * 120)
 
-  override lazy val registrationRepository: RegistrationRepository = new DefaultRegistrationRepository(datasource).registrationRepository
+    Right(ConnectionFactory.createDataSource(url = dataSourceUri.toString, username = username, password = password))
+  }
 
-  class DefaultRegistrationRepository(dataSource: DataSource) {
+  override lazy val registrationRepository: RegistrationRepository = {
+    logger.info(
+      s"Starting Database session for driver '$driver', connected to '${Storage.Registrations.url}' ('${Storage.Registrations.user}')")
+    Class.forName(driver)
 
-    private val driver = Storage.Registrations.driver
-
-    private def startDatabaseSession(): Unit = {
-      logger.debug(
-        s"Starting Database session for driver '$driver', connected to '${Storage.Registrations.url}' ('${Storage.Registrations.user}')")
-      Class.forName(driver)
-
-      SessionFactory.concreteFactory = DatabaseAdapterFactory
-        .retrieveDatabaseAdapterFor(driver)
-        .map(databaseAdapter => () => Session.create(dataSource.getConnection(), databaseAdapter))
-    }
-
-    val registrationRepository: RegistrationRepository = {
-      new SquerylRegistrationRepository() {
-        startDatabaseSession()
-        initialize()
+    SessionFactory.concreteFactory = DatabaseAdapterFactory
+      .retrieveDatabaseAdapterFor(driver)
+      .map { databaseAdapter => () =>
+        Session.create(dataSource.getConnection(), databaseAdapter)
       }
+
+    new SquerylRegistrationRepository() {
+      //      initialize()
     }
   }
+
+  private lazy val driver: String = Storage.Registrations.driver
+
+  private lazy val dataSource: BasicDataSource = createDataSource(
+    username = Storage.Registrations.user,
+    password = Storage.Registrations.password,
+    dataSourceUri = new URI(Storage.Registrations.url)) match {
+    case Left(message) =>
+      logger.error(s"Could not create DataSource: $message")
+      throw new IllegalArgumentException(s"Properties not configured correctly: $message")
+    case Right(dataSource) =>
+      dataSource
+  }
+
 }
