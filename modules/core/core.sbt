@@ -1,0 +1,1 @@
+name := "hourstracker-core"
