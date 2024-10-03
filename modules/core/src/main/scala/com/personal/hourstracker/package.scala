@@ -17,14 +17,10 @@ package object hourstracker {
 
     firstDate match {
       case e: LocalDate if e.getMonthValue < lastDate.getMonthValue =>
-        s"${firstDate.format(DateTimeFormatter.ofPattern("MMM", locale))}-${
-          lastDate
-            .format(DateTimeFormatter.ofPattern("MMM-yyyy", locale))
-        }"
+        s"${firstDate.format(DateTimeFormatter.ofPattern("MM-yyyy", locale))} - ${lastDate.format(DateTimeFormatter.ofPattern("MM-yyyy", locale))}"
 
-      case e: LocalDate =>
-        firstDate.format(DateTimeFormatter.ofPattern("MMM-yyyy", locale))
+      case _ =>
+        firstDate.format(DateTimeFormatter.ofPattern("MM-yyyy", locale))
     }
   }
-
 }

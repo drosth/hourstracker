@@ -24,7 +24,7 @@ import java.util.Locale
 import scala.util.{Failure, Success}
 
 object RegistrationApi {
-  implicit lazy val locale: Locale = new Locale("nl", "NL")
+  implicit lazy val locale: Locale = Locale.of("nl", "NL")
 
   implicit val stringToLocalDateUnmarshaller: Unmarshaller[String, LocalDate] =
     Unmarshaller.strict[String, LocalDate] {
@@ -97,17 +97,9 @@ trait RegistrationApi extends RegistrationApiProtocol with RegistrationApiDoc wi
     get {
       pathPrefix("registrations") {
         path(Segment / "consolidated") { year =>
-          {
-            val source = registrationService.fetchRegistrations(request = SelectByYear(year.toInt))
-            complete(consolidateRegistrationsFor(source)(jsonPresenter))
-          }
-        } ~
-        path(Segment / Segment / "consolidated") { (year, month) =>
-          val source = registrationService.fetchRegistrations(request = SelectByYearAndMonth(year.toInt, month.toInt))
+          val source = registrationService.fetchRegistrations(request = SelectByYear(year.toInt))
 
           parameters('type.?) {
-            case Some("pdf") => complete(consolidateRegistrationsFor(source)(pdfPresenter))
-
             case Some("html") =>
               onComplete(consolidateRegistrationsFor(source)(htmlPresenter).runWith(Sink.last)) {
                 case Success(consolidatedFiles) if consolidatedFiles.nonEmpty =>
@@ -119,8 +111,29 @@ trait RegistrationApi extends RegistrationApiProtocol with RegistrationApiDoc wi
                 case Failure(ex) => complete((StatusCodes.InternalServerError, s"An error occurred: ${ex.getMessage}"))
               }
 
-            case Some("json") | None => complete(consolidateRegistrationsFor(source)(jsonPresenter))
-            case Some(t)             => complete((StatusCodes.BadRequest, s"Unknown type '$t'"))
+            case Some("json") => complete(consolidateRegistrationsFor(source)(jsonPresenter))
+
+            case _ => complete(consolidateRegistrationsFor(source)(pdfPresenter))
+          }
+        } ~
+        path(Segment / Segment / "consolidated") { (year, month) =>
+          val source = registrationService.fetchRegistrations(request = SelectByYearAndMonth(year.toInt, month.toInt))
+
+          parameters('type.?) {
+            case Some("html") =>
+              onComplete(consolidateRegistrationsFor(source)(htmlPresenter).runWith(Sink.last)) {
+                case Success(consolidatedFiles) if consolidatedFiles.nonEmpty =>
+                  getFromFile(consolidatedFiles.head)
+
+                case Success(consolidatedFiles) if consolidatedFiles.isEmpty =>
+                  complete("nothing here...")
+
+                case Failure(ex) => complete((StatusCodes.InternalServerError, s"An error occurred: ${ex.getMessage}"))
+              }
+
+            case Some("json") => complete(consolidateRegistrationsFor(source)(jsonPresenter))
+
+            case _ => complete(consolidateRegistrationsFor(source)(pdfPresenter))
           }
         }
       }

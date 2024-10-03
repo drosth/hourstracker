@@ -154,7 +154,7 @@ object Settings {
   defaultProjectSettings
 
   def dockerSettings(name: String): Seq[Def.Setting[_]] = Seq(
-    Docker / dockerBaseImage := "openjdk:11-jre",
+    Docker / dockerBaseImage := "eclipse-temurin:19.0.2_7-jdk",
     Docker / daemonUserUid := Some("1001"),
     Docker / daemonUser := "daemon",
     Docker / maintainer := Common.maintainer,

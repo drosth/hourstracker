@@ -11,7 +11,7 @@ import com.personal.hourstracker.storage.repository.squeryl.schema.RegistrationS
 import org.slf4j.{Logger, LoggerFactory}
 
 import java.sql.Timestamp
-import java.time.LocalDateTime
+import java.time.{Instant, LocalDateTime}
 
 class SquerylRegistrationRepository extends RegistrationRepository {
   import RegistrationSchema._
@@ -55,13 +55,14 @@ class SquerylRegistrationRepository extends RegistrationRepository {
     val lower = LocalDateTime.of(year, 1, 1, 0, 0, 0)
     val upper = LocalDateTime.of(year, 1, 1, 0, 0, 0).plusYears(1).minusSeconds(1)
 
-    registrations
-      .where(
-        r =>
-          (r.clockedIn isNotNull)
-            and ((r.clockedIn.get gte Timestamp.valueOf(lower)) and (r.clockedIn.get lte Timestamp.valueOf(upper))))
+    val r = registrations
+      .where(r =>
+          ((r.duration isNotNull) and (r.duration.get gt 0))
+          and ((r.clockedIn isNotNull) and ((r.clockedIn.get gte Timestamp.valueOf(lower)) and (r.clockedIn.get lte Timestamp.valueOf(upper))))
+      )
       .toList
       .map(_.convert)
+    r
   }
 
   private def selectRegistrationsByYearAndMonth(year: Int, month: Int): Registrations = transaction {
@@ -71,8 +72,9 @@ class SquerylRegistrationRepository extends RegistrationRepository {
     registrations
       .where(
         r =>
-          (r.clockedIn isNotNull)
-            and ((r.clockedIn.get gte Timestamp.valueOf(lower)) and (r.clockedIn.get lte Timestamp.valueOf(upper))))
+          ((r.duration isNotNull) and (r.duration.get gt 0))
+          and ((r.clockedIn isNotNull) and ((r.clockedIn.get gte Timestamp.valueOf(lower)) and (r.clockedIn.get lte Timestamp.valueOf(upper))))
+      )
       .toList
       .map(_.convert)
   }
