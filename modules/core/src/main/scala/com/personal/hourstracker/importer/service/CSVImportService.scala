@@ -1,16 +1,14 @@
 package com.personal.hourstracker.importer.service
 
-import java.io.{ File, FileInputStream, InputStreamReader, Reader }
-
 import akka.NotUsed
 import akka.stream.scaladsl.Source
 import com.github.tototoshi.csv.CSVReader
 import com.personal.hourstracker.domain.Registration
 import com.personal.hourstracker.domain.Registration.Registrations
-import com.personal.hourstracker.service.{ ImporterService, _ }
+import com.personal.hourstracker.service.{ImporterService, _}
 
-import scala.concurrent.{ ExecutionContext, Future }
-import scala.util.{ Failure, Success }
+import java.io.{File, FileInputStream, InputStreamReader, Reader}
+import scala.concurrent.{ExecutionContext, Future}
 
 object CSVImportService {
 
@@ -43,17 +41,21 @@ class CSVImportService()(implicit executionContext: ExecutionContext) extends Im
         .map(
           record =>
             Registration(
-              None,
-              record.getOrElse("Job", ""),
-              record.get("Clocked In"),
-              record.get("Clocked Out"),
-              record.get("Duration"),
-              record.get("Hourly Rate"),
-              record.get("Earnings"),
-              record.get("Comment"),
-              readTagsFrom(record.get("Tags")),
-              record.get("TotalTimeAdjustment"),
-              record.get("TotalEarningsAdjustment")))
+              id = None,
+              job = record.getOrElse("Job", ""),
+              clockedIn = record.get("Clocked In"),
+              clockedOut = record.get("Clocked Out"),
+              duration = record.get("Duration"),
+              hourlyRate = record.get("Hourly Rate"),
+              earnings = record.get("Earnings"),
+              comment = record.get("Comment"),
+              tags = readTagsFrom(record.get("Tags")),
+              breaks = record.get("Breaks"),
+              adjustments = record.get("Adjustments"),
+              totalTimeAdjustment = record.get("TotalTimeAdjustment"),
+              totalEarningsAdjustment = record.get("TotalEarningsAdjustment"),
+              totalKilometrage = record.get("TotalKilometrage")
+            ))
         .toList
 
       Right(registrations)
@@ -72,17 +74,21 @@ class CSVImportService()(implicit executionContext: ExecutionContext) extends Im
         .map(
           record =>
             Registration(
-              None,
-              record.getOrElse("Job", ""),
-              record.get("Clocked In"),
-              record.get("Clocked Out"),
-              record.get("Duration"),
-              record.get("Hourly Rate"),
-              record.get("Earnings"),
-              record.get("Comment"),
-              readTagsFrom(record.get("Tags")),
-              record.get("TotalTimeAdjustment"),
-              record.get("TotalEarningsAdjustment")))
+              id = None,
+              job = record.getOrElse("Job", ""),
+              clockedIn = record.get("Clocked In"),
+              clockedOut = record.get("Clocked Out"),
+              duration = record.get("Duration"),
+              hourlyRate = record.get("Hourly Rate"),
+              earnings = record.get("Earnings"),
+              comment = record.get("Comment"),
+              tags = readTagsFrom(record.get("Tags")),
+              breaks = record.get("Breaks"),
+              adjustments = record.get("Adjustments"),
+              totalTimeAdjustment = record.get("TotalTimeAdjustment"),
+              totalEarningsAdjustment = record.get("TotalEarningsAdjustment"),
+              totalKilometrage = record.get("TotalKilometrage")
+            ))
         .toList
 
       Right(Source.fromIterator(() => registrations.iterator))

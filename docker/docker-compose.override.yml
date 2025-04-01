@@ -1,5 +1,4 @@
-version: "3.9"
-
+name: hourstracker
 services:
   swagger-ui:
     image: swaggerapi/swagger-ui:v3.19.3
@@ -29,7 +28,7 @@ services:
         condition: service_healthy
 
   postgresql:
-    image: bitnami/postgresql
+    image: bitnami/postgresql:16.6.0
     container_name: hourstracker-postgresql
     ports:
       - "5432:5432"

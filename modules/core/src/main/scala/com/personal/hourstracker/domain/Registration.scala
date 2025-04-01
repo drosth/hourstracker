@@ -11,9 +11,8 @@ object Registration {
   type Registrations = List[Registration]
 
   object JsonProtocol extends CommonJsonSupport {
-
     implicit lazy val registrationFormat: RootJsonFormat[Registration] =
-      jsonFormat11(Registration.apply)
+      jsonFormat14(Registration.apply)
   }
 
 }
@@ -28,8 +27,11 @@ final case class Registration(
   earnings: Option[Double] = None,
   comment: Option[String] = None,
   tags: Option[Set[String]] = None,
+  breaks: Option[String] = None,
+  adjustments: Option[String] = None,
   totalTimeAdjustment: Option[Double] = None,
-  totalEarningsAdjustment: Option[Double] = None) {
+  totalEarningsAdjustment: Option[Double] = None,
+  totalKilometrage: Option[String] = None) {
 
   def calculateDurationInMinutes(): Long = (clockedIn, clockedOut) match {
     case (Some(in: LocalDateTime), Some(out: LocalDateTime)) =>
