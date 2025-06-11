@@ -20,33 +20,39 @@ import scala.concurrent.duration._
 
 class DefaultRegistrationServiceSpec extends FixtureAnyFlatSpec with BeforeAndAfter with Matchers with MockitoSugar {
 
-  private implicit val logger: Logger = mock[Logger]
-  private implicit val system: ActorSystem = ActorSystem()
+  private implicit val logger: Logger                     = mock[Logger]
+  private implicit val system: ActorSystem                = ActorSystem()
   private implicit val executionContext: ExecutionContext = system.dispatcher
-  private implicit lazy val locale: Locale = new Locale("nl", "NL")
+  private implicit lazy val locale: Locale                = new Locale("nl", "NL")
 
-  private val importerService = mock[ImporterService]
-  private val registrationRepository = mock[RegistrationRepository]
-  private val facturationService: FacturationService = mock[FacturationService]
+  private val importerService                                                  = mock[ImporterService]
+  private val registrationRepository                                           = mock[RegistrationRepository]
+  private val facturationService: FacturationService                           = mock[FacturationService]
   private val consolidatedRegistrationService: ConsolidatedRegistrationService = mock[ConsolidatedRegistrationService]
 
   override type FixtureParam = RegistrationService
 
   override protected def withFixture(test: OneArgTest): Outcome = {
-    reset(logger, importerService, registrationRepository, facturationService, consolidatedRegistrationService)
+    reset(
+      logger,
+      importerService,
+      registrationRepository,
+      facturationService,
+      consolidatedRegistrationService
+    )
     test(new DefaultRegistrationService(registrationRepository, importerService, facturationService, consolidatedRegistrationService))
   }
 
   behavior of "Importing registrations"
 
   it should "return registrations" in { classUnderTest =>
-    val registration = mock[Registration]
+    val registration          = mock[Registration]
     val expectedRegistrations = List(registration)
 
     val fileName = "someFile"
     when(importerService.importRegistrationsFrom(fileName)).thenReturn(Future.successful(Right(expectedRegistrations)))
 
-    val actual = Await.result(classUnderTest.importRegistrationsFrom(fileName), 1 second)
+    val actual = Await.result(classUnderTest.importRegistrationsFrom(fileName), 1.second)
     actual shouldEqual Right(expectedRegistrations.size)
   }
 
@@ -54,7 +60,7 @@ class DefaultRegistrationServiceSpec extends FixtureAnyFlatSpec with BeforeAndAf
     val fileName = "unreadableFile"
     when(importerService.importRegistrationsFrom(fileName)).thenReturn(Future.successful(Left(s"'$fileName' is unreadable")))
 
-    val actual = Await.result(classUnderTest.importRegistrationsFrom(fileName), 1 second)
+    val actual = Await.result(classUnderTest.importRegistrationsFrom(fileName), 1.second)
     actual shouldEqual Left("Could not import registrations")
 
     verify(logger).warn(s"Could not import from 'unreadableFile': ''unreadableFile' is unreadable'")

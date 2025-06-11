@@ -10,5 +10,5 @@ trait SystemComponent {
   implicit def executionContext: ExecutionContext
 //  implicit def materializer: ActorMaterializer
   implicit def system: ActorSystem
-  implicit lazy val timeout = Timeout(5 seconds)
+  implicit lazy val timeout: Timeout = Timeout(5.seconds)
 }

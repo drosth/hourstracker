@@ -13,13 +13,12 @@ object Helpers {
 
   implicit class DataTableToListOfMaps(dataTable: DataTable) {
 
-    def withMaps[A](f: Map[String, String] => A): List[A] = {
+    def withMaps[A](f: Map[String, String] => A): List[A] =
       dataTable
         .asMaps(classOf[String], classOf[String])
         .asScala
         .toList
         .map(row => row.asScala.toMap)
         .map(row => f(row))
-    }
   }
 }

@@ -10,4 +10,3 @@ trait FacturationComponent {
 
   def facturationService: FacturationService = new DefaultFacturationService()
 }
-

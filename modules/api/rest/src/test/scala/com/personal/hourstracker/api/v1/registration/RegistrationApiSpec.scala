@@ -23,19 +23,19 @@ import scala.collection.immutable
 
 class RegistrationApiSpec
   extends ApiSpec
-  with RegistrationApi
-  with RegistrationModule
-  with ImporterModule
-  with PresenterModule
-  with LoggingComponent
-  with SystemComponent {
+    with RegistrationApi
+    with RegistrationModule
+    with ImporterModule
+    with PresenterModule
+    with LoggingComponent
+    with SystemComponent {
 
   import Fixtures._
   import RegistrationApi._
 
-  override lazy val importerService: ImporterService = mock[ImporterService]
+  override lazy val importerService: ImporterService               = mock[ImporterService]
   override lazy val registrationRepository: RegistrationRepository = mock[RegistrationRepository]
-  override lazy val registrationService: RegistrationService = mock[RegistrationService]
+  override lazy val registrationService: RegistrationService       = mock[RegistrationService]
 
   private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
@@ -50,7 +50,8 @@ class RegistrationApiSpec
         registrationInLastDayOfPreviousMonth,
         registrationInFirstDayOfCurrentMonth,
         registrationInLastDayOfCurrentMonth,
-        registrationInFirstDayOfNextMonth).map(_.convert())
+        registrationInFirstDayOfNextMonth
+      ).map(_.convert())
     }
   }
 
@@ -65,7 +66,8 @@ class RegistrationApiSpec
         registrationInLastDayOfPreviousMonth,
         registrationInFirstDayOfCurrentMonth,
         registrationInLastDayOfCurrentMonth,
-        registrationInFirstDayOfNextMonth).map(_.convert())
+        registrationInFirstDayOfNextMonth
+      ).map(_.convert())
     }
   }
 
@@ -80,8 +82,8 @@ class RegistrationApiSpec
   }
 
   it should "be able retrieve registrations in a month of a year" in {
-    val year = LocalDateTime.now().getYear
-    val month = LocalDateTime.now().getMonthValue
+    val year          = LocalDateTime.now().getYear
+    val month         = LocalDateTime.now().getMonthValue
     val registrations = registrationsWithMonthlyBoundaries ::: registrationsWithYearlyBoundaries
     givenFetchingRegistrationsOfAMonthInAYearReturns(year, month, registrations)
 
@@ -105,8 +107,10 @@ class RegistrationApiSpec
           """sep=,
             |"Job","Clocked In","Clocked Out","Duration","Hourly Rate","Earnings","Comment","Tags","Breaks","Adjustments","TotalTimeAdjustment","TotalEarningsAdjustment"
             |"Johan Enschedé","14/11/2011 10:45","14/11/2011 17:49","7","74,38","520,66","","","","","",""
-            |""".stripMargin),
-        Map("filename" -> "exported.csv")))
+            |""".stripMargin
+        ),
+        Map("filename" -> "exported.csv")
+      ))
 
     Post("/registrations/upload", multipartForm) ~> registrationRoutes ~> check {
       status shouldEqual StatusCodes.OK
@@ -117,35 +121,60 @@ class RegistrationApiSpec
   object Fixtures {
 
     val registrationInLastDayOfPreviousYear =
-      Registration(job = "Last day of previous year", clockedIn = Some(LocalDateTime.now().withDayOfYear(1).minusDays(1)))
+      Registration(
+        job       = "Last day of previous year",
+        clockedIn = Some(LocalDateTime.now().withDayOfYear(1).minusDays(1))
+      )
 
     val registrationInFirstDayOfCurrentYear =
-      Registration(job = "First day of current year", clockedIn = Some(LocalDateTime.now().withDayOfYear(1)))
+      Registration(
+        job       = "First day of current year",
+        clockedIn = Some(LocalDateTime.now().withDayOfYear(1))
+      )
 
     val registrationInLastDayOfPreviousMonth =
-      Registration(job = "Last day of previous month", clockedIn = Some(LocalDateTime.now().withDayOfMonth(1).minusDays(1)))
+      Registration(
+        job       = "Last day of previous month",
+        clockedIn = Some(LocalDateTime.now().withDayOfMonth(1).minusDays(1))
+      )
 
     val registrationInFirstDayOfCurrentMonth =
-      Registration(job = "First day of current month", clockedIn = Some(LocalDateTime.now().withDayOfMonth(1)))
+      Registration(
+        job       = "First day of current month",
+        clockedIn = Some(LocalDateTime.now().withDayOfMonth(1))
+      )
 
     val registrationInLastDayOfCurrentMonth =
-      Registration(job = "Last day of current month", clockedIn = Some(LocalDateTime.now().plusMonths(1).withDayOfMonth(1).minusDays(1)))
+      Registration(
+        job       = "Last day of current month",
+        clockedIn = Some(LocalDateTime.now().plusMonths(1).withDayOfMonth(1).minusDays(1))
+      )
 
     val registrationInFirstDayOfNextMonth =
-      Registration(job = "First day of next month", clockedIn = Some(LocalDateTime.now().plusMonths(1).withDayOfMonth(1)))
+      Registration(
+        job       = "First day of next month",
+        clockedIn = Some(LocalDateTime.now().plusMonths(1).withDayOfMonth(1))
+      )
 
     val registrationInLastDayOfCurrentYear =
-      Registration(job = "Last day of current year", clockedIn = Some(LocalDateTime.now().plusYears(1).withDayOfYear(1).minusDays(1)))
+      Registration(
+        job       = "Last day of current year",
+        clockedIn = Some(LocalDateTime.now().plusYears(1).withDayOfYear(1).minusDays(1))
+      )
 
     val registrationInFirstDayOfNextYear =
-      Registration(job = "First day of next year", clockedIn = Some(LocalDateTime.now().plusYears(1).withDayOfYear(1)))
+      Registration(
+        job       = "First day of next year",
+        clockedIn = Some(LocalDateTime.now().plusYears(1).withDayOfYear(1))
+      )
 
     val registrationsWithMonthlyBoundaries =
       List(
         registrationInLastDayOfPreviousMonth,
         registrationInFirstDayOfCurrentMonth,
         registrationInLastDayOfCurrentMonth,
-        registrationInFirstDayOfNextMonth)
+        registrationInFirstDayOfNextMonth
+      )
 
     def givenFetchingRegistrationsReturns(registrations: Registrations = List.empty) =
       when(registrationService.fetchRegistrations()).thenReturn(Source.fromIterator(() => registrations.iterator))
@@ -162,14 +191,13 @@ class RegistrationApiSpec
         registrationInLastDayOfPreviousYear,
         registrationInFirstDayOfCurrentYear,
         registrationInLastDayOfCurrentYear,
-        registrationInFirstDayOfNextYear)
+        registrationInFirstDayOfNextYear
+      )
 
-    def givenImportingRegistrationsIsSuccessful() = {
+    def givenImportingRegistrationsIsSuccessful() =
       when(registrationService.importRegistrationsFromSource(any[String])).thenReturn( // Future.successful(Right(4))
         Source.fromIterator(() =>
-          registrationsWithMonthlyBoundaries.map(_.asRight[String]).toIterator
-        )
-      )
-    }
+          registrationsWithMonthlyBoundaries.map(_.asRight[String]).iterator
+        ))
   }
 }

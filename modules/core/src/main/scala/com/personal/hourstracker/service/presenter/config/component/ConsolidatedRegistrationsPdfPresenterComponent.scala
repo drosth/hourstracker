@@ -4,8 +4,8 @@ import java.io.File
 
 import com.personal.hourstracker.config.Configuration
 import com.personal.hourstracker.config.component.LoggingComponent
-import com.personal.hourstracker.domain.ConsolidatedRegistration.{ ConsolidatedRegistrations, ConsolidatedRegistrationsPerJob }
-import io.github.cloudify.scala.spdf.{ Pdf, PdfConfig, Portrait }
+import com.personal.hourstracker.domain.ConsolidatedRegistration.{ConsolidatedRegistrations, ConsolidatedRegistrationsPerJob}
+import io.github.cloudify.scala.spdf.{Pdf, PdfConfig, Portrait}
 
 trait ConsolidatedRegistrationsPdfPresenterComponent extends PdfPresenterComponent {
   this: HtmlPresenterComponent with LoggingComponent =>
@@ -14,16 +14,20 @@ trait ConsolidatedRegistrationsPdfPresenterComponent extends PdfPresenterCompone
 
   class ConsolidatedRegistrationsPdfPresenter(htmlPresenter: HtmlPresenter) extends PdfPresenter with Configuration {
 
-    val executablePath = "/usr/local/bin/wkhtmltopdf"
+    val executablePath = "/usr/bin/wkhtmltopdf"
+//    val executablePath = "/usr/local/bin/wkhtmltopdf"
 
-    lazy val pdf = Pdf(executablePath, new PdfConfig {
-      orientation := Portrait
-      pageSize := "A4"
-      marginTop := "0.5cm"
-      marginBottom := "0.5cm"
-      marginLeft := "0.5cm"
-      marginRight := "0.5cm"
-    })
+    lazy val pdf: Pdf = Pdf(
+      executablePath,
+      new PdfConfig {
+        orientation := Portrait
+        pageSize := "A4"
+        marginTop := "0.5cm"
+        marginBottom := "0.5cm"
+        marginLeft := "0.5cm"
+        marginRight := "0.5cm"
+      }
+    )
 
     override val renderRegistrationsPerJobs: ConsolidatedRegistrationsPerJob => Seq[File] = registrationsPerJob => {
       logger.info(s"Rendering to HTML")

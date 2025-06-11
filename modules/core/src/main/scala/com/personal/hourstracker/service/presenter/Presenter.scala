@@ -1,10 +1,10 @@
 package com.personal.hourstracker.service.presenter
 
-import java.io.{ File, PrintWriter, Writer }
+import java.io.{File, PrintWriter, Writer}
 
 import com.personal.hourstracker._
 import com.personal.hourstracker.config.Configuration
-import com.personal.hourstracker.domain.ConsolidatedRegistration.{ ConsolidatedRegistrations, ConsolidatedRegistrationsPerJob }
+import com.personal.hourstracker.domain.ConsolidatedRegistration.{ConsolidatedRegistrations, ConsolidatedRegistrationsPerJob}
 
 trait Presenter {
   this: Configuration =>
@@ -13,23 +13,21 @@ trait Presenter {
 
   def renderConsolidatedRegistrations: ConsolidatedRegistrations => String
 
-  def renderRegistrationsPerJobs: ConsolidatedRegistrationsPerJob => Seq[File] = consolidatedRegistrationsPerJob => {
+  def renderRegistrationsPerJobs: ConsolidatedRegistrationsPerJob => Seq[File] = consolidatedRegistrationsPerJob =>
     consolidatedRegistrationsPerJob.map {
       case (job, consolidatedRegistrations) => renderRegistrationsPerSingleJob(job, consolidatedRegistrations)
     }.toSeq
-  }
 
   def fileName(job: String, consolidatedRegistrations: ConsolidatedRegistrations, extension: String): String =
     s"${Application.exportTo}/[Timesheet] - $job - ${dateRangeAsStringOf(consolidatedRegistrations)}$extension"
 
-  protected[presenter] def withWriterTo(fileName: String)(fn: Writer => Unit) {
+  protected[presenter] def withWriterTo(fileName: String)(fn: Writer => Unit): Unit = {
     val writer: Writer = new PrintWriter(new File(fileName))
-    try {
+    try
       fn(writer)
-    } catch {
+    catch {
       case e: Exception =>
-    } finally {
+    } finally
       writer.close()
-    }
   }
 }

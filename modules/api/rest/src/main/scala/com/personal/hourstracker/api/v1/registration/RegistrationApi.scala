@@ -69,7 +69,7 @@ trait RegistrationApi extends RegistrationApiProtocol with RegistrationApiDoc wi
       .json()
       .withParallelMarshalling(parallelism = 8, unordered = false)
 
-  override def getRegistrations: Route = {
+  override def getRegistrations: Route =
     get {
       pathPrefix("registrations") {
         pathEnd {
@@ -91,24 +91,23 @@ trait RegistrationApi extends RegistrationApiProtocol with RegistrationApiDoc wi
         }
       }
     }
-  }
 
-  override def getConsolidatedRegistrations: Route = {
+  override def getConsolidatedRegistrations: Route =
     get {
       pathPrefix("registrations") {
         path(Segment / "consolidated") { year =>
           val source = registrationService.fetchRegistrations(request = SelectByYear(year.toInt))
 
-          parameters('type.?) {
+          parameters("type".?) {
             case Some("html") =>
               onComplete(consolidateRegistrationsFor(source)(htmlPresenter).runWith(Sink.last)) {
+                case Failure(ex) => complete((StatusCodes.InternalServerError, s"An error occurred: ${ex.getMessage}"))
+
                 case Success(consolidatedFiles) if consolidatedFiles.nonEmpty =>
                   getFromFile(consolidatedFiles.head)
 
-                case Success(consolidatedFiles) if consolidatedFiles.isEmpty =>
+                case _ =>
                   complete("nothing here...")
-
-                case Failure(ex) => complete((StatusCodes.InternalServerError, s"An error occurred: ${ex.getMessage}"))
               }
 
             case Some("json") => complete(consolidateRegistrationsFor(source)(jsonPresenter))
@@ -119,16 +118,16 @@ trait RegistrationApi extends RegistrationApiProtocol with RegistrationApiDoc wi
         path(Segment / Segment / "consolidated") { (year, month) =>
           val source = registrationService.fetchRegistrations(request = SelectByYearAndMonth(year.toInt, month.toInt))
 
-          parameters('type.?) {
+          parameters("type".?) {
             case Some("html") =>
               onComplete(consolidateRegistrationsFor(source)(htmlPresenter).runWith(Sink.last)) {
+                case Failure(ex) => complete((StatusCodes.InternalServerError, s"An error occurred: ${ex.getMessage}"))
+
                 case Success(consolidatedFiles) if consolidatedFiles.nonEmpty =>
                   getFromFile(consolidatedFiles.head)
 
-                case Success(consolidatedFiles) if consolidatedFiles.isEmpty =>
+                case _ =>
                   complete("nothing here...")
-
-                case Failure(ex) => complete((StatusCodes.InternalServerError, s"An error occurred: ${ex.getMessage}"))
               }
 
             case Some("json") => complete(consolidateRegistrationsFor(source)(jsonPresenter))
@@ -138,13 +137,12 @@ trait RegistrationApi extends RegistrationApiProtocol with RegistrationApiDoc wi
         }
       }
     }
-  }
 
   private def consolidateRegistrationsFor(source: Source[Registration, NotUsed])(presenter: Presenter): Source[List[String], NotUsed] =
     registrationService.consolidateRegistrations(source) {
       _.map {
         case (job, consolidatedRegistrations) =>
-          logger.info(s"Rendering ${consolidatedRegistrations.size} registrations for job - '${job}'")
+          logger.info(s"Rendering ${consolidatedRegistrations.size} registrations for job - '$job'")
           presenter.renderRegistrationsPerSingleJob(job, consolidatedRegistrations)
       }.map(_.getAbsolutePath).toList
     }

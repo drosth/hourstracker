@@ -1,5 +1,5 @@
 package com.personal.common
-import spray.json.{ DefaultJsonProtocol, DeserializationException, JsNumber, JsString, JsValue, JsonFormat }
+import spray.json.{DefaultJsonProtocol, DeserializationException, JsNumber, JsString, JsValue, JsonFormat}
 
 trait JsonEnumSupport {
   this: DefaultJsonProtocol =>

@@ -7,7 +7,7 @@ import java.util.Locale
 import com.personal.common.CommonJsonSupport
 import com.personal.hourstracker.domain.ConsolidatedRegistration
 import com.personal.hourstracker.domain.ConsolidatedRegistration.ConsolidatedRegistrations
-import com.personal.hourstracker.service.presenter.Model.{ month, monthFormatter }
+import com.personal.hourstracker.service.presenter.Model.{month, monthFormatter}
 import spray.json.RootJsonFormat
 
 object Model {

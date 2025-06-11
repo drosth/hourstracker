@@ -14,7 +14,11 @@ ThisBuild / envFileName := Option(System.getProperty("envfile")).getOrElse(".env
 
 lazy val root = project
   .in(file("."))
-  .aggregate(api, core, storage)
+  .aggregate(
+    api,
+    core,
+    storage
+  )
   .settings(Settings.defaultProjectSettings)
 //  .settings(
 //    ThisBuild / versionScheme := Some("early-semver")
@@ -46,15 +50,17 @@ lazy val storage = (project in file("modules/storage"))
     publishArtifact := true
   )
 
-lazy val api = project
-  .in(file("modules/api"))
-  .aggregate(rest)
+lazy val api = project.in(file("modules/api"))
+  .aggregate(
+    rest
+  )
   .settings(Settings.defaultProjectSettings)
 
 lazy val rest = (project in file("modules/api/rest"))
   .dependsOn(core, storage)
   .enablePlugins(JavaAppPackaging)
   .settings(Settings.defaultScalaProjectSettings)
+  .settings(Settings.dockerSettings("hourstracker"))
   .settings(Settings.akkaHttpSettings)
   .settings(Settings.akkaStreamSettings)
   .settings(Settings.jsonSettings)

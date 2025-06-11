@@ -1,13 +1,11 @@
 resolvers ++= Seq(
   DefaultMavenRepository,
   Resolver.typesafeRepo("releases"),
-  Resolver.sonatypeRepo("public"),
-//  Resolver.sonatypeOssRepos("public"),
-  Resolver.sbtPluginRepo("releases")
-)
+  Resolver.sbtPluginRepo("releases"),
+  "repo.akka.io" at "https://repo.akka.io/maven/"
+) ++ Resolver.sonatypeOssRepos("public")
 
-
-dependencyOverrides += "org.scala-lang.modules" %% "scala-xml" % "2.2.0"
+dependencyOverrides += "org.scala-lang.modules" %% "scala-xml" % "2.4.0"
 
 // Create a über JAR of your project with all of its dependencies
 // see also: https://github.com/sbt/sbt-assembly
@@ -21,7 +19,7 @@ addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.2")
 // integrates the scapegoat static code analysis library
 // see also: https://github.com/scapegoat-scala/sbt-scapegoat
 //addSbtPlugin("com.sksamuel.scapegoat" %% "scalac-scapegoat-plugin" % "2.1.3")
-addSbtPlugin("com.sksamuel.scapegoat" %% "sbt-scapegoat" % "1.2.2") // Verify latest in badge above
+addSbtPlugin("com.sksamuel.scapegoat" %% "sbt-scapegoat" % "1.2.13")
 
 // Display your sbt project's dependency updates
 // see also: https://github.com/rtimush/sbt-updates

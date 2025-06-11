@@ -8,7 +8,7 @@ import spray.json._
 
 object Registration {
   type RegistrationID = Long
-  type Registrations = List[Registration]
+  type Registrations  = List[Registration]
 
   object JsonProtocol extends CommonJsonSupport {
     implicit lazy val registrationFormat: RootJsonFormat[Registration] =
@@ -20,18 +20,19 @@ object Registration {
 final case class Registration(
   id: Option[Registration.RegistrationID] = None,
   job: String,
-  clockedIn: Option[LocalDateTime] = None,
-  clockedOut: Option[LocalDateTime] = None,
-  duration: Option[Double] = None,
-  hourlyRate: Option[Double] = None,
-  earnings: Option[Double] = None,
-  comment: Option[String] = None,
-  tags: Option[Set[String]] = None,
-  breaks: Option[String] = None,
-  adjustments: Option[String] = None,
-  totalTimeAdjustment: Option[Double] = None,
+  clockedIn: Option[LocalDateTime]        = None,
+  clockedOut: Option[LocalDateTime]       = None,
+  duration: Option[Double]                = None,
+  hourlyRate: Option[Double]              = None,
+  earnings: Option[Double]                = None,
+  comment: Option[String]                 = None,
+  tags: Option[Set[String]]               = None,
+  breaks: Option[String]                  = None,
+  adjustments: Option[String]             = None,
+  totalTimeAdjustment: Option[Double]     = None,
   totalEarningsAdjustment: Option[Double] = None,
-  totalKilometrage: Option[String] = None) {
+  totalKilometrage: Option[String]        = None
+) {
 
   def calculateDurationInMinutes(): Long = (clockedIn, clockedOut) match {
     case (Some(in: LocalDateTime), Some(out: LocalDateTime)) =>

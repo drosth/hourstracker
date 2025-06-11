@@ -22,8 +22,10 @@ object RegistrationSchema extends Schema with PrimitiveTypeMode {
 
   val registrations: Table[RegistrationEntity] = table[RegistrationEntity]("hours_registered")
 
-  on(registrations)(r => declare(
-    r.job is indexed,
-    columns(r.job, r.clockedIn, r.clockedOut) are (indexed, unique))
+  on(registrations)(r =>
+    declare(
+      r.job is indexed,
+      columns(r.job, r.clockedIn, r.clockedOut) are (indexed, unique)
+    )
   )
 }

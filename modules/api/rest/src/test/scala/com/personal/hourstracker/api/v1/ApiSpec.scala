@@ -12,13 +12,13 @@ import scala.concurrent.ExecutionContext
 
 trait ApiSpec
   extends AnyFlatSpec
-  with Matchers
-  with BeforeAndAfter
-  with MockitoSugar
-  with ScalatestRouteTest
-  with SystemComponent
-  with LoggingComponent
-  with Configuration {
+    with Matchers
+    with BeforeAndAfter
+    with MockitoSugar
+    with ScalatestRouteTest
+    with SystemComponent
+    with LoggingComponent
+    with Configuration {
 
   override def executionContext: ExecutionContext = system.dispatcher
 }

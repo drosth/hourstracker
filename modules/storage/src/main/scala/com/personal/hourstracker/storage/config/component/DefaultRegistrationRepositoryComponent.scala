@@ -8,8 +8,8 @@ import com.personal.hourstracker.storage.config.StorageConfiguration
 import com.personal.hourstracker.storage.repository.squeryl.SquerylRegistrationRepository
 import javax.sql.DataSource
 import org.apache.commons.dbcp2.BasicDataSource
-import org.slf4j.{ Logger, LoggerFactory }
-import org.squeryl.{ Session, SessionFactory }
+import org.slf4j.{Logger, LoggerFactory}
+import org.squeryl.{Session, SessionFactory}
 
 trait DefaultRegistrationRepositoryComponent extends RegistrationRepositoryComponent {
   this: StorageConfiguration =>
@@ -29,7 +29,8 @@ trait DefaultRegistrationRepositoryComponent extends RegistrationRepositoryCompo
 
   override lazy val registrationRepository: RegistrationRepository = {
     logger.info(
-      s"Starting Database session for driver '$driver', connected to '${Storage.Registrations.url}' ('${Storage.Registrations.user}')")
+      s"Starting Database session for driver '$driver', connected to '${Storage.Registrations.url}' ('${Storage.Registrations.user}')"
+    )
     Class.forName(driver)
 
     SessionFactory.concreteFactory = DatabaseAdapterFactory
@@ -46,9 +47,10 @@ trait DefaultRegistrationRepositoryComponent extends RegistrationRepositoryCompo
   private lazy val driver: String = Storage.Registrations.driver
 
   private lazy val dataSource: BasicDataSource = createDataSource(
-    username = Storage.Registrations.user,
-    password = Storage.Registrations.password,
-    dataSourceUri = new URI(Storage.Registrations.url)) match {
+    username      = Storage.Registrations.user,
+    password      = Storage.Registrations.password,
+    dataSourceUri = new URI(Storage.Registrations.url)
+  ) match {
     case Left(message) =>
       logger.error(s"Could not create DataSource: $message")
       throw new IllegalArgumentException(s"Properties not configured correctly: $message")

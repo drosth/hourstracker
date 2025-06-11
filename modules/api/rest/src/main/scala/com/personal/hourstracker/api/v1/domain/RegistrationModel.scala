@@ -18,4 +18,5 @@ final case class RegistrationModel(
   comment: Option[String],
   tags: Option[Set[String]],
   totalTimeAdjustment: Option[Double],
-  totalEarningsAdjustment: Option[Double])
+  totalEarningsAdjustment: Option[Double]
+)

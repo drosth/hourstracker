@@ -13,7 +13,8 @@ object ConsolidatedRegistration {
 
   trait Protocol extends CommonJsonSupport {
     implicit lazy val consolidatedRegistrationFormat: JsonFormat[ConsolidatedRegistration] = jsonFormat4(
-      ConsolidatedRegistration.apply)
+      ConsolidatedRegistration.apply
+    )
   }
 
   object DateTimeOrdering extends Ordering[ConsolidatedRegistration] {
@@ -29,4 +30,5 @@ final case class ConsolidatedRegistration(
   date: LocalDate,
   job: String,
   duration: Option[Double],
-  comment: Option[String])
+  comment: Option[String]
+)

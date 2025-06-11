@@ -10,9 +10,8 @@ import scala.util.Try
 
 class CompressorService(implicit executionContext: ExecutionContext) {
 
-  def zip(targetFiles: Seq[File], destinationFile: File, optionalPassword: Option[String] = None): Future[Try[ZipFile]] = {
+  def zip(targetFiles: Seq[File], destinationFile: File, optionalPassword: Option[String] = None): Future[Try[ZipFile]] =
     Future(zipTarget(targetFiles, destinationFile, optionalPassword)(getZipParameters))
-  }
 
   private def getZipParameters(optionalPassword: Option[String]): ZipParameters = {
     val parameters = new ZipParameters

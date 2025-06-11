@@ -5,7 +5,7 @@ import java.io.File
 import com.personal.hourstracker.config.Configuration
 import com.personal.hourstracker.config.component.LoggingComponent
 import com.personal.hourstracker.consolidated.presenter
-import com.personal.hourstracker.domain.ConsolidatedRegistration.{ ConsolidatedRegistrations, ConsolidatedRegistrationsPerJob }
+import com.personal.hourstracker.domain.ConsolidatedRegistration.{ConsolidatedRegistrations, ConsolidatedRegistrationsPerJob}
 import com.personal.hourstracker.service.presenter.Model
 
 trait ConsolidatedRegistrationsHtmlPresenterComponent extends HtmlPresenterComponent {
@@ -20,18 +20,18 @@ trait ConsolidatedRegistrationsHtmlPresenterComponent extends HtmlPresenterCompo
 
       val model: Model = Model(
         consultantName = Application.consultantName,
-        registrations = consolidatedRegistrations)
+        registrations  = consolidatedRegistrations
+      )
 
       logger.debug(s"ConsolidatedRegistrationsHtmlPresenter:renderConsolidatedRegistrations - consolidatedRegistrations = $consolidatedRegistrations")
 
       presenter.html.index.render(model).toString()
     }
 
-    override val renderRegistrationsPerJobs: ConsolidatedRegistrationsPerJob => Seq[File] = consolidatedRegistrationsPerJob => {
+    override val renderRegistrationsPerJobs: ConsolidatedRegistrationsPerJob => Seq[File] = consolidatedRegistrationsPerJob =>
       consolidatedRegistrationsPerJob.map {
         case (job, consolidatedRegistrations) => renderRegistrationsPerSingleJob(job, consolidatedRegistrations)
       }.toSeq
-    }
 
     override def renderRegistrationsPerSingleJob(job: String, registrations: ConsolidatedRegistrations): File = {
       logger.info(s"Rendering #${registrations.size} consolidated registrations for job '$job' to HTML")

@@ -12,4 +12,3 @@ trait PdfPresenterComponent {
 trait PdfPresenter extends Presenter {
   this: Configuration =>
 }
-

@@ -7,24 +7,21 @@ import scoverage.ScoverageKeys.*
 import scala.util.Properties
 
 object Settings {
-  val akkaVersion = "2.8.5"
-  val akkaHttpVersion = "10.5.3"
+  val akkaVersion         = "2.8.8" // because of scala version 2.12
+  val akkaHttpVersion     = "10.5.3" // because of scala version 2.12
+  val akkaHttpCorsVersion = "1.2.0" // because of scala version 2.12
 
   lazy val akkaHttpSettings = Seq(
     libraryDependencies ++= {
-      val akkaHttpCorsVersion = "1.2.0" //0.3.0"
-
       Seq(
         "akka-http-spray-json",
         "akka-http-xml",
         "akka-http"
       ).map("com.typesafe.akka" %% _ % akkaHttpVersion) ++
       Seq(
-        "ch.megard" %% "akka-http-cors" % akkaHttpCorsVersion excludeAll ExclusionRule(organization = "com.typesafe.akka"),
+        "ch.megard"                    %% "akka-http-cors"    % akkaHttpCorsVersion, // excludeAll ExclusionRule(organization = "com.typesafe.akka")
         "com.github.swagger-akka-http" %% "swagger-akka-http" % "2.11.0",
-        "jakarta.ws.rs" % "jakarta.ws.rs-api" % "3.1.0"
-
-        //        "javax.ws.rs" % "javax.ws.rs-api" % "2.1.1"
+        "jakarta.ws.rs"                 % "jakarta.ws.rs-api" % "4.0.0"
       )
     }
   )
@@ -48,9 +45,9 @@ object Settings {
   lazy val akkaTestSettings = Seq(
     libraryDependencies ++= {
       Seq(
-        "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion,
+        "com.typesafe.akka" %% "akka-http-testkit"   % akkaHttpVersion,
         "com.typesafe.akka" %% "akka-stream-testkit" % akkaVersion,
-        "com.typesafe.akka" %% "akka-testkit" % akkaVersion
+        "com.typesafe.akka" %% "akka-testkit"        % akkaVersion
       ).map(_ % Test)
     }
   )
@@ -59,24 +56,24 @@ object Settings {
     updateOptions := updateOptions.value
       .withLatestSnapshots(true)
       .withGigahorse(false),
-    scalacOptions ++= Seq(
-      "-unchecked",
-      "-feature",
-      "-language:existentials",
-      "-language:higherKinds",
-      "-language:implicitConversions",
-      "-language:postfixOps",
-      "-deprecation",
-      "-encoding",
-      "utf8"
-    ),
+//    scalacOptions ++= Seq(
+//      "-unchecked",
+//      "-feature",
+//      "-language:existentials",
+//      "-language:higherKinds",
+//      "-language:implicitConversions",
+//      "-language:postfixOps",
+//      "-deprecation",
+//      "-encoding",
+//      "utf8"
+//    ),
     libraryDependencies ++= {
       Seq(
-        "com.softwaremill.quicklens" %% "quicklens" % "1.9.7",
-        "commons-codec" % "commons-codec" % "20041127.091804",
-        "commons-io" % "commons-io" % "20030203.000550",
-        "org.apache.commons" % "commons-text" % "1.11.0",
-        "org.typelevel" %% "cats-core" % "2.10.0"
+        "com.softwaremill.quicklens" %% "quicklens"     % "1.9.12",
+        "commons-codec"               % "commons-codec" % "20041127.091804",
+        "commons-io"                  % "commons-io"    % "20030203.000550",
+        "org.apache.commons"          % "commons-text"  % "1.13.1",
+        "org.typelevel"              %% "cats-core"     % "2.13.0"
       )
     }
   )
@@ -88,7 +85,7 @@ object Settings {
     coverageHighlighting := true,
     coverageExcludedFiles := s"${sourceManaged.value.toString}/.*;.*/target/.*/twirl/.*",
     //    coverageExcludedPackages := """.*\.config\..*;nl\.dpes\.b2b\.v[0-9]+\..*;nl\.dpes\.b2b\.salesforce\.v[0-9]+\..*;nl\.dpes\.b2b\.jobmanager\.v[0-9]+\..*"""
-    libraryDependencies += "org.scoverage" %% "scalac-scoverage-runtime" % "2.0.11" % Runtime
+    libraryDependencies += "org.scoverage" %% "scalac-scoverage-runtime" % "2.0.7" % Test
   )
 
   lazy val cucumberSettings: Seq[Def.Setting[Seq[ModuleID]]] = Seq(
@@ -101,33 +98,33 @@ object Settings {
         // A reporter plug-in for pretty Cucumber reports
         // See also: https://gitlab.com/jamietanna/cucumber-reporting-plugin
         "me.jvt.cucumber" % "reporting-plugin" % "7.11.0",
-        "io.cucumber" %% "cucumber-scala" % "8.20.0"
+        "io.cucumber"    %% "cucumber-scala"   % "8.28.0"
       ) ++
-      Seq(
-        "io.cucumber" % "cucumber-core",
-        "io.cucumber" % "cucumber-junit",
-        "io.cucumber" % "cucumber-jvm"
-      ).map(_ % cucumberVersion))
+        Seq(
+          "io.cucumber" % "cucumber-core",
+          "io.cucumber" % "cucumber-junit",
+          "io.cucumber" % "cucumber-jvm"
+        ).map(_ % cucumberVersion))
         .map(_ % Test)
     }
   )
 
   lazy val databaseSettings = Seq(
     libraryDependencies ++= {
-      val squerylVersion = "0.9.18"
-      val h2Version = "2.2.224"
-      val mysqlVersion = "8.0.33"
+      val squerylVersion    = "0.9.18"
+      val h2Version         = "2.2.224"
+      val mysqlVersion      = "8.0.33"
       val postgresqlVersion = "42.7.1"
 
       Seq(
-        "org.squeryl" %% "squeryl" % squerylVersion,
-        "com.h2database" % "h2" % h2Version % Test,
-        "mysql" % "mysql-connector-java" % mysqlVersion,
-        "org.postgresql" % "postgresql" % postgresqlVersion
+        "org.squeryl"   %% "squeryl"              % squerylVersion,
+        "com.h2database" % "h2"                   % h2Version % Test,
+        "mysql"          % "mysql-connector-java" % mysqlVersion,
+        "org.postgresql" % "postgresql"           % postgresqlVersion
       ) ++
       Seq(
-        "org.flywaydb" % "flyway-core" % "9.22.3", // "10.6.0"
-        "org.apache.commons" % "commons-dbcp2" % "2.11.0"
+        "org.flywaydb"       % "flyway-core"   % "9.22.3", // "10.6.0"
+        "org.apache.commons" % "commons-dbcp2" % "2.13.0"
       )
     }
   )
@@ -144,17 +141,18 @@ object Settings {
 
   lazy val defaultScalaProjectSettings: Seq[Def.Setting[_]] = Seq(
     scalaVersion := Common.scalaVersion,
-    addCompilerPlugin("org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full)
+    libraryDependencies += "org.scala-lang" % "scala-library" % Common.scalaVersion,
+    addCompilerPlugin("org.typelevel" % "kind-projector" % "0.13.3" cross CrossVersion.full)
   ) ++
-  commonSettings ++
-  loggingSettings ++
-  jsonSettings ++
-  coverageSettings ++
-  testSettings ++
-  defaultProjectSettings
+    commonSettings ++
+    loggingSettings ++
+    jsonSettings ++
+    coverageSettings ++
+    testSettings ++
+    defaultProjectSettings
 
   def dockerSettings(name: String): Seq[Def.Setting[_]] = Seq(
-    Docker / dockerBaseImage := "eclipse-temurin:19.0.2_7-jdk",
+    Docker / dockerBaseImage := "eclipse-temurin:21.0.7_6-jdk",
     Docker / daemonUserUid := Some("1001"),
     Docker / daemonUser := "daemon",
     Docker / maintainer := Common.maintainer,
@@ -166,21 +164,21 @@ object Settings {
   lazy val jsonSettings = Seq(
     libraryDependencies ++= {
       Seq(
-        "io.spray" %% "spray-json" % "1.3.6" //1.3.4"
+        "io.spray" %% "spray-json" % "1.3.6" // 1.3.4"
       )
     }
   )
 
   lazy val loggingSettings = {
-    val slf4jVersion = "2.0.0"
+    val slf4jVersion = "2.0.17"
 
     Seq(
       libraryDependencies ++=
         Seq(
-          "ch.qos.logback" % "logback-classic" % "1.4.0",
-          "org.slf4j" % "slf4j-api" % slf4jVersion,
-          "net.logstash.logback" % "logstash-logback-encoder" % "7.2" excludeAll ExclusionRule("ch.qos.logback"),
-          "ch.qos.logback.contrib" % "logback-json-classic" % "0.1.5" excludeAll ExclusionRule("ch.qos.logback")
+          "ch.qos.logback"         % "logback-classic"          % "1.5.18",
+          "org.slf4j"              % "slf4j-api"                % slf4jVersion,
+          "net.logstash.logback"   % "logstash-logback-encoder" % "8.1" excludeAll ExclusionRule("ch.qos.logback"),
+          "ch.qos.logback.contrib" % "logback-json-classic"     % "0.1.5" excludeAll ExclusionRule("ch.qos.logback")
         ),
       dependencyOverrides ++= Seq(
         "org.slf4j" % "slf4j-api" % slf4jVersion
@@ -199,7 +197,7 @@ object Settings {
   lazy val scalaCsvSettings = Seq(
     libraryDependencies ++= {
       Seq(
-        "com.github.tototoshi" %% "scala-csv" % "1.3.10"
+        "com.github.tototoshi" %% "scala-csv" % "2.0.0"
       )
     }
   )
@@ -209,12 +207,12 @@ object Settings {
       Seq(
         "io.github.cloudify" % "spdf_2.12" % "1.4.0" excludeAll ExclusionRule(
           organization = "org.scala-lang.modules",
-          name = "scala-xml_2.12"
-        ),
+          name         = "scala-xml_2.12"
+        )
       )
     },
     dependencyOverrides ++= Seq(
-      "org.scala-lang.modules" %% "scala-xml" % "2.2.0"
+      "org.scala-lang.modules" %% "scala-xml" % "2.4.0"
     )
   )
 
@@ -228,17 +226,17 @@ object Settings {
 
   lazy val testSettings = Seq(
     libraryDependencies ++= {
-      val scalatestVersion = "3.2.17"
-      val mockitoVersion = "5.10.0"
-      val junitVersion = "4.13.2"
-      val scalaCheckVersion = "1.17.0"
+      val scalatestVersion  = "3.2.19"
+      val mockitoVersion    = "5.18.0"
+      val junitVersion      = "4.13.2"
+      val scalaCheckVersion = "1.18.1"
 
       Seq(
-        "org.scalatest" %% "scalatest" % scalatestVersion,
-        "org.mockito" % "mockito-core" % mockitoVersion,
-        "junit" % "junit" % junitVersion,
-        "org.scalacheck" %% "scalacheck" % scalaCheckVersion,
-        "org.scalatestplus" %% "mockito-5-8" % "3.2.17.0"
+        "org.scalatest"     %% "scalatest"    % scalatestVersion,
+        "org.mockito"        % "mockito-core" % mockitoVersion,
+        "junit"              % "junit"        % junitVersion,
+        "org.scalacheck"    %% "scalacheck"   % scalaCheckVersion,
+        "org.scalatestplus" %% "mockito-5-8"  % "3.2.17.0"
       ).map(_ % Test)
     }
   )

@@ -19,22 +19,28 @@ protected[registration] trait RegistrationApiDoc {
     summary = "Retrieve registrations",
     parameters = Array(
       new Parameter(
-        in = ParameterIn.PATH,
-        name = "year",
+        in       = ParameterIn.PATH,
+        name     = "year",
         required = false,
-        schema = new Schema(implementation = classOf[String]),
-        example = "2019"),
+        schema   = new Schema(implementation = classOf[String]),
+        example  = "2019"
+      ),
       new Parameter(
-        in = ParameterIn.PATH,
-        name = "month",
+        in       = ParameterIn.PATH,
+        name     = "month",
         required = false,
-        schema = new Schema(implementation = classOf[String]),
-        example = "1")),
+        schema   = new Schema(implementation = classOf[String]),
+        example  = "1"
+      )
+    ),
     responses = Array(
       new ApiResponse(
         description = "The registrations",
-        content = Array(new Content(mediaType = "application/json", schema = new Schema(implementation = classOf[RegistrationModels])))),
-      new ApiResponse(responseCode = "404", description = "Registrations not found")))
+        content     = Array(new Content(mediaType = "application/json", schema = new Schema(implementation = classOf[RegistrationModels])))
+      ),
+      new ApiResponse(responseCode = "404", description = "Registrations not found")
+    )
+  )
   @Tags(Array(new Tag(name = "Registration")))
   def getRegistrations: Route
 
@@ -44,20 +50,25 @@ protected[registration] trait RegistrationApiDoc {
     summary = "Retrieve consolidated registrations",
     parameters = Array(
       new Parameter(
-        in = ParameterIn.PATH,
-        name = "year",
+        in       = ParameterIn.PATH,
+        name     = "year",
         required = true,
-        schema = new Schema(implementation = classOf[String]),
-        example = "2019"),
+        schema   = new Schema(implementation = classOf[String]),
+        example  = "2019"
+      ),
       new Parameter(
-        in = ParameterIn.PATH,
-        name = "month",
+        in       = ParameterIn.PATH,
+        name     = "month",
         required = false,
-        schema = new Schema(implementation = classOf[String]),
-        example = "1")),
+        schema   = new Schema(implementation = classOf[String]),
+        example  = "1"
+      )
+    ),
     responses = Array(
       new ApiResponse(description = "The filenames of the generated, consolidated registrations"),
-      new ApiResponse(responseCode = "404", description = "Registrations not found")))
+      new ApiResponse(responseCode = "404", description = "Registrations not found")
+    )
+  )
   @Tags(Array(new Tag(name = "Registration")))
   def getConsolidatedRegistrations: Route
 
@@ -67,14 +78,17 @@ protected[registration] trait RegistrationApiDoc {
     summary = "Import and store registrations",
     responses = Array(
       new ApiResponse(responseCode = "202", description = "Registrations will be imported"),
-      new ApiResponse(responseCode = "404", description = "Could not import registrations")))
+      new ApiResponse(responseCode = "404", description = "Could not import registrations")
+    )
+  )
   @Tags(Array(new Tag(name = "Registration")))
   def importRegistrationsFromSource: Route
 
   @POST
   @Path("/registrations/upload")
   @Operation(
-    summary = "Upload registrations")
+    summary = "Upload registrations"
+  )
   @Tags(Array(new Tag(name = "Registration")))
   def uploadRegistrations: Route
 }

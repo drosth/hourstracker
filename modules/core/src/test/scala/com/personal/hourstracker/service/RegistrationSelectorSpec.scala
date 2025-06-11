@@ -23,12 +23,14 @@ class RegistrationSelectorSpec extends AnyFlatSpec with BeforeAndAfter with Matc
       Fixtures.withRegistration(Some(2), Some("2019-01-01 00:00:00")),
       Fixtures.withRegistration(Some(3), Some("2019-01-01 00:00:01")),
       Fixtures.withRegistration(Some(4), Some("2019-12-31 23:59:59")),
-      Fixtures.withRegistration(Some(5), Some("2020-01-01 00:00:00")))
+      Fixtures.withRegistration(Some(5), Some("2020-01-01 00:00:00"))
+    )
 
     registrations.filter(RegistrationInYearSelector(2019).filter) shouldEqual List(
       Fixtures.withRegistration(Some(2), Some("2019-01-01 00:00:00")),
       Fixtures.withRegistration(Some(3), Some("2019-01-01 00:00:01")),
-      Fixtures.withRegistration(Some(4), Some("2019-12-31 23:59:59")))
+      Fixtures.withRegistration(Some(4), Some("2019-12-31 23:59:59"))
+    )
   }
 
   behavior of "RegistrationRangeSelector"
@@ -39,7 +41,8 @@ class RegistrationSelectorSpec extends AnyFlatSpec with BeforeAndAfter with Matc
       Fixtures.withRegistration(Some(2), Some("2019-01-01 00:00:00")),
       Fixtures.withRegistration(Some(3), Some("2019-01-01 00:00:01")),
       Fixtures.withRegistration(Some(4), Some("2019-12-31 23:59:59")),
-      Fixtures.withRegistration(Some(5), Some("2020-01-01 00:00:00")))
+      Fixtures.withRegistration(Some(5), Some("2020-01-01 00:00:00"))
+    )
 
     registrations.filter(RegistrationRangeSelector(None, None).filter) shouldEqual registrations
   }
@@ -51,14 +54,16 @@ class RegistrationSelectorSpec extends AnyFlatSpec with BeforeAndAfter with Matc
       Fixtures.withRegistration(Some(3), Some("2019-01-01 00:00:01")),
       Fixtures.withRegistration(Some(4), Some("2019-03-01 00:00:00")),
       Fixtures.withRegistration(Some(5), Some("2019-12-31 23:59:59")),
-      Fixtures.withRegistration(Some(6), Some("2020-01-01 00:00:00")))
+      Fixtures.withRegistration(Some(6), Some("2020-01-01 00:00:00"))
+    )
 
     val classUnderTest = RegistrationRangeSelector(Some(LocalDate.of(2019, 3, 1)), None)
 
     registrations.filter(classUnderTest.filter) shouldEqual List(
       Fixtures.withRegistration(Some(4), Some("2019-03-01 00:00:00")),
       Fixtures.withRegistration(Some(5), Some("2019-12-31 23:59:59")),
-      Fixtures.withRegistration(Some(6), Some("2020-01-01 00:00:00")))
+      Fixtures.withRegistration(Some(6), Some("2020-01-01 00:00:00"))
+    )
   }
 
   it should "return correct list of Registrations, given startAt is undefined and endAt is '2019-03-01'" in {
@@ -68,7 +73,8 @@ class RegistrationSelectorSpec extends AnyFlatSpec with BeforeAndAfter with Matc
       Fixtures.withRegistration(Some(3), Some("2019-01-01 00:00:01")),
       Fixtures.withRegistration(Some(4), Some("2019-03-01 00:00:00")),
       Fixtures.withRegistration(Some(5), Some("2019-12-31 23:59:59")),
-      Fixtures.withRegistration(Some(6), Some("2020-01-01 00:00:00")))
+      Fixtures.withRegistration(Some(6), Some("2020-01-01 00:00:00"))
+    )
 
     val classUnderTest = RegistrationRangeSelector(None, Some(LocalDate.of(2019, 3, 1)))
 
@@ -76,7 +82,8 @@ class RegistrationSelectorSpec extends AnyFlatSpec with BeforeAndAfter with Matc
       Fixtures.withRegistration(Some(1), Some("2018-12-31 23:59:59")),
       Fixtures.withRegistration(Some(2), Some("2019-01-01 00:00:00")),
       Fixtures.withRegistration(Some(3), Some("2019-01-01 00:00:01")),
-      Fixtures.withRegistration(Some(4), Some("2019-03-01 00:00:00")))
+      Fixtures.withRegistration(Some(4), Some("2019-03-01 00:00:00"))
+    )
   }
 
   it should "return correct list of Registrations, given startAt is '2019-01-01' and endAt is '2019-06-01'" in {
@@ -86,13 +93,15 @@ class RegistrationSelectorSpec extends AnyFlatSpec with BeforeAndAfter with Matc
       Fixtures.withRegistration(Some(3), Some("2019-01-01 00:00:01")),
       Fixtures.withRegistration(Some(4), Some("2019-03-01 00:00:00")),
       Fixtures.withRegistration(Some(5), Some("2019-12-31 23:59:59")),
-      Fixtures.withRegistration(Some(6), Some("2020-01-01 00:00:00")))
+      Fixtures.withRegistration(Some(6), Some("2020-01-01 00:00:00"))
+    )
 
     val classUnderTest = RegistrationRangeSelector(Some(LocalDate.of(2019, 1, 1)), Some(LocalDate.of(2019, 6, 1)))
     registrations.filter(classUnderTest.filter) shouldEqual List(
       Fixtures.withRegistration(Some(2), Some("2019-01-01 00:00:00")),
       Fixtures.withRegistration(Some(3), Some("2019-01-01 00:00:01")),
-      Fixtures.withRegistration(Some(4), Some("2019-03-01 00:00:00")))
+      Fixtures.withRegistration(Some(4), Some("2019-03-01 00:00:00"))
+    )
   }
 
   object Fixtures {
@@ -108,7 +117,8 @@ class RegistrationSelectorSpec extends AnyFlatSpec with BeforeAndAfter with Matc
       withRegistration(Some(4), Some("2019-03-01 00:00:00")),
       withRegistration(Some(5), Some("2019-03-01 00:00:01")),
       withRegistration(Some(6), Some("2019-05-31 23:59:59")),
-      withRegistration(Some(7), Some("2019-06-01 00:00:00")))
+      withRegistration(Some(7), Some("2019-06-01 00:00:00"))
+    )
 
     def withRegistration(id: Option[Registration.RegistrationID], clockedIn: Option[String], clockedOut: Option[String] = None) =
       Registration(id, id.map(i => s"Job-$i").getOrElse("Job"), clockedIn, clockedOut)

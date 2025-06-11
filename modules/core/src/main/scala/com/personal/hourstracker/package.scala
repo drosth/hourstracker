@@ -13,7 +13,7 @@ package object hourstracker {
   def dateRangeAsStringOf(registrations: ConsolidatedRegistrations): String = {
 
     val firstDate = registrations.head.date
-    val lastDate = registrations.last.date
+    val lastDate  = registrations.last.date
 
     firstDate match {
       case e: LocalDate if e.getMonthValue < lastDate.getMonthValue =>

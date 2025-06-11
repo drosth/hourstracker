@@ -11,7 +11,11 @@ trait FlywayMigrationComponent extends StorageConfiguration with LoggingComponen
     logger.info("=" * 120)
     logger.info(s" Using Datasource '${Storage.Registrations.user} @ ${Storage.Registrations.url}' to run migrations ")
 
-    val flyway = Flyway.configure.dataSource(Storage.Registrations.url, Storage.Registrations.user, Storage.Registrations.password).baselineOnMigrate(true).load
+    val flyway = Flyway.configure.dataSource(
+      Storage.Registrations.url,
+      Storage.Registrations.user,
+      Storage.Registrations.password
+    ).baselineOnMigrate(true).load
     flyway.migrate
   }
 }

@@ -1,28 +1,42 @@
-import sbt._
+import sbt.*
 
 object Commands {
-  val additionalCommands: Seq[Command] = Seq(withCoverage, prepare, prepareCommit, prepareCommitWithIT)
+  val additionalCommands: Seq[Command] = Seq(
+    aggregateCoverage,
+    formatAll,
+    formatCheckAll,
+    prepare,
+    prepareCommit,
+    reportCoverage,
+    withCoverage
+  )
 
-  def withCoverage: Command = Command.command("with-coverage") { state =>
-    "Test / compile" ::
-    "coverage" ::
-    "test" ::
-    "coverageReport" ::
+  def aggregateCoverage: Command = Command.command("aggregate-coverage") { state =>
+    "with-coverage" ::
+    "coverageAggregate" ::
+    state
+  }
+
+  def formatAll: Command = Command.command("format-all") { state =>
+    "scalafmtAll" ::
+    "scalafmtSbt" ::
+    state
+  }
+
+  def formatCheckAll: Command = Command.command("format-check-all") { state =>
+    "scalafmtCheckAll" ::
+    "scalafmtSbtCheck" ::
     state
   }
 
   def prepare: Command = Command.command("prepare") { state =>
-    "scalafmtAll" ::
-    "integration-test / scalafmtAll" ::
-    "scalafmtSbt" ::
+    "format-all" ::
     "testQuick" ::
     state
   }
 
   def prepareCommit: Command = Command.command("prepare-commit") { state =>
-    "scalafmtAll" ::
-    "integration-test / scalafmtAll" ::
-    "scalafmtSbt" ::
+    "format-all" ::
     "Test / compile" ::
     "coverage" ::
     "test" ::
@@ -31,17 +45,16 @@ object Commands {
     state
   }
 
-  def prepareCommitWithIT: Command = Command.command("prepare-commit-with-IT") { state =>
-    "scalafmtAll" ::
-    "integration-test / scalafmtAll" ::
-    "scalafmtSbt" ::
-    "Test / compile" ::
-//    "application / Docker / publishLocal" ::
+  def reportCoverage: Command = Command.command("report-coverage") { state =>
+    "with-coverage" ::
+    "coverageReport" ::
+    state
+  }
+
+  def withCoverage: Command = Command.command("with-coverage") { state =>
     "coverage" ::
     "test" ::
-    "integration-test / test" ::
     "coverageOff" ::
-    "coverageReport" ::
     state
   }
 }

@@ -1,8 +1,8 @@
 package com.personal.common
-import java.time.{ LocalDate, LocalDateTime }
+import java.time.{LocalDate, LocalDateTime}
 import java.time.format.DateTimeFormatter
 
-import spray.json.{ deserializationError, DefaultJsonProtocol, JsonFormat, JsString, JsValue }
+import spray.json.{deserializationError, DefaultJsonProtocol, JsString, JsValue, JsonFormat}
 
 trait JsonDateTimeSupport {
   this: DefaultJsonProtocol =>
@@ -14,7 +14,7 @@ trait JsonDateTimeSupport {
 
     def read(json: JsValue): LocalDate = json match {
       case JsString(a) => LocalDate.parse(a, formatter)
-      case _ => deserializationError("String expected")
+      case _           => deserializationError("String expected")
     }
   }
 
@@ -27,10 +27,10 @@ trait JsonDateTimeSupport {
 
       def read(json: JsValue): LocalDateTime = json match {
         case JsString(a) => LocalDateTime.parse(a, formatter)
-        case _ => deserializationError("String expected")
+        case _           => deserializationError("String expected")
       }
     }
 
   implicit lazy val dateTimeFormat: JsonFormat[LocalDateTime] = jsonDateTime()
-  implicit lazy val dateFormat: JsonFormat[LocalDate] = jsonDate()
+  implicit lazy val dateFormat: JsonFormat[LocalDate]         = jsonDate()
 }

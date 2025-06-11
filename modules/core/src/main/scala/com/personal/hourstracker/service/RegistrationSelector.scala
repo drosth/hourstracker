@@ -1,7 +1,7 @@
 package com.personal.hourstracker.service
 
 import java.time.format.DateTimeFormatter
-import java.time.{ LocalDate, LocalDateTime }
+import java.time.{LocalDate, LocalDateTime}
 
 import com.personal.hourstracker.domain.Registration
 
@@ -19,19 +19,18 @@ object RegistrationSelector {
   final case class RegistrationRangeSelector(startAt: Option[LocalDate], endAt: Option[LocalDate]) extends Selector {
     implicit class LocalDateOps(source: LocalDate) {
       def isGreaterThanOrEqualTo(boundary: LocalDate): Boolean = source.isAfter(boundary) || source.isEqual(boundary)
-      def isLessThanOrEqualTo(boundary: LocalDate): Boolean = source.isBefore(boundary) || source.isEqual(boundary)
+      def isLessThanOrEqualTo(boundary: LocalDate): Boolean    = source.isBefore(boundary) || source.isEqual(boundary)
     }
 
     private def isInRange(source: LocalDate): Boolean = (startAt, endAt) match {
-      case (None, None) => true
-      case (Some(start), None) => source.isGreaterThanOrEqualTo(start)
-      case (None, Some(end)) => source.isLessThanOrEqualTo(end)
+      case (None, None)             => true
+      case (Some(start), None)      => source.isGreaterThanOrEqualTo(start)
+      case (None, Some(end))        => source.isLessThanOrEqualTo(end)
       case (Some(start), Some(end)) => source.isGreaterThanOrEqualTo(start) && source.isLessThanOrEqualTo(end)
     }
 
-    private def isInRange(source: LocalDateTime): Boolean = {
+    private def isInRange(source: LocalDateTime): Boolean =
       isInRange(source.toLocalDate)
-    }
 
     override lazy val filter: Registration => Boolean = registration => registration.clockedIn.exists(isInRange)
   }

@@ -6,7 +6,8 @@ import com.personal.hourstracker.service.RegistrationService
 import com.personal.hourstracker.service.impl.DefaultRegistrationService
 
 trait RegistrationComponent {
-  this: RegistrationRepositoryComponent with ImporterServiceComponent with FacturationComponent with ConsolidatedRegistrationComponent with LoggingComponent with SystemComponent =>
+  this: RegistrationRepositoryComponent with ImporterServiceComponent with FacturationComponent with ConsolidatedRegistrationComponent with LoggingComponent
+    with SystemComponent =>
 
   implicit lazy val locale: Locale = new Locale("nl", "NL")
 

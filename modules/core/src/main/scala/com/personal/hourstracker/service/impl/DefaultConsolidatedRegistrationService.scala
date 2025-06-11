@@ -5,8 +5,8 @@ import java.time.format.DateTimeFormatter
 
 import scala.concurrent.ExecutionContext
 
-import com.personal.hourstracker.domain.{ ConsolidatedRegistration, Registration }
-import com.personal.hourstracker.domain.ConsolidatedRegistration.{ ConsolidatedRegistrations, ConsolidatedRegistrationsPerJob, DateTimeOrdering }
+import com.personal.hourstracker.domain.{ConsolidatedRegistration, Registration}
+import com.personal.hourstracker.domain.ConsolidatedRegistration.{ConsolidatedRegistrations, ConsolidatedRegistrationsPerJob, DateTimeOrdering}
 import com.personal.hourstracker.domain.Registration.Registrations
 import com.personal.hourstracker.service.ConsolidatedRegistrationService
 import org.slf4j.Logger
@@ -21,17 +21,20 @@ class DefaultConsolidatedRegistrationService(implicit logger: Logger, executionC
       registration.clockedIn.get.toLocalDate,
       registration.job,
       determineDurationOf(registration),
-      registration.comment)
+      registration.comment
+    )
 
-  override def consolidateAndProcessRegistrations[T](registrations: Registrations)(processConsolidatedRegistrations: ConsolidatedRegistrationsPerJob => T): T = {
+  override def consolidateAndProcessRegistrations[T](registrations: Registrations)(processConsolidatedRegistrations: ConsolidatedRegistrationsPerJob => T)
+    : T = {
 
     val consolidatedRegistrationsPerJob = addUnregisteredEntriesTo(
-      consolidateRegistrations(registrations).groupBy(_.job))
+      consolidateRegistrations(registrations).groupBy(_.job)
+    )
 
     processConsolidatedRegistrations(consolidatedRegistrationsPerJob)
   }
 
-  private def consolidateRegistrations(registrations: Registrations): ConsolidatedRegistrations = {
+  private def consolidateRegistrations(registrations: Registrations): ConsolidatedRegistrations =
     registrations
       .map(asConsolidatedRegistration)
       .groupBy(_.date)
@@ -39,14 +42,13 @@ class DefaultConsolidatedRegistrationService(implicit logger: Logger, executionC
       .values
       .toList
       .flatten
-  }
 
   private def consolidateConsolidatedRegistrations(consolidatedRegistrations: ConsolidatedRegistrations): ConsolidatedRegistrations = {
     def add(x: Option[Double], y: Option[Double]): Option[Double] = x match {
       case None => y
       case Some(a) =>
         y match {
-          case None => x
+          case None    => x
           case Some(b) => Some(a + b)
         }
     }
@@ -55,7 +57,7 @@ class DefaultConsolidatedRegistrationService(implicit logger: Logger, executionC
       case None => y
       case Some(a) =>
         y match {
-          case None => x
+          case None    => x
           case Some(b) => Some(s"$a $b".trim)
         }
     }
@@ -64,7 +66,10 @@ class DefaultConsolidatedRegistrationService(implicit logger: Logger, executionC
       registrations =>
         registrations
           .foldLeft(registrations.head.copy(duration = None, comment = None)) { (acc, registration) =>
-            acc.copy(duration = add(acc.duration, registration.duration), comment = aggregateComments(acc.comment, registration.comment))
+            acc.copy(
+              duration = add(acc.duration, registration.duration),
+              comment  = aggregateComments(acc.comment, registration.comment)
+            )
           }
 
     consolidatedRegistrations
@@ -74,19 +79,18 @@ class DefaultConsolidatedRegistrationService(implicit logger: Logger, executionC
       .toList
   }
 
-  private def addUnregisteredEntriesTo(consolidatedRegistrationsPerJob: ConsolidatedRegistrationsPerJob): ConsolidatedRegistrationsPerJob = {
-
+  private def addUnregisteredEntriesTo(consolidatedRegistrationsPerJob: ConsolidatedRegistrationsPerJob): ConsolidatedRegistrationsPerJob =
     consolidatedRegistrationsPerJob
       .map {
         case (job, registrations) =>
           val sorted = registrations.sorted(DateTimeOrdering)
 
           val firstDate: LocalDate = sorted.head.date.withDayOfMonth(1)
-          val lastDate = sorted.last.date.withDayOfMonth(1).plusMonths(1)
+          val lastDate             = sorted.last.date.withDayOfMonth(1).plusMonths(1)
 
           val actualDates = registrations.map(_.date)
 
-          val expectedDates: List[LocalDate] = Iterator.iterate(firstDate) { _.plusDays(1) }.takeWhile(_.isBefore(lastDate)).toList
+          val expectedDates: List[LocalDate] = Iterator.iterate(firstDate)(_.plusDays(1)).takeWhile(_.isBefore(lastDate)).toList
 
           val datesToAdd: List[LocalDate] = expectedDates.filterNot(actualDates.toSet)
 
@@ -97,11 +101,10 @@ class DefaultConsolidatedRegistrationService(implicit logger: Logger, executionC
           }
           (job, addedRegistrations.sorted(DateTimeOrdering))
       }
-  }
 
   private def determineDurationOf(registration: Registration): Option[Double] =
     registration.totalTimeAdjustment match {
-      case None => registration.duration
+      case None    => registration.duration
       case Some(_) => registration.totalTimeAdjustment
     }
 }

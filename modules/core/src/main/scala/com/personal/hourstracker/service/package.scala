@@ -17,16 +17,16 @@ package object service {
   implicit def toLocalDateTime(value: Option[String]): Option[LocalDateTime] =
     value match {
       case Some(v) => Some(LocalDateTime.parse(v, dateTimeFormatter))
-      case None => None
+      case None    => None
     }
 
   implicit def toDouble(value: String): Double = value match {
     case x if x.length == 0 => 0
-    case x => format.parse(value).doubleValue()
+    case x                  => format.parse(value).doubleValue()
   }
 
   implicit def toDouble(value: Option[String]): Option[Double] = value match {
     case Some(v) => Some(toDouble(v))
-    case None => None
+    case None    => None
   }
 }

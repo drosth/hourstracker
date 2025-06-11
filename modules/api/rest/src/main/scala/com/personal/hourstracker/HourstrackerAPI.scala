@@ -38,7 +38,14 @@ object HourstrackerAPI extends App with ApiV1 with WebModule {
   val corsSettings = CorsSettings.defaultSettings
     .withAllowGenericHttpRequests(true)
     .withAllowedOrigins(corsAllowedOrigins)
-    .withAllowedMethods(List(HttpMethods.GET, HttpMethods.PUT, HttpMethods.DELETE, HttpMethods.POST, HttpMethods.HEAD, HttpMethods.OPTIONS))
+    .withAllowedMethods(List(
+      HttpMethods.GET,
+      HttpMethods.PUT,
+      HttpMethods.DELETE,
+      HttpMethods.POST,
+      HttpMethods.HEAD,
+      HttpMethods.OPTIONS
+    ))
 
 //  private val corsSettings = CorsSettings.defaultSettings
 //    .withAllowedOrigins(HttpOriginRange.create(AccessControlAllowOrigin))

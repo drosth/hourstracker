@@ -27,5 +27,6 @@ trait RegistrationService {
   def fetchRegistrations(request: RegistrationRequest): Source[Registration, NotUsed]
 
   def consolidateRegistrations[T](registrations: Source[Registration, NotUsed])(
-    processConsolidatedRegistrations: ConsolidatedRegistrationsPerJob => T): Source[T, NotUsed]
+    processConsolidatedRegistrations: ConsolidatedRegistrationsPerJob => T
+  ): Source[T, NotUsed]
 }

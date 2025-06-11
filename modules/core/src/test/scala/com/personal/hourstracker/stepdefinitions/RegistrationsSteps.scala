@@ -21,21 +21,21 @@ import org.scalatest.matchers.should.Matchers
 import org.slf4j.Logger
 
 import scala.concurrent.duration._
-import scala.concurrent.{ Await, ExecutionContext, Future }
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 class RegistrationsSteps extends ScalaDsl with EN with Matchers with MockitoSugar with ScalaFutures {
   import scala.jdk.CollectionConverters._
 //  import scala.jdk.CollectionConverters._
   import Helpers._
 
-  private implicit val logger: Logger = mock[Logger]
-  private implicit val system: ActorSystem = ActorSystem()
+  private implicit val logger: Logger                          = mock[Logger]
+  private implicit val system: ActorSystem                     = ActorSystem()
   private implicit lazy val executionContext: ExecutionContext = system.dispatcher
-  private implicit lazy val locale: Locale = new Locale("nl", "NL")
+  private implicit lazy val locale: Locale                     = new Locale("nl", "NL")
 
-  private val registrationRepository: RegistrationRepository = mock[RegistrationRepository]
-  private val importService: ImporterService = mock[ImporterService]
-  private val facturationService: FacturationService = mock[FacturationService]
+  private val registrationRepository: RegistrationRepository                   = mock[RegistrationRepository]
+  private val importService: ImporterService                                   = mock[ImporterService]
+  private val facturationService: FacturationService                           = mock[FacturationService]
   private val consolidatedRegistrationService: ConsolidatedRegistrationService = mock[ConsolidatedRegistrationService]
 
   private val registrationService: RegistrationService =
@@ -44,26 +44,27 @@ class RegistrationsSteps extends ScalaDsl with EN with Matchers with MockitoSuga
   Given("""^a CSV file named '(.*)' with the following registrations:$""") { (fileName: String, dataTable: DataTable) =>
     val dateTimeFormatter = new SimpleDateFormat("dd/MM/yyyy hh:mm")
 
-    val fixture: Seq[Registration] = dataTable withMaps (row => {
+    val fixture: Seq[Registration] = dataTable withMaps (row =>
       Registration(
-        id = None,
-        job = row.getOrElse("Job", ""),
-        clockedIn = row.get("Clocked In").map(source => { dateTimeFormatter.parse(source) }),
-        clockedOut = row.get("Clocked Out").map(source => { dateTimeFormatter.parse(source) }),
-        duration = row.get("Duration"),
-        hourlyRate = row.get("Hourly Rate"),
-        earnings = row.get("Earnings"),
-        comment = row.get("Comment"),
-        tags = row.get("Tags").map(_.split(";").toSet),
-        totalTimeAdjustment = row.get("TotalTimeAdjustment"),
-        totalEarningsAdjustment = row.get("TotalEarningsAdjustment"))
-    })
+        id                      = None,
+        job                     = row.getOrElse("Job", ""),
+        clockedIn               = row.get("Clocked In").map(source => dateTimeFormatter.parse(source)),
+        clockedOut              = row.get("Clocked Out").map(source => dateTimeFormatter.parse(source)),
+        duration                = row.get("Duration"),
+        hourlyRate              = row.get("Hourly Rate"),
+        earnings                = row.get("Earnings"),
+        comment                 = row.get("Comment"),
+        tags                    = row.get("Tags").map(_.split(";").toSet),
+        totalTimeAdjustment     = row.get("TotalTimeAdjustment"),
+        totalEarningsAdjustment = row.get("TotalEarningsAdjustment")
+      )
+    )
     when(importService.importRegistrationsFrom(fileName)).thenReturn(Future.successful(Right(fixture.toList)))
   }
 
   When("""^I import the registrations from file '(.*)'$""") { fileName: String =>
     RegistrationAttributes.registrations = List.empty
-    Await.result(registrationService.importRegistrationsFrom(fileName), 3 seconds) match {
+    Await.result(registrationService.importRegistrationsFrom(fileName), 3.seconds) match {
       case Right(numberOfRegistrationsImported) =>
         RegistrationAttributes.numberOfRegistrationsImported = numberOfRegistrationsImported
 
@@ -73,27 +74,28 @@ class RegistrationsSteps extends ScalaDsl with EN with Matchers with MockitoSuga
 
   Then("""^my registrations consists of:$""") { expectedRegistrations: DataTable =>
     val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm")
-    expectedRegistrations withMaps (row => {
+    expectedRegistrations withMaps (row =>
       Registration(
-        id = None,
+        id  = None,
         job = row.getOrElse("Job", ""),
         clockedIn = row
           .get("Clocked In")
-          .map(source => {
+          .map { source =>
             dateTimeFormatter.parse(source)
-          }),
+          },
         clockedOut = row
           .get("Clocked Out")
-          .map(source => {
+          .map { source =>
             dateTimeFormatter.parse(source)
-          }),
-        duration = row.get("Duration"),
-        hourlyRate = row.get("Hourly Rate"),
-        earnings = row.get("Earnings"),
-        comment = row.get("Comment"),
-        tags = row.get("Tags").map(_.split(",").map(_.trim).toSet),
-        totalTimeAdjustment = row.get("TotalTimeAdjustment"),
-        totalEarningsAdjustment = row.get("TotalEarningsAdjustment"))
-    }) shouldEqual RegistrationAttributes.registrations
+          },
+        duration                = row.get("Duration"),
+        hourlyRate              = row.get("Hourly Rate"),
+        earnings                = row.get("Earnings"),
+        comment                 = row.get("Comment"),
+        tags                    = row.get("Tags").map(_.split(",").map(_.trim).toSet),
+        totalTimeAdjustment     = row.get("TotalTimeAdjustment"),
+        totalEarningsAdjustment = row.get("TotalEarningsAdjustment")
+      )
+    ) shouldEqual RegistrationAttributes.registrations
   }
 }

@@ -23,7 +23,8 @@ dockerCommands ++= Seq(
   Cmd("RUN", "apt-get install -qy --no-install-recommends xfonts-base xfonts-75dpi"),
   Cmd("RUN", "apt-get -q clean update"),
 
-  Cmd("RUN", "apt-get -qy install '/opt/docker/third-party/wkhtmltox_0.12.5-1.stretch_amd64.deb'"),
+//  Cmd("RUN", "apt-get install -qy '/opt/docker/third-party/wkhtmltox_0.12.5-1.stretch_amd64.deb'"),
+  Cmd("RUN", "apt-get install -qy wkhtmltopdf"),
   Cmd("RUN", "apt-get install -f"),
 
   Cmd("USER", ( Docker / daemonUser ).value),

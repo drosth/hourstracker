@@ -34,10 +34,10 @@ class SquerylRegistrationRepository extends RegistrationRepository {
 //  }
 
   override def findAll(): Source[Registration, NotUsed] =
-    Source.fromIterator(() => {
+    Source.fromIterator { () =>
       val registrations = findAllRegistrations()
       registrations.iterator
-    })
+    }
 
   override def findByRequest(request: RegistrationRequest): Source[Registration, NotUsed] = {
     val requestedRegistrations: Registrations = request match {
@@ -57,8 +57,8 @@ class SquerylRegistrationRepository extends RegistrationRepository {
 
     val r = registrations
       .where(r =>
-          ((r.duration isNotNull) and (r.duration.get gt 0))
-          and ((r.clockedIn isNotNull) and ((r.clockedIn.get gte Timestamp.valueOf(lower)) and (r.clockedIn.get lte Timestamp.valueOf(upper))))
+        ((r.duration.isNotNull) and (r.duration.get gt 0))
+          and ((r.clockedIn.isNotNull) and ((r.clockedIn.get gte Timestamp.valueOf(lower)) and (r.clockedIn.get lte Timestamp.valueOf(upper))))
       )
       .toList
       .map(_.convert)
@@ -70,10 +70,9 @@ class SquerylRegistrationRepository extends RegistrationRepository {
     val upper = LocalDateTime.of(year, month, 1, 0, 0, 0).plusMonths(1).minusSeconds(1)
 
     registrations
-      .where(
-        r =>
-          ((r.duration isNotNull) and (r.duration.get gt 0))
-          and ((r.clockedIn isNotNull) and ((r.clockedIn.get gte Timestamp.valueOf(lower)) and (r.clockedIn.get lte Timestamp.valueOf(upper))))
+      .where(r =>
+        ((r.duration.isNotNull) and (r.duration.get gt 0))
+          and ((r.clockedIn.isNotNull) and ((r.clockedIn.get gte Timestamp.valueOf(lower)) and (r.clockedIn.get lte Timestamp.valueOf(upper))))
       )
       .toList
       .map(_.convert)
@@ -94,19 +93,19 @@ class SquerylRegistrationRepository extends RegistrationRepository {
 
   private def updateRegistration(registration: Registration): Either[String, Registration] = {
     def updateEntity(id: Long, entity: RegistrationEntity): RegistrationEntity = transaction {
-      update(registrations)(
-        r =>
-          where(r.id === id)
-            set (r.job := entity.job,
-              r.clockedIn := entity.clockedIn,
-              r.clockedOut := entity.clockedOut,
-              r.duration := entity.duration,
-              r.hourlyRate := entity.hourlyRate,
-              r.earnings := entity.earnings,
-              r.comment := entity.comment,
-              r.tags := entity.tags,
-              r.totalTimeAdjustment := entity.totalTimeAdjustment,
-              r.totalEarningsAdjustment := entity.totalEarningsAdjustment))
+      update(registrations)(r =>
+        where(r.id === id)
+          set (r.job := entity.job,
+          r.clockedIn := entity.clockedIn,
+          r.clockedOut := entity.clockedOut,
+          r.duration := entity.duration,
+          r.hourlyRate := entity.hourlyRate,
+          r.earnings := entity.earnings,
+          r.comment := entity.comment,
+          r.tags := entity.tags,
+          r.totalTimeAdjustment := entity.totalTimeAdjustment,
+          r.totalEarningsAdjustment := entity.totalEarningsAdjustment)
+      )
       entity
     }
 
@@ -124,11 +123,12 @@ class SquerylRegistrationRepository extends RegistrationRepository {
 
   override def findBy(job: String, clockedIn: Option[LocalDateTime], clockedOut: Option[LocalDateTime]): Seq[Registration] =
     transaction {
-      from(registrations)(
-        registration =>
-          where(
-            registration.job === job
-              and registration.clockedIn === clockedIn.map(Timestamp.valueOf)
-              and registration.clockedOut === clockedOut.map(Timestamp.valueOf)) select registration).toList.map(_.convert)
+      from(registrations)(registration =>
+        where(
+          registration.job === job
+            and registration.clockedIn === clockedIn.map(Timestamp.valueOf)
+            and registration.clockedOut === clockedOut.map(Timestamp.valueOf)
+        ) select registration
+      ).toList.map(_.convert)
     }
 }

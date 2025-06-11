@@ -4,7 +4,7 @@ import java.net.URI
 
 import com.personal.hourstracker.storage.config.StorageConfiguration
 import org.apache.commons.dbcp2.BasicDataSource
-import org.slf4j.{ Logger, LoggerFactory }
+import org.slf4j.{Logger, LoggerFactory}
 
 object ConnectionFactory extends StorageConfiguration {
   private lazy val logger: Logger = LoggerFactory.getLogger(this.getClass)

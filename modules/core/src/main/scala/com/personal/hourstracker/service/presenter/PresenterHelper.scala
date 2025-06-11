@@ -13,18 +13,17 @@ object PresenterHelper {
 
   implicit val localDateOrdering: Ordering[LocalDate] = Ordering.by(_.toEpochDay)
 
-  def toHumanReadable(value: LocalDate): String = {
+  def toHumanReadable(value: LocalDate): String =
     value.format(formatter)
-  }
 
   def toHumanReadableHours(value: Double): String = {
     val hours = value.intValue()
-    val min = ((value - hours) * 60).intValue()
+    val min   = ((value - hours) * 60).intValue()
     f"$hours:$min%02.0f"
   }
 
   def toHumanReadableHours(value: Option[Double]): String = value match {
-    case None => ""
+    case None    => ""
     case Some(v) => toHumanReadableHours(v)
   }
 

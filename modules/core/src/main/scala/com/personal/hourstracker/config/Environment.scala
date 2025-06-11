@@ -5,10 +5,10 @@ sealed abstract class Environment(val name: String, val abbreviation: String)
 object Environment {
   def apply(name: String): Environment = name match {
     case Development.name => Development
-    case Testing.name => Testing
-    case Acceptance.name => Acceptance
-    case Production.name => Production
-    case _ => throw UnknownEnvironmentException(s"Environment for “$name” does not exist")
+    case Testing.name     => Testing
+    case Acceptance.name  => Acceptance
+    case Production.name  => Production
+    case _                => throw UnknownEnvironmentException(s"Environment for “$name” does not exist")
   }
 
   final case class UnknownEnvironmentException(message: String) extends RuntimeException(message)
